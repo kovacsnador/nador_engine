@@ -1,0 +1,34 @@
+Standard: Cpp11
+BasedOnStyle: WebKit
+IndentWidth: 4
+ColumnLimit: 150
+AccessModifierOffset: -4
+NamespaceIndentation: All
+BreakBeforeBraces: Custom
+ConstructorInitializerIndentWidth: 0
+FixNamespaceComments: true
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveAssignments: Consecutive
+BinPackArguments: false
+BinPackParameters: false
+ExperimentalAutoDetectBinPacking: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AlignAfterOpenBracket: Align
+SortIncludes: Never
+AllowShortFunctionsOnASingleLine: Inline
+PenaltyReturnTypeOnItsOwnLine: 1000
+AlwaysBreakTemplateDeclarations: Yes
+BraceWrapping:
+  AfterEnum: true
+  AfterStruct: true
+  AfterClass: true
+  SplitEmptyFunction: true
+  AfterControlStatement: true
+  AfterNamespace: true
+  AfterFunction: true
+  AfterUnion: true
+  AfterExternBlock: false
+  BeforeCatch: true
+  BeforeElse: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true

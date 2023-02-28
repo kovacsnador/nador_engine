@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\rdjpgcom.dir/objects.a
+C:\MinGW\bin\ar.exe qc CMakeFiles\rdjpgcom.dir/objects.a @CMakeFiles\rdjpgcom.dir\objects1
+C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\rdjpgcom.dir/objects.a -Wl,--no-whole-archive -o ..\..\out\Debug\bin\rdjpgcom.exe -Wl,--out-implib,..\..\out\Debug\lib\librdjpgcom.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\rdjpgcom.dir\linkLibs.rsp

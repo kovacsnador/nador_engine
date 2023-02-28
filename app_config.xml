@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppConfig>
+	<AppName> Nador Application </AppName>
+	<WindowDimensions> 1024 768 </WindowDimensions>
+	<VSync> false </VSync>
+
+	<RootFilePath></RootFilePath>
+	<AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
+	<AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
+	<TexturesPath></TexturesPath>
+	<FontsPath> res/fonts/ </FontsPath>
+	<SoundsPath> res/sounds/ </SoundsPath>
+	<UiPath> res/ui/ </UiPath>
+	
+	<ShowDebugWindow> true </ShowDebugWindow>
+	<ShowDebugInfo> true </ShowDebugInfo>
+</AppConfig>

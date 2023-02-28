@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\example64.dir/objects.a
+C:\MinGW\bin\ar.exe qc CMakeFiles\example64.dir/objects.a @CMakeFiles\example64.dir\objects1
+C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\example64.dir/objects.a -Wl,--no-whole-archive -o ..\..\out\Debug\bin\example64.exe -Wl,--out-implib,..\..\out\Debug\lib\libexample64.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\example64.dir\linkLibs.rsp
