@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\md5cmp.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\md5cmp.dir/objects.a @CMakeFiles\md5cmp.dir\objects1
-C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\md5cmp.dir/objects.a -Wl,--no-whole-archive -o ..\..\..\out\Debug\bin\md5cmp.exe -Wl,--out-implib,..\..\..\out\Debug\lib\libmd5cmp.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\md5cmp.dir\linkLibs.rsp

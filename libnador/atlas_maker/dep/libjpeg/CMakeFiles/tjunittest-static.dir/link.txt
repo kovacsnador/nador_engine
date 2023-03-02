@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\tjunittest-static.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\tjunittest-static.dir/objects.a @CMakeFiles\tjunittest-static.dir\objects1
-C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\tjunittest-static.dir/objects.a -Wl,--no-whole-archive -o ..\..\out\Debug\bin\tjunittest-static.exe -Wl,--out-implib,..\..\out\Debug\lib\libtjunittest-static.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\tjunittest-static.dir\linkLibs.rsp
