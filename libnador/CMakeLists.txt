@@ -57,8 +57,6 @@ set(SDL_2_DIR dep/sdl2)
 option(NADOR_EIMAGE_NAME_PATH "Path to EImageName.h" "")
 
 
-#set(RESOURCE_DIR ../res)
-
 add_subdirectory(${GLFW_DIR})
 add_subdirectory(${GLEW_DIR}/build/cmake)
 add_subdirectory(${OPENAL_SOFT_DIR})

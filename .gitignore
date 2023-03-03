@@ -2,8 +2,4 @@
 /out
 /imgui.ini
 /libnador/Config.cmake.in
-/libnador/atlas_maker/CMakeFiles
-/libnador/atlas_maker/out
-/libnador/atlas_maker/cmake_install.cmake
-/libnador/atlas_maker/CMakeCache.txt
-/libnador/atlas_maker/Makefile
+libnador/dep/glew/glew.pc

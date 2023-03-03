@@ -1,6 +1,6 @@
-prefix=C:/Program Files (x86)/nador_test_app
+prefix=E:/nador_engine/nador_engine/install
 exec_prefix=${prefix}
-libdir=C:/Program Files (x86)/nador_test_app/lib
+libdir=E:/nador_engine/nador_engine/install/lib
 includedir=${prefix}/include
 
 Name: glew
