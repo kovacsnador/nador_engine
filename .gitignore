@@ -2,4 +2,4 @@
 /out
 /imgui.ini
 /libnador/Config.cmake.in
-libnador/dep/glew/glew.pc
+/libnador/dep/glew/glew.pc
