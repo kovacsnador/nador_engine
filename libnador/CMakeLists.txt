@@ -19,9 +19,6 @@ set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -D_DEBUG=${_DEBUG}")
 set(NADOR_VIDEO_DEBUG       1   CACHE STRING "C++ flag")
 set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DNADOR_VIDEO_DEBUG=${NADOR_VIDEO_DEBUG}")
 
-#set(USE_GLFW_WINDOW         1   CACHE STRING "C++ flag")
-#set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_GLFW_WINDOW=${USE_GLFW_WINDOW}")
-
 set(USE_OPENGL_3            1   CACHE STRING "C++ flag")
 set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_OPENGL_3=${USE_OPENGL_3}")
 
@@ -56,17 +53,23 @@ set(SDL_2_DIR dep/sdl2)
 
 option(NADOR_EIMAGE_NAME_PATH "Path to EImageName.h" "")
 
-
 add_subdirectory(${GLFW_DIR})
 add_subdirectory(${GLEW_DIR}/build/cmake)
 add_subdirectory(${OPENAL_SOFT_DIR})
 add_subdirectory(${FREETYPE_DIR})
 add_subdirectory(${SDL_2_DIR})
 
-add_definitions(
-    #-DUSE_GLFW_WINDOW
-    -DUSE_SDL_WINDOW
-)
+
+option(NADOR_USE_SDL_WINDOW "Enable SDL window support" ON)
+option(NADOR_USE_GLFW_WINDOW "Enable GLFW window support" OFF)
+
+if(NADOR_USE_SDL_WINDOW)
+    add_definitions(-DUSE_SDL_WINDOW)
+elseif(NADOR_USE_GLFW_WINDOW)
+    add_definitions(-DUSE_GLFW_WINDOW)
+else()
+    message(FATAL_ERROR "Base platform not set! You need to set NADOR_USE_SDL_WINDOW or NADOR_USE_GLFW_WINDOW!")
+endif()
 
 add_library(${PROJECT_NAME} STATIC)
 
@@ -197,19 +200,8 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/dep
         ${CMAKE_CURRENT_SOURCE_DIR}/dep/json-develop/single_include
         
+        # location of header EImageName
         ${NADOR_EIMAGE_NAME_PATH}
-        # ${CMAKE_CURRENT_SOURCE_DIR}/../res/atlas/__atlases
-        
-
-    #PUBLIC
-    #    # where top-level project will look for the library's public headers
-    #    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    #    # where external projects will look for the library's public headers
-    #    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-
-    #    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dep>
-    #    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dep/json-develop/single_include>
-    #    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/res/atlas/__atlases>
 )
 
 # note that it is not CMAKE_INSTALL_PREFIX we are checking here
