@@ -13,26 +13,45 @@ endif()
 # CXX Flags
 set(NADOR_CXX_FLAGS "")
 
-set(_DEBUG                  1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -D_DEBUG=${_DEBUG}")
+set(NADOR_WINDOW_OPTIONS "SDL2, GLFW")
+set(NADOR_VIDEO_OPTIONS "OPENGL_3")
 
-set(NADOR_VIDEO_DEBUG       1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DNADOR_VIDEO_DEBUG=${NADOR_VIDEO_DEBUG}")
+option(NADOR_VIDEO_DEBUG_ENABLE     "Enable video debug"                        ON)
+option(NADOR_IMGUI_ENABLE           "Enable imgui."                             ON)
 
-set(USE_OPENGL_3            1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_OPENGL_3=${USE_OPENGL_3}")
+set(NADOR_WINDOW_API                "SDL2" CACHE STRING "Enable window support. Options: ${NADOR_WINDOW_OPTIONS}")
+set(NADOR_VIDEO_API                 "OPENGL_3" CACHE STRING "The nador video api. Options: ${NADOR_VIDEO_OPTIONS}")
 
-set(USE_IMGUI               1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_IMGUI=${USE_IMGUI}")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -D_DEBUG")
+endif()
 
-set(PLATFORM_WINDOWS        1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DPLATFORM_WINDOWS=${PLATFORM_WINDOWS}")
+if(NADOR_VIDEO_DEBUG_ENABLE)
+    set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DNADOR_VIDEO_DEBUG")
+endif()
 
-set(DR_MP3_IMPLEMENTATION   1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_MP3_IMPLEMENTATION=${DR_MP3_IMPLEMENTATION}")
+if(${NADOR_VIDEO_API} STREQUAL "OPENGL_3")
+    set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_OPENGL_3")
+endif()
 
-set(DR_WAV_IMPLEMENTATION   1   CACHE STRING "C++ flag")
-set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_WAV_IMPLEMENTATION=${DR_WAV_IMPLEMENTATION}")
+if(NADOR_IMGUI_ENABLE)
+    set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DUSE_IMGUI")
+endif()
+
+if(WIN32)
+    set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DPLATFORM_WINDOWS")
+endif()
+
+set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_MP3_IMPLEMENTATION")
+set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_WAV_IMPLEMENTATION")
+
+if(${NADOR_WINDOW_API} STREQUAL "SDL2")
+    set(NADOR_CXX_FLAGS "${NADOR_CXX_FLAGS} -DUSE_SDL_WINDOW")
+elseif(${NADOR_WINDOW_API} STREQUAL "GLFW")
+    set(NADOR_CXX_FLAGS "${NADOR_CXX_FLAGS} -USE_GLFW_WINDOW")
+else()
+    message(FATAL_ERROR "Base platform not set! You need to set NADOR_WINDOW_API! Options: ${NADOR_WINDOW_OPTIONS}")
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NADOR_CXX_FLAGS}")
 
@@ -58,18 +77,6 @@ add_subdirectory(${GLEW_DIR}/build/cmake)
 add_subdirectory(${OPENAL_SOFT_DIR})
 add_subdirectory(${FREETYPE_DIR})
 add_subdirectory(${SDL_2_DIR})
-
-
-option(NADOR_USE_SDL_WINDOW "Enable SDL window support" ON)
-option(NADOR_USE_GLFW_WINDOW "Enable GLFW window support" OFF)
-
-if(NADOR_USE_SDL_WINDOW)
-    add_definitions(-DUSE_SDL_WINDOW)
-elseif(NADOR_USE_GLFW_WINDOW)
-    add_definitions(-DUSE_GLFW_WINDOW)
-else()
-    message(FATAL_ERROR "Base platform not set! You need to set NADOR_USE_SDL_WINDOW or NADOR_USE_GLFW_WINDOW!")
-endif()
 
 add_library(${PROJECT_NAME} STATIC)
 
@@ -204,93 +211,5 @@ target_include_directories(${PROJECT_NAME}
         ${NADOR_EIMAGE_NAME_PATH}
 )
 
-# note that it is not CMAKE_INSTALL_PREFIX we are checking here
-if(DEFINED CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX is not set\n"
-        "Default value: ${CMAKE_INSTALL_PREFIX}\n"
-        "Will set it to ${CMAKE_SOURCE_DIR}/install"
-    )
-    set(CMAKE_INSTALL_PREFIX
-        "${CMAKE_SOURCE_DIR}/install"
-        CACHE PATH "Where the library will be installed to" FORCE
-    )
-else()
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX was already set\n"
-        "Current value: ${CMAKE_INSTALL_PREFIX}"
-    )
-endif()
-
-# without it public headers won't get installed
-set(public_headers
-    #include/calculate.h
-    #include/test/test.h
-)
-
-# note that ${public_headers} has to be in quotes
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${public_headers}")
-
-# for CMAKE_INSTALL_INCLUDEDIR definition
-include(GNUInstallDirs)
-
-# the variant with PUBLIC_HEADER property unfortunately does not preserve the folder structure
-# set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${public_headers}")
-# so instead we iterate through public headers and install them "manually"
-#foreach(header ${public_headers})
-#    file(RELATIVE_PATH header_file_path "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}" "${header}")   
-#    get_filename_component(header_directory_path "${header_file_path}" DIRECTORY)
-#    install(
-#        FILES ${header}
-#        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${header_directory_path}"
-#    )
-#endforeach()
-
 # Or you can set it globally for the entire project on configuration with -DCMAKE_DEBUG_POSTFIX="d".
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
-
-# install the target and create export-set
-#install(TARGETS ${PROJECT_NAME}
-#    EXPORT "${PROJECT_NAME}Targets"
-#    # these get default values from GNUInstallDirs, no need to set them
-#    #RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
-#    #LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-#    #ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-#    # except for public headers, as we want them to be inside a library folder
-#    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/SomeLibrary
-#    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
-#)
-
-# generate and install export file
-#install(EXPORT "${PROJECT_NAME}Targets"
-#    FILE "${PROJECT_NAME}Targets.cmake"
-#    NAMESPACE ${namespace}::
-#    DESTINATION cmake
-#)
-
-#include(CMakePackageConfigHelpers)
-
-# generate the version file for the config file
-#write_basic_package_version_file(
-#    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-#    VERSION "${version}"
-#    COMPATIBILITY AnyNewerVersion
-#)
-# create config file
-#configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-#    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-#    INSTALL_DESTINATION cmake
-#)
-# install config files
-#install(FILES
-#    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-#    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-#    DESTINATION cmake
-#)
-# generate the export targets for the build tree
-#export(EXPORT "${PROJECT_NAME}Targets"
-#    FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake"
-#    NAMESPACE ${namespace}::
-#)
