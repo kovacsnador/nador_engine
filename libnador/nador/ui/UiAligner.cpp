@@ -13,9 +13,9 @@ namespace nador
 		_alignerType = aligner;
 	}
 
-	void UiAligner::SetOffset(const glm::ivec2& offset)
+	void UiAligner::SetOffset(const glm::vec2& offset)
 	{
-		const glm::ivec2* pOffset = &offset;
+		const glm::vec2* pOffset = &offset;
 
 		if (_alignerType == EAligner::VERTICAL)
 		{
@@ -44,29 +44,29 @@ namespace nador
 		Update();
 	}
 
-	void UiAligner::SetMinOffset(const glm::ivec2& minOffset)
+	void UiAligner::SetMinOffset(const glm::vec2& minOffset)
 	{
 		_minOffset = minOffset;
 		SetOffset(_offset);
 	}
 
-	void UiAligner::SetMaxOffset(const glm::ivec2& maxOffset)
+	void UiAligner::SetMaxOffset(const glm::vec2& maxOffset)
 	{
 		_maxOffset = maxOffset;
 		SetOffset(_offset);
 	}
 
-	const glm::ivec2& UiAligner::GetMinOffset() const noexcept
+	const glm::vec2& UiAligner::GetMinOffset() const noexcept
 	{
 		return _minOffset;
 	}
 
-	const glm::ivec2& UiAligner::GetMaxOffset() const noexcept
+	const glm::vec2& UiAligner::GetMaxOffset() const noexcept
 	{
 		return _maxOffset;
 	}
 
-	const glm::ivec2& UiAligner::GetOffset() const noexcept
+	const glm::vec2& UiAligner::GetOffset() const noexcept
 	{
 		return _offset;
 	}
@@ -121,7 +121,7 @@ namespace nador
 		}
 	}
 
-	glm::ivec2 UiAligner::CalculateMaxOffset() const
+	glm::vec2 UiAligner::CalculateMaxOffset() const
 	{
 		glm::ivec2 offset{ 0, 0 };
 		for (const auto& it : _elements)

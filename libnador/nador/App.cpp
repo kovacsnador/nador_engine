@@ -103,7 +103,7 @@ namespace nador
         _factory->GetWindow()->TickBegin();
         _factory->GetSoundController()->TickBegin();
 
-        g_onTickStartEvent();
+        g_onTickBeginEvent();
     }
 
     void App::Tick()

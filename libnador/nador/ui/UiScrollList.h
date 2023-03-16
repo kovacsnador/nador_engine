@@ -19,7 +19,7 @@ namespace nador
         {
             float_t   lastDeltaTime { 0 };
             glm::vec2 lastOffset { 0, 0 };
-            float_t   deceleration { 0.85f };
+            float_t   deceleration { 8.0f };    // 1.0f - ...
 
             glm::ivec2 Calculate(float_t currdDltaTime);
         };

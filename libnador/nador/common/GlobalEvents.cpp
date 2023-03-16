@@ -14,7 +14,7 @@ namespace nador
 	onMouse_event_t g_onMousePressedEvent;
 	onMouse_event_t g_onMouseReleasedEvent;
 
-	onTickStart_event_t g_onTickStartEvent;
+	onTickBegin_event_t g_onTickBeginEvent;
 	onTick_event_t		g_onTickEvent;
 	onTickEnd_event_t	g_onTickEndEvent;
 

@@ -27,8 +27,8 @@ namespace nador
 	extern onMouse_event_t g_onMouseReleasedEvent;
 
 	//=====================================================================
-	CREATE_EVENT_TYPE_ARG_0(onTickStart);
-	extern onTickStart_event_t g_onTickStartEvent;
+	CREATE_EVENT_TYPE_ARG_0(onTickBegin);
+	extern onTickBegin_event_t g_onTickBeginEvent;
 
 	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_1(onTick, float_t);

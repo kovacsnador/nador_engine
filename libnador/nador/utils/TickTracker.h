@@ -18,7 +18,7 @@ namespace nador
 		}
 	};
 
-	class TickTracker : public onTick_listener_t, public IntervalCounter<>
+	class TickTracker : public onTickBegin_listener_t, public IntervalCounter<>
 	{
 	public:
 		TickTracker();
@@ -45,7 +45,7 @@ namespace nador
 		float_t GetFramePerSecond() const;
 
 	private:
-		void _onTick(float_t /*deltaTime*/);
+		void _onTickBegin();
 
 		FrameTracker		_frameTracker;
 	};

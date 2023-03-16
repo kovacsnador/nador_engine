@@ -3,7 +3,7 @@
 namespace nador
 {
     TickTracker::TickTracker()
-	: onTick_listener_t(&g_onTickEvent, std::bind(&TickTracker::_onTick, this, arg::_1))
+	: onTickBegin_listener_t(&g_onTickBeginEvent, std::bind(&TickTracker::_onTickBegin, this))
 	{
 	}
     
@@ -22,7 +22,7 @@ namespace nador
         return _frameTracker.GetCountPerInterval(1.f);
     }
 
-    void TickTracker::_onTick(float_t /*deltaTime*/)  
+    void TickTracker::_onTickBegin()  
 	{
 		CountUp();
 	}

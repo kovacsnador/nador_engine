@@ -62,7 +62,7 @@ namespace nador
 			const IInputController* inputCtrl = uiLogicState->GetInputCtrl();
 			glm::ivec2 currMousePos = inputCtrl->GetMousePosition();
 
-			glm::ivec2 offset = _lastMousePos - currMousePos;
+			glm::vec2 offset = _lastMousePos - currMousePos;
 
 			if (glm::abs(offset.x) > 1 || glm::abs(offset.y) > 1)
 			{
@@ -90,7 +90,7 @@ namespace nador
 			_state = EState::IDLE;
 			_slider.Hide();
 
-			glm::ivec2 spinningOffset = _spinner.Calculate(uiLogicState->GetDeltaTime());
+			glm::vec2 spinningOffset = _spinner.Calculate(uiLogicState->GetDeltaTime());
 			_aligner.SetOffset(_aligner.GetOffset() + spinningOffset);
 		}
 	}
@@ -143,10 +143,10 @@ namespace nador
 	{
 		glm::vec2 result{ 0, 0 };
 
-		if (lastDeltaTime > 0)
+		if (lastDeltaTime > 0 && lastOffset != glm::vec2(0.0f, 0.0f))
 		{
 			glm::vec2 diff = lastOffset / lastDeltaTime;
-			result = (diff * currdDeltaTime) * deceleration;
+			result = (diff * currdDeltaTime) * (1 - currdDeltaTime * deceleration);
 
 			lastOffset = result;
 			lastDeltaTime = currdDeltaTime;
