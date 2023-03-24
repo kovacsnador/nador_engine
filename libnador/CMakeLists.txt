@@ -213,3 +213,10 @@ target_include_directories(${PROJECT_NAME}
 
 # Or you can set it globally for the entire project on configuration with -DCMAKE_DEBUG_POSTFIX="d".
 set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
+
+#------------------ Unit tests -------------------------------
+option(NADOR_BUILD_UNIT_TEST    "Building unit tests"   ON)
+
+if(NADOR_BUILD_UNIT_TEST)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+endif()
