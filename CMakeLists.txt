@@ -25,6 +25,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY      ${OUTPUT_DIR}/${CMAKE_BUILD_TYPE}/bin)
 
 set(NADOR_EIMAGE_NAME_PATH              ${CMAKE_CURRENT_SOURCE_DIR}/res/atlas/__atlases)
 
+set(NADOR_WINDOW_API                "SDL2" CACHE STRING "" FORCE)
+
 add_subdirectory(libnador)
 
 add_executable(${PROJECT_NAME})

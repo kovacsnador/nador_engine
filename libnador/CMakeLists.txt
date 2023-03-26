@@ -45,25 +45,36 @@ endif()
 set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_MP3_IMPLEMENTATION")
 set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_WAV_IMPLEMENTATION")
 
-if(${NADOR_WINDOW_API} STREQUAL "SDL2")
-    set(NADOR_CXX_FLAGS "${NADOR_CXX_FLAGS} -DUSE_SDL_WINDOW")
-elseif(${NADOR_WINDOW_API} STREQUAL "GLFW")
-    set(NADOR_CXX_FLAGS "${NADOR_CXX_FLAGS} -USE_GLFW_WINDOW")
-else()
-    message(FATAL_ERROR "Base platform not set! You need to set NADOR_WINDOW_API! Options: ${NADOR_WINDOW_OPTIONS}")
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NADOR_CXX_FLAGS}")
 
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(LIBTYPE "STATIC")
+
+set(LIBTYPE             "STATIC")
+set(BUILD_UTILS         OFF CACHE BOOL "" FORCE)
+
+set(ALSOFT_EXAMPLES     OFF CACHE BOOL "" FORCE)
+set(ALSOFT_UTILS        OFF CACHE BOOL "" FORCE)
+
+set(ALSOFT_INSTALL                  OFF CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL_CONFIG           OFF CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL_HRTF_DATA        OFF CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL_AMBDEC_PRESETS   OFF CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL_EXAMPLES         OFF CACHE BOOL "" FORCE)
+set(ALSOFT_INSTALL_UTILS            OFF CACHE BOOL "" FORCE)
+set(ALSOFT_UPDATE_BUILD_VERSION     OFF CACHE BOOL "" FORCE)
+
+set(SDL_SHARED  OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC  ON CACHE BOOL "" FORCE)
+set(SDL_TEST    OFF CACHE BOOL "" FORCE)
+set(SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
 
 set(NADOR_SRC_DIR nador)
 set(TINYXML2_DIR dep/tinyxml2)
 set(GLFW_DIR dep/glfw)
 set(GLEW_DIR dep/glew)
+
 set(OPENAL_SOFT_DIR dep/openal-soft)
 set(FREETYPE_DIR dep/freetype)
 set(IMGUI_DIR dep/imgui)
@@ -72,19 +83,15 @@ set(SDL_2_DIR dep/sdl2)
 
 option(NADOR_EIMAGE_NAME_PATH "Path to EImageName.h" "")
 
-add_subdirectory(${GLFW_DIR})
+add_library(${PROJECT_NAME} STATIC)
+
 add_subdirectory(${GLEW_DIR}/build/cmake)
 add_subdirectory(${OPENAL_SOFT_DIR})
 add_subdirectory(${FREETYPE_DIR})
-add_subdirectory(${SDL_2_DIR})
 
-add_library(${PROJECT_NAME} STATIC)
-
-target_link_libraries(${PROJECT_NAME} LINK_PRIVATE glfw)
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE glew_s)
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE OpenAL)
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE freetype)
-target_link_libraries(${PROJECT_NAME} LINK_PRIVATE SDL2-static)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
@@ -99,12 +106,6 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/system/Factory.cpp
 
     ${NADOR_SRC_DIR}/system/file/WindowsFileController.cpp
-
-    ${NADOR_SRC_DIR}/system/input/GLFWInputController.cpp
-    ${NADOR_SRC_DIR}/system/input/SDLInputController.cpp
-
-    ${NADOR_SRC_DIR}/system/window/WindowGLFW.cpp
-    ${NADOR_SRC_DIR}/system/window/WindowSDL.cpp
 
     ${NADOR_SRC_DIR}/test/DebugMenu.cpp
     ${NADOR_SRC_DIR}/test/TestCommon.cpp
@@ -179,13 +180,53 @@ target_sources(${PROJECT_NAME}
     ${IMGUI_DIR}/imgui_draw.cpp
     ${IMGUI_DIR}/imgui_tables.cpp
 
-    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-    ${IMGUI_DIR}/backends/imgui_impl_sdl.cpp
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 
     # stb_image
     ${STB_IMAGE_DIR}/stb_image.cpp
 )
+
+# ------------------------- SDL2 ---------------------------------
+if(${NADOR_WINDOW_API} STREQUAL "SDL2")
+    target_compile_options(${PROJECT_NAME} PRIVATE -DUSE_SDL_WINDOW)
+
+    add_subdirectory(${SDL_2_DIR})
+    target_link_libraries(${PROJECT_NAME} LINK_PRIVATE SDL2-static)
+
+    target_sources(${PROJECT_NAME}
+        PRIVATE
+        ${NADOR_SRC_DIR}/system/input/SDLInputController.cpp
+        ${NADOR_SRC_DIR}/system/window/WindowSDL.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_sdl.cpp
+    )
+
+    target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/${SDL_2_DIR}/include
+    )
+
+# ------------------------- GLFW ---------------------------------
+elseif(${NADOR_WINDOW_API} STREQUAL "GLFW")
+    # Add GLFW relevant sources
+    target_compile_options(${PROJECT_NAME} PRIVATE -DUSE_GLFW_WINDOW)
+
+    add_subdirectory(${GLFW_DIR})
+    target_link_libraries(${PROJECT_NAME} LINK_PRIVATE glfw)
+
+    target_sources(${PROJECT_NAME}
+        PRIVATE
+        ${NADOR_SRC_DIR}/system/input/GLFWInputController.cpp
+        ${NADOR_SRC_DIR}/system/window/WindowGLFW.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    )
+
+    target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/${GLFW_DIR}/include
+    )
+else()
+    message(FATAL_ERROR "Base platform not set! You need to set NADOR_WINDOW_API! Options: ${NADOR_WINDOW_OPTIONS}")
+endif()
 
 if(NOT NADOR_EIMAGE_NAME_PATH)
     message(FATAL_ERROR "NADOR_EIMAGE_NAME_PATH is not set")
@@ -198,11 +239,9 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}/nador
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/${GLFW_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${GLEW_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${OPENAL_SOFT_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${FREETYPE_DIR}/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/${SDL_2_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${IMGUI_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/dep
         ${CMAKE_CURRENT_SOURCE_DIR}/dep/json-develop/single_include
@@ -218,5 +257,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 option(NADOR_BUILD_UNIT_TEST    "Building unit tests"   ON)
 
 if(NADOR_BUILD_UNIT_TEST)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 endif()
