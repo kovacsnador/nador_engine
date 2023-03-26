@@ -21,7 +21,7 @@ target_include_directories(${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
     PRIVATE
     main.cpp
-    nador_app_test.cpp
+    appconfig_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
