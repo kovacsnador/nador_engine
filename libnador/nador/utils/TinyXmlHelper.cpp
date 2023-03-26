@@ -7,7 +7,7 @@ namespace nador
 {
 	namespace xml
 	{
-		bool GetBoolean(tinyxml2::XMLElement* elem, const char* name, bool def)
+		bool GetBoolean(const tinyxml2::XMLElement* elem, const char* name, bool def)
 		{
 			bool ret;
 			std::string text = GetText(elem, name, "false");
@@ -18,12 +18,12 @@ namespace nador
 			return def;
 		}
 
-		std::string GetText(tinyxml2::XMLElement* elem, const char* name, const char* def)
+		std::string GetText(const tinyxml2::XMLElement* elem, const char* name, const char* def)
 		{
 			NADOR_ASSERT(elem);
 			NADOR_ASSERT(name);
 
-			tinyxml2::XMLElement* child = elem->FirstChildElement(name);
+			const tinyxml2::XMLElement* child = elem->FirstChildElement(name);
 			if (child)
 			{
 				return nador::utils::trim(child->GetText());
@@ -32,12 +32,12 @@ namespace nador
 			return def;
 		}
 
-		glm::uvec2 GetUVec2(tinyxml2::XMLElement* elem, const char* name, const glm::uvec2 def)
+		glm::uvec2 GetUVec2(const tinyxml2::XMLElement* elem, const char* name, const glm::uvec2& def)
 		{
 			NADOR_ASSERT(elem);
 			NADOR_ASSERT(name);
 
-			tinyxml2::XMLElement* child = elem->FirstChildElement(name);
+			const tinyxml2::XMLElement* child = elem->FirstChildElement(name);
 			if (child)
 			{
 				glm::uvec2 result = {};

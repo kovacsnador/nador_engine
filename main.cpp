@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "libnador/nador/App.h"
+#include "nador/App.h"
 
 enum Fonts : uint32_t
 {
@@ -61,7 +61,7 @@ int main(void)
 	NADOR_LOG.EnableFuncName(false);
 
 	//Initialize the app with the config settings.
-	nador::AppConfig config = nador::ReadAppConfig("app_config.xml");
+	nador::AppConfig config = nador::ReadAppConfigFromFile("app_config.xml");
 
 	// Create the main Application.
 	nador::App app(config);

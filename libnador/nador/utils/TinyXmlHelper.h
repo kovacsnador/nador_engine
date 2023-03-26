@@ -8,9 +8,9 @@ namespace nador
 {
 	namespace xml
 	{
-		bool GetBoolean(tinyxml2::XMLElement* elem, const char* name, bool def);
-		std::string GetText(tinyxml2::XMLElement* elem, const char* name, const char* def = 0);
-		glm::uvec2 GetUVec2(tinyxml2::XMLElement* elem, const char* name, const glm::uvec2 def = {});
+		bool GetBoolean(const tinyxml2::XMLElement* elem, const char* name, bool def);
+		std::string GetText(const tinyxml2::XMLElement* elem, const char* name, const char* def = 0);
+		glm::uvec2 GetUVec2(const tinyxml2::XMLElement* elem, const char* name, const glm::uvec2& def = {});
 	}
 }
 

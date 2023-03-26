@@ -16,7 +16,6 @@
 #include "nador/sound/ISoundController.h"
 #include "nador/ui/UiApp.h"
 #include "nador/system/IWindow.h"
-#include "App.h"
 
 namespace nador
 {

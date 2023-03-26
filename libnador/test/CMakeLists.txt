@@ -9,18 +9,22 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(dep/googletest-main) # add googletest subdirectory
 
-include_directories(dep/googletest-main/googletest/include) # this is so we can #include <gtest/gtest.h>
-include_directories(dep/googletest-main/googlemock/include) # this is so we can #include <gmock>
-
 add_executable(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest-main/googletest/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/dep/googletest-main/googlemock/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
+)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
     main.cpp
-    hello_test.cc
     nador_app_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
                       PRIVATE gtest
-                      PRIVATE gmock) # link google test to this executable
+                      PRIVATE gmock
+                      PRIVATE nador)

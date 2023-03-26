@@ -25,23 +25,29 @@ namespace nador
 
         bool showDebugWindow { false };
         bool showDebugInfo { false };
+
+        bool operator==(const AppConfig& other) const
+        {
+            return (appName == other.appName 
+                    && windowDimension == other.windowDimension
+                    && vSync == other.vSync
+                    && rootFilePath == other.rootFilePath
+                    && atlasConfigPath == other.atlasConfigPath
+                    && atlasImagesPath == other.atlasImagesPath
+                    && texturesPath == other.texturesPath
+                    && fontsPath == other.fontsPath
+                    && soundsPath == other.soundsPath
+                    && uiPath == other.uiPath
+                    && showDebugInfo == other.showDebugInfo
+                    && showDebugWindow == other.showDebugWindow);
+        }
     };
 
-    /*!
-     * Reads the app config settings from file.
-     *
-     * \param configPath	The full path of the config file.
-     */
-    inline AppConfig ReadAppConfig(const char* configPath)
+    inline AppConfig Parse(const tinyxml2::XMLDocument& doc)
     {
-        ENGINE_DEBUG("Read app config file %s.", configPath);
-
         AppConfig appConfig;
 
-        tinyxml2::XMLDocument doc;
-		doc.LoadFile(configPath);
-
-        tinyxml2::XMLElement* pRootElement = doc.RootElement();
+        const tinyxml2::XMLElement* pRootElement = doc.RootElement();
         if (pRootElement)
         {
             appConfig.appName         = xml::GetText(pRootElement, "AppName");
@@ -60,6 +66,29 @@ namespace nador
         }
 
         return appConfig;
+    }
+
+    /*!
+     * Reads the app config settings from file.
+     *
+     * \param configPath	The full path of the config file.
+     */
+    inline AppConfig ReadAppConfigFromFile(const char* configPath)
+    {
+        ENGINE_DEBUG("Read app config file %s.", configPath);
+
+        tinyxml2::XMLDocument doc;
+		doc.LoadFile(configPath);
+
+        return Parse(doc);
+    }
+
+    inline AppConfig ReadAppConfig(const std::string& data)
+    {
+        tinyxml2::XMLDocument doc;
+        doc.Parse(data.c_str(), data.size());
+
+        return Parse(doc);
     }
 
 } // namespace nador
