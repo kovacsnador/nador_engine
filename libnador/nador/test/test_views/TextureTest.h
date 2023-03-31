@@ -14,7 +14,7 @@ namespace nador
 		/*!
 		 * TextureTest constructor.
 		 */
-		TextureTest();
+		TextureTest(const IVideo* video);
 
 		/*!
 		 * Called on render.

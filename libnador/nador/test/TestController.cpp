@@ -7,12 +7,13 @@
 
 namespace nador
 {
-	TestController::TestController()
+	TestController::TestController(const IVideo* video)
 	: _onTickListener(&g_onTickEvent, std::bind(&TestController::OnTick, this, arg::_1))
 	, _onRenderListener(&g_onRenderEvent, std::bind(&TestController::OnRender, this))
 	, _onDebugRenderListener(&g_onDebugRenderEvent, std::bind(&TestController::OnDebugRender, this))
+	, _video(video)
 	{
-		_currentTest.reset(new DebugMenu);
+		_currentTest.reset(new DebugMenu(video));
 
 		AddTest<ClearColorTest>("Clear Color");
 		AddTest<BaseMaterialTest>("Base Material Test");
@@ -44,7 +45,7 @@ namespace nador
 		{
 			if(ImGui::Button("<-"))
 			{
-				_currentTest.reset(new DebugMenu);
+				_currentTest.reset(new DebugMenu(_video));
 			}
 		}
 		else

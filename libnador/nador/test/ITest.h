@@ -8,9 +8,19 @@
 namespace nador
 {
 	class IRenderer;
+	class IVideo;
 
 	class ITest
 	{
+	protected:
+		/*!
+		 * Constructor.
+		 */
+		ITest(const IVideo* video)
+		: _video(video)
+		{
+		}
+
 	public:
 		/*!
 		 * Virtual destructor.
@@ -33,6 +43,9 @@ namespace nador
 		 * Render the imgui content.
 		 */
 		virtual void OnDebugRender() {};
+
+	protected:
+		const IVideo* _video;
 	};
 }
 

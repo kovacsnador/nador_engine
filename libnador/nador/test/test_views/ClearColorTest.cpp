@@ -7,7 +7,8 @@ float_t nador::ClearColorTest::_clearColor[4];
 
 namespace nador
 {
-	ClearColorTest::ClearColorTest()
+	ClearColorTest::ClearColorTest(const IVideo* video)
+	: ITest(video)
 	{
 	}
 

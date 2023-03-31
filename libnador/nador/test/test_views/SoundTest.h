@@ -11,7 +11,7 @@ namespace nador
 	public:
 		using vec_t = std::vector<std::pair<SoundData, ISoundSourcePtr>>;
 
-		SoundTest();
+		SoundTest(const IVideo* video);
 
 		/*!
 		 * Render the imgui content.

@@ -11,7 +11,7 @@ namespace nador
 		/*!
 		 * ClearColorTest constructor.
 		 */
-		ClearColorTest();
+		ClearColorTest(const IVideo* video);
 
 		/*!
 		 * Called on render.

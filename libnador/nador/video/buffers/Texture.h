@@ -17,28 +17,31 @@ namespace nador
 		/*!
 		 * Texture constructor.
 		 *
+		 * \param video				The video api interface.
 		 * \param filePath			The texture file path.
 		 * \param textureSettings	The specified texture settings.
 		 */
-		Texture(const char* filePath, TextureSettings textureSettings = {});
+		Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings = {});
 
 		/*!
 		 * Texture constructor.
 		 *
+		 * \param video				The video api interface.
 		 * \param data				The texture buffer.
 		 * \param textureSettings	The specified texture settings.
 		 */
-		Texture(const DataPtr& data, TextureSettings textureSettings = {});
+		Texture(const IVideo* video, const DataPtr& data, TextureSettings textureSettings = {});
 
 		/*!
 		 * Texture constructor.
 		 *
+		 * \param video				The video api interface.
 		 * \param data				The texture data.
 		 * \param width				The width of the texture.
 		 * \param height			The height of the texture.
 		 * \param textureSettings	The specified texture settings.
 		 */
-		Texture(const void* data, uint32_t width, uint32_t height, TextureSettings textureSettings = {});
+		Texture(const IVideo* video, const void* data, uint32_t width, uint32_t height, TextureSettings textureSettings = {});
 
 		/*!
 		 * Texture destructor.

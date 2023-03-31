@@ -89,7 +89,7 @@ namespace nador
          * \param fontSize	    The size of the font.
          * \param fileName	    The name of the font file.
          */
-        Font(const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName);
+        Font(const IVideo* video, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName);
 
         /*!
          * Get the font texture.
@@ -146,6 +146,8 @@ namespace nador
             FINISHED,
             FAILED,
         };
+
+        const IVideo* _video;
 
         uint32_t            _fontSize;
         char_container_t    _characters;

@@ -13,7 +13,7 @@ namespace nador
 		/*!
 		 * AtlasTest constructor.
 		 */
-		AtlasTest();
+		AtlasTest(const IVideo* video);
 
 		/*!
 		 * Called on render.

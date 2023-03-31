@@ -15,16 +15,22 @@ namespace nador
 	{
 	}
 
-	Atlas::Atlas(const std::string& textureName, const std::string& configName)
-	: _textureName(textureName)
+	Atlas::Atlas(const IVideo* video, const IFileController* fileCtrl, const std::string& atlasImagePath, const std::string& textureName, const std::string& configName)
+	: _video(video)
+	, _fileCtrl(fileCtrl)
+	, _textureName(textureName)
 	, _configName(configName)
+	, _atlasImagePath(atlasImagePath)
 	{
-		IApp* app = IApp::Get();
+		NADOR_ASSERT(_video);
+		NADOR_ASSERT(_fileCtrl);
 
-		const std::string& atlasImagePath = app->GetAppConfig().atlasImagesPath;
+		//IApp* app = IApp::Get();
 
-		const IFileController* fileCtrl = app->GetFileController();
-		DataPtr configData = fileCtrl->Read((atlasImagePath + configName));
+		//const std::string& atlasImagePath = app->GetAppConfig().atlasImagesPath;
+
+		//const IFileController* fileCtrl = app->GetFileController();
+		DataPtr configData = _fileCtrl->Read((_atlasImagePath + configName));
 
 		nlohmann::json json = nlohmann::json::parse(configData->Begin(), configData->End());
 
@@ -63,14 +69,14 @@ namespace nador
 			return;
 		}
 
-		IApp* app = IApp::Get();
+		//IApp* app = IApp::Get();
 
-		const std::string& atlasImagePath = app->GetAppConfig().atlasImagesPath;
+		//const std::string& atlasImagePath = app->GetAppConfig().atlasImagesPath;
 
-		IFileController* fileCtrl = app->GetFileController();
-		DataPtr textureData = fileCtrl->Read((atlasImagePath + _textureName));
+		//IFileController* fileCtrl = app->GetFileController();
+		DataPtr textureData = _fileCtrl->Read((_atlasImagePath + _textureName));
 
-		_texture.reset(new Texture(textureData));
+		_texture.reset(new Texture(_video, textureData));
 	}
 
 	void Atlas::DeloadTexture()

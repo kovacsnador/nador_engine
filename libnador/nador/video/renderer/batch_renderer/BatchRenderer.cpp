@@ -18,9 +18,9 @@ namespace nador
 		uint32_t color = 0xffffffff;
 		uint32_t width = 1;
 		uint32_t height = 1;
-		_whiteTexture.reset(new Texture(&color, width, height));
+		_whiteTexture.reset(new Texture(_video, &color, width, height));
 
-		_vertexBuffer.reset(new VertexBuffer(nullptr, sizeof(BatchVertex) * _maxVertexCount, VertexBuffer::EBufferType::DYNAMIC));
+		_vertexBuffer.reset(new VertexBuffer(_video, nullptr, sizeof(BatchVertex) * _maxVertexCount, VertexBuffer::EBufferType::DYNAMIC));
 		
 		_batchRendererData.vertices.resize(_maxVertexCount);
 		_batchRendererData.indices.resize(_maxVertexCount);
@@ -132,7 +132,7 @@ namespace nador
 			_textureSlots.at(slot)->Bind(slot);
 		}
 
-		IndexBuffer indices(&_batchRendererData.indices.front(), _batchRendererData.indices.size());
+		IndexBuffer indices(_video, &_batchRendererData.indices.front(), _batchRendererData.indices.size());
 		indices.Bind();
 
 		_video->DrawElements(EDrawMode::E_TRIANGLES, _batchRendererData.indices.size(), nullptr);

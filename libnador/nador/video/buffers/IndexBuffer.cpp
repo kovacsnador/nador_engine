@@ -4,9 +4,9 @@
 
 namespace nador
 {
-	IndexBuffer::IndexBuffer(const uint32_t* data, uint32_t count)
+	IndexBuffer::IndexBuffer(const IVideo* video, const uint32_t* data, uint32_t count)
 	: _id(0)
-	, _video(IApp::Get()->GetVideo())
+	, _video(video)
 	, _count(count)
 	{
 		NADOR_ASSERT(_video && data);

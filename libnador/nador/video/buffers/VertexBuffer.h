@@ -20,11 +20,12 @@ namespace nador
 		/*!
 		 * Vertex buffer constructor.
 		 *
+		 * \param video	The video api interface.
 		 * \param data	The vertex data to upload.
 		 * \param size	Specifies the size in bytes of the buffer object's new data store.
 		 * \param type	The buffer type.
 		 */
-		VertexBuffer(const void* data, size_t size, EBufferType type = EBufferType::STATIC);
+		VertexBuffer(const IVideo* video, const void* data, size_t size, EBufferType type = EBufferType::STATIC);
 
 		/*!
 		 * Vertex buffer destructor.

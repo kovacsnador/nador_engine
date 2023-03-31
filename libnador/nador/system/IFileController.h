@@ -37,8 +37,6 @@ namespace nador
             {
                 _deleter(_data);
             }
-            _size = 0;
-            _data = nullptr;
         }
 
         /*!
@@ -92,8 +90,8 @@ namespace nador
         }
 
     private:
-        const data_t*  _data;
-        size_t          _size;
+        const data_t*   _data;
+        const size_t    _size;
         deleter_t       _deleter;
     };
 

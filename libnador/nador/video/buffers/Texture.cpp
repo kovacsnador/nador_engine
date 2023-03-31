@@ -3,8 +3,8 @@
 
 namespace nador
 {
-	Texture::Texture(const char* filePath, TextureSettings textureSettings)
-	: _video(IApp::Get()->GetVideo())
+	Texture::Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings)
+	: _video(video)
 	, _id(0)
 	, _width(0)
 	, _height(0)
@@ -17,8 +17,8 @@ namespace nador
 		_UploadTexture(textureData);
 	}
 
-	Texture::Texture(const DataPtr& data, TextureSettings textureSettings)
-	: _video(IApp::Get()->GetVideo())
+	Texture::Texture(const IVideo* video, const DataPtr& data, TextureSettings textureSettings)
+	: _video(video)
 	, _id(0)
 	, _width(0)
 	, _height(0)
@@ -29,8 +29,8 @@ namespace nador
 		_UploadTexture(textureData);
 	}
 
-	Texture::Texture(const void* data, uint32_t width, uint32_t height, TextureSettings textureSettings)
-	: _video(IApp::Get()->GetVideo())
+	Texture::Texture(const IVideo* video, const void* data, uint32_t width, uint32_t height, TextureSettings textureSettings)
+	: _video(video)
 	, _id(0)
 	, _width(width)
 	, _height(height)

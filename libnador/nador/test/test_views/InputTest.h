@@ -14,7 +14,7 @@ namespace nador
 		/*!
 		 * InputTest constructor.
 		 */
-		InputTest();
+		InputTest(const IVideo* video);
 
 		/*!
 		 * InputTest destructor.

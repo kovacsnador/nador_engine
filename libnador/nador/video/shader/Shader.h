@@ -26,11 +26,12 @@ namespace nador
 		/*!
 		 * Shader constructor.
 		 *
+		 * \param video				The video api interface.
 		 * \param type				The shader type.
 		 * \param vertexShader		The vertex shader source.
 		 * \param fragmentShader	The fragment shader source.
 		 */
-		Shader(EShader type, const char* vertexShader, const char* fragmentShader);
+		Shader(const IVideo* video, EShader type, const char* vertexShader, const char* fragmentShader);
 
 		/*!
 		 * Shader destructor.

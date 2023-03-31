@@ -5,10 +5,11 @@
 
 namespace nador
 {
-	TextureTest::TextureTest()
+	TextureTest::TextureTest(const IVideo* video)
+	: ITest(video)
 	{
 		_material.uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		_material.texture.reset(new Texture("res/textures/test.png"));
+		_material.texture.reset(new Texture(_video, "res/textures/test.png"));
 
 		_renderData.vertices = {
 			{0.0f,   0.0f,   0.0f, 1.0f},

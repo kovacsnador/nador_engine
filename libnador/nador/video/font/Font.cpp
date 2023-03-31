@@ -8,8 +8,9 @@
 
 namespace nador
 {
-    Font::Font(const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName)
-    : _fontSize(fontSize)
+    Font::Font(const IVideo* video, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName)
+    : _video(video)
+    , _fontSize(fontSize)
     , _state(State::LOADING)
     , _fileName(fileName)
     {
@@ -370,7 +371,7 @@ namespace nador
                                      ColorFormat::ALPHA,
                                      PixelStore::GL_UNPACK_ALIGNMENT_1);
 
-            _texture = std::make_shared<Texture>(nullptr, _textureLoadData.width, _textureLoadData.height, settings);
+            _texture = std::make_shared<Texture>(_video, nullptr, _textureLoadData.width, _textureLoadData.height, settings);
 
             for(const auto& it : _bitmapLoadDatas)
             {

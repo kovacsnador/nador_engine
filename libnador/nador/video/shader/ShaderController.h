@@ -24,7 +24,7 @@ namespace nador
 		/*!
 		 * ShaderController constructor.
 		 */
-		ShaderController(size_t maxTextureUnit);
+		ShaderController(const IVideo* video);
 
 		/*!
 		 * Gets the specific shader program.
@@ -89,9 +89,10 @@ namespace nador
 		 * \param vertexShader		The vertex shader source.
 		 * \param fragmentShader	The fragment shader source.
 		 */
-		void _Add(EShader type, const char* vertexShader, const char* fragmentShader);
+		void _Add(const IVideo* video, EShader type, const char* vertexShader, const char* fragmentShader);
 
-		container_t _shaders;
+		container_t 	_shaders;
+		const IVideo* 	_video;
 	};
 }
 

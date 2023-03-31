@@ -45,8 +45,9 @@ namespace nador
 		return std::nullopt;
 	}
 
-	FontTest::FontTest()
-	: _position(2, 500)
+	FontTest::FontTest(const IVideo* video)
+	: ITest(video)
+	, _position(2, 500)
 	, _scale(20, 20, 1)
 	, _color(1, 0, 0, 1)
 	{

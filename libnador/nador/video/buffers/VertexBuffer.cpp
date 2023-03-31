@@ -4,9 +4,9 @@
 
 namespace nador
 {
-	VertexBuffer::VertexBuffer(const void* data, size_t size, EBufferType type)
+	VertexBuffer::VertexBuffer(const IVideo* video, const void* data, size_t size, EBufferType type)
 	: _id(0)
-	, _video(IApp::Get()->GetVideo())
+	, _video(video)
 	{
 		NADOR_ASSERT(_video);
 

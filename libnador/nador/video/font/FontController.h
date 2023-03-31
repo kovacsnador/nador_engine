@@ -21,9 +21,9 @@ namespace nador
 		/*!
 		 * Font controller default constructor.
 		 * 
-		 * \param maxTextureSize		The max supported texture size.
+		 * \param video		The video api interface.
 		 */
-		FontController(int32_t maxTextureSize);
+		FontController(const IVideo* video);
 
 		/*!
 		 * Add font size.
@@ -97,15 +97,18 @@ namespace nador
 		bool IsLoading() const override;
 
 	private:
-		void _AddFont(FT_Library library, const DataPtr& data, uint32_t fontId, uint32_t fontSize, const char* fileName);
+		void _AddFont(FT_Library library, const DataPtr& data, uint32_t fontId, uint32_t fontSize, const char* fileName, uint32_t maxTextureSize);
 
 		/*!
 		 * Register a new font.
 		 *
 		 * \param fontId		The id of the font.
 		 * \param fileName		The name of the font file.
+		 * \param maxTextureSize		The max texture size.
 		 */
-		void _RegisterFont(uint32_t fontId, const char* fileName);
+		void _RegisterFont(uint32_t fontId, const char* fileName, uint32_t maxTextureSize);
+
+		const IVideo* _video;
 
 		int32_t				_maxTextureSize;
 		fonts_list_t		_registeredFonts;

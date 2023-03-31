@@ -7,7 +7,8 @@
 
 namespace nador
 {
-	AtlasTest::AtlasTest()
+	AtlasTest::AtlasTest(const IVideo* video)
+	: ITest(video)
 	{
 		const IAtlasController* atlasCtrl = IApp::Get()->GetAtlasController();
 

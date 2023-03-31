@@ -64,13 +64,14 @@ int main(void)
 	nador::AppConfig config = nador::ReadAppConfigFromFile("app_config.xml");
 
 	// Create the main Application.
-	nador::App app(config);
+	//nador::App app(config);
+	nador::IAppUPtr app = nador::App::CreateApp(config);
 
 	InitFonts();
 	InitSounds();
 
 	//Game loop
-	app.Run();
+	app->Run();
 
 	return 0;
 }

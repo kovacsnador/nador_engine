@@ -19,7 +19,7 @@ namespace nador
 		/*!
 		 * TestController constructor.
 		 */
-		TestController();
+		TestController(const IVideo* video);
 
 		/*!
 		 * Add new test.
@@ -32,7 +32,7 @@ namespace nador
 			_tests.push_back(std::make_pair(name, 
 											[this]() 
 											{ 
-												_currentTest.reset(new T);
+												_currentTest.reset(new T(_video));
 											}));
 		}
 
@@ -72,6 +72,8 @@ namespace nador
 		onTick_listener_t			_onTickListener;
 		onRender_listener_t			_onRenderListener;
 		onDebugRender_listener_t	_onDebugRenderListener;
+
+		const IVideo* _video;
 	};
 
 	CREATE_PTR_TYPES(TestController);

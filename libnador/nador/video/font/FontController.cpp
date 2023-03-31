@@ -3,8 +3,8 @@
 
 namespace nador
 {
-	FontController::FontController(int32_t maxTextureSize)
-	: _maxTextureSize(maxTextureSize)
+	FontController::FontController(const IVideo* video)
+	: _video(video)
 	{
 	}
 
@@ -24,7 +24,7 @@ namespace nador
 			ENGINE_FATAL("No font size registered! Use AddFontSize before!");
 		}
 
-		std::future<void> future = std::async(std::launch::async, &FontController::_RegisterFont, this, fontId, fileName);
+		std::future<void> future = std::async(std::launch::async, &FontController::_RegisterFont, this, fontId, fileName, _video->GetMaxTextureSize());
 		_pending_futures.push_back(std::move(future));
 	}
 
@@ -114,7 +114,7 @@ namespace nador
 		return loading;
 	}
 
-	void FontController::_RegisterFont(uint32_t fontId, const char* fileName)
+	void FontController::_RegisterFont(uint32_t fontId, const char* fileName, uint32_t maxTextureSize)
 	{
 		const IApp* app = IApp::Get();
 
@@ -131,17 +131,11 @@ namespace nador
 		IFileController* fileController = app->GetFileController();
 		DataPtr file = fileController->Read(filePath);
 
-		/*if (FT_New_Face(library, filePath.c_str(), 0, &face))
-		{
-			ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
-		}*/
-
 		std::vector<std::future<void>> futures;
 
 		for(const auto& fontSize : _fontSizes)
 		{
-			futures.emplace_back(std::async(&FontController::_AddFont, this, library, file, fontId, fontSize, fileName));
-			//_AddFont(library, file, fontId, fontSize, fileName);
+			futures.emplace_back(std::async(&FontController::_AddFont, this, library, file, fontId, fontSize, fileName, maxTextureSize));
 		}
 
 		// wait for futures
@@ -151,11 +145,10 @@ namespace nador
 
 		_fontNamesToIds[fileName] = fontId;
 
-		//FT_Done_Face(face);
 		FT_Done_FreeType(library);
 	}
 
-	void FontController::_AddFont(FT_Library library, const DataPtr& file, uint32_t fontId, uint32_t fontSize, const char* fileName)
+	void FontController::_AddFont(FT_Library library, const DataPtr& file, uint32_t fontId, uint32_t fontSize, const char* fileName, uint32_t maxTextureSize)
 	{
 		FT_Face face;
 
@@ -164,7 +157,7 @@ namespace nador
 			ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
 		}
 
-		FontPtr font = std::make_shared<Font>(face, fontSize, _maxTextureSize, fileName);
+		FontPtr font = std::make_shared<Font>(_video, face, fontSize, maxTextureSize, fileName);
 
 		FT_Done_Face(face);
 

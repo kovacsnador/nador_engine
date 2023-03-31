@@ -10,7 +10,8 @@ namespace nador
 	class SimpleLineTest : public ITest
 	{
 	public:
-		SimpleLineTest()
+		SimpleLineTest(const IVideo* video)
+		: ITest(video)
 		{
 			_renderData.vertices = {
 				{.1f,	0.0f,	0.0f, 1.0f},

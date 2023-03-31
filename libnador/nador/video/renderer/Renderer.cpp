@@ -10,7 +10,7 @@ namespace nador
 {
 	Renderer::Renderer(const IVideo* video)
 	: _video(video)
-	, _shaderCtrl(video->GetMaxTextureUnits())
+	, _shaderCtrl(video)
 	, _cameraMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 	, _projectionMatrix(1.0f)
 	, _modelMatrix(1.0f)

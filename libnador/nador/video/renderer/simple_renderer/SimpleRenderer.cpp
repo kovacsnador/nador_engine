@@ -58,20 +58,20 @@ namespace nador
 
 		_currentMaterial->Activate(_currentShader, _uMVP);
 
-		VertexBuffer aPosition(&_renderData.vertices.front(), utils::VectorsizeInBytes(_renderData.vertices));
+		VertexBuffer aPosition(_video, &_renderData.vertices.front(), utils::VectorsizeInBytes(_renderData.vertices));
 		aPosition.Bind();
 
 		decltype (_renderData.vertices)::value_type vertex;
 		_currentShader->EnableAttribArray(_currentMaterial->GetVerticesName(), vertex.length(), nullptr);
 
-		IndexBuffer indices(&_renderData.indices.front(), _renderData.indices.size());
+		IndexBuffer indices(_video, &_renderData.indices.front(), _renderData.indices.size());
 		indices.Bind();
 
 		VertexBufferPtr aTexCoord;
 
 		if (_renderData.texCoords.empty() == false)
 		{
-			aTexCoord = std::make_shared<VertexBuffer>(&_renderData.texCoords.front(), utils::VectorsizeInBytes(_renderData.texCoords));
+			aTexCoord = std::make_shared<VertexBuffer>(_video, &_renderData.texCoords.front(), utils::VectorsizeInBytes(_renderData.texCoords));
 			aTexCoord->Bind();
 
 			decltype (_renderData.texCoords)::value_type texCoord;

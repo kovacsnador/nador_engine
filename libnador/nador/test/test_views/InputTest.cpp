@@ -9,7 +9,8 @@ namespace nador
 {
 	const uint32_t InputTest::bufferSize;
 
-	InputTest::InputTest()
+	InputTest::InputTest(const IVideo* video)
+	: ITest(video)
 	{
 		memset(_additionalMsg, 0, bufferSize * sizeof(*_additionalMsg));
 		memset(_additionalMsgMouse, 0, bufferSize * sizeof(*_additionalMsgMouse));

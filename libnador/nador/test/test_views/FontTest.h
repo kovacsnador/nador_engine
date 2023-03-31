@@ -18,7 +18,7 @@ namespace nador
 		/*!
 		 * FontTest constructor.
 		 */
-		FontTest();
+		FontTest(const IVideo* video);
 
 		/*!
 		 * Called on render.

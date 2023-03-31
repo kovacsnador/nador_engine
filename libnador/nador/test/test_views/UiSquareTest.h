@@ -23,7 +23,7 @@ namespace nador
 	class UiSquareTest : public ITest
 	{
 	public:
-		UiSquareTest();
+		UiSquareTest(const IVideo* video);
 
 		void OnRender(IRenderer* renderer) override;
 		void OnDebugRender() override;

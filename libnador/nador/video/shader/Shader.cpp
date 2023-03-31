@@ -4,8 +4,8 @@
 
 namespace nador
 {
-	Shader::Shader(EShader type, const char* vertexShader, const char* fragmentShader)
-	: _video(IApp::Get()->GetVideo())
+	Shader::Shader(const IVideo* video, EShader type, const char* vertexShader, const char* fragmentShader)
+	: _video(video)
 	, _id(0)
 	, _type(type)
 	{

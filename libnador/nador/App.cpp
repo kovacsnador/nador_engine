@@ -52,7 +52,7 @@ namespace nador
 
     //----------------------------------------------------------------------------------------------
 
-    App::App(const AppConfig& config)
+    /*App::App(const AppConfig& config)
     : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
     {
         ENGINE_DEBUG("App initializing...");
@@ -74,6 +74,28 @@ namespace nador
         ShowDebugInfo(_config.showDebugInfo);
 
         ENGINE_DEBUG("App initialized.");
+    }*/
+
+    App::App(const AppConfig&     config,
+             IFactoryUPtr         factory,
+             IUiAppUPtr           uiApp,
+             IRendererUPtr        renderer,
+             IAtlasControllerUPtr atlasCtrl,
+             IFontControllerUPtr  fontCtrl,
+             TestControllerUPtr   testController)
+    : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
+    , _config(config)
+    , _factory(std::move(factory))
+    , _renderer(std::move(renderer))
+    , _atlasCtrl(std::move(atlasCtrl))
+    , _fontCtrl(std::move(fontCtrl))
+    , _testController(std::move(testController))
+    , _uiApp(std::move(uiApp))
+    {
+        ShowDebugWindow(_config.showDebugWindow);
+        ShowDebugInfo(_config.showDebugInfo);
+
+        ENGINE_DEBUG("App initialized.");
     }
 
     App::~App()
@@ -88,6 +110,26 @@ namespace nador
         _factory.reset();
 
         ENGINE_DEBUG("App deinitialized.");
+    }
+
+    IAppUPtr App::CreateApp(const AppConfig& config)
+    {
+        IFactoryUPtr factory = std::make_unique<Factory>(config);
+
+        const IVideo* video = factory->GetVideo(); 
+
+        IRendererUPtr renderer = std::make_unique<Renderer>(video);
+
+        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video);
+        TestControllerUPtr testController = std::make_unique<TestController>(video);
+
+        IFileController* fileCtrl        = factory->GetFileController();
+        DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
+        IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
+
+        IUiAppUPtr uiApp = std::make_unique<UiApp>();
+
+        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testController));
     }
 
     bool App::ShouldClose() const

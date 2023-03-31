@@ -31,10 +31,11 @@ namespace nador
 		return vertices;
 	}
 
-	UiSquareTest::UiSquareTest()
+	UiSquareTest::UiSquareTest(const IVideo* video)
+	: ITest(video)
 	{
-		_parent.material.texture.reset(new Texture("res/textures/playerBtn.png"));
-		_child.material.texture.reset(new Texture("res/textures/test.png"));
+		_parent.material.texture.reset(new Texture(_video, "res/textures/playerBtn.png"));
+		_child.material.texture.reset(new Texture(_video, "res/textures/test.png"));
 
 		_parent.pos = { 100, 100 };
 		_parent.size = { 500, 500 };

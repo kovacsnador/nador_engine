@@ -16,7 +16,7 @@ namespace nador
 		 * \param data	The index data to upload.
 		 * \param count	The index count.
 		 */
-		IndexBuffer(const uint32_t* data, uint32_t count);
+		IndexBuffer(const IVideo* video, const uint32_t* data, uint32_t count);
 
 		/*!
 		 * Index buffer destructor.

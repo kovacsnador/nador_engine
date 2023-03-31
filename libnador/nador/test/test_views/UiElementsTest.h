@@ -16,7 +16,7 @@ namespace nador
 	class UiElementsTest : public ITest
 	{
 	public:
-		UiElementsTest();
+		UiElementsTest(const IVideo* video);
 
 		void OnDebugRender() override;
 

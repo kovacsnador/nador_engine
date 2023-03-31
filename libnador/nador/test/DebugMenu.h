@@ -8,6 +8,8 @@ namespace nador
 	class DebugMenu : public ITest 
 	{
 	public:
+		DebugMenu(const IVideo* video);
+
 		/*!
 		 * DebugMenu destructor.
 		 */

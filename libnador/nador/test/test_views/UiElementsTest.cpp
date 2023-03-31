@@ -26,7 +26,8 @@ namespace nador
 												doming id quod mazim placerat facer)";
 
 
-	UiElementsTest::UiElementsTest()
+	UiElementsTest::UiElementsTest(const IVideo* video)
+	: ITest(video)
 	{
 		_uiImage.reset(new UiImage({ 0, 200 }, { 100, 100 }, video::EImageName::BACK));
 		_uiImage->SetName("UiImage");
