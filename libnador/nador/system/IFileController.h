@@ -209,6 +209,8 @@ namespace nador
         {
             _rootPath = root;
         }
+
+        virtual std::string GetFileName(std::string_view filePath) const = 0;
     
     protected:
         std::string _rootPath;

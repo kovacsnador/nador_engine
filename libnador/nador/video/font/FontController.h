@@ -23,7 +23,7 @@ namespace nador
 		 * 
 		 * \param video		The video api interface.
 		 */
-		FontController(const IVideo* video);
+		FontController(const IVideo* video, const IFileController* fileCtrl);
 
 		/*!
 		 * Add font size.
@@ -36,9 +36,9 @@ namespace nador
 		 * Register a new font.
 		 *
 		 * \param fontId		The id of the font.
-		 * \param fileName		The name of the font file.
+		 * \param filePath		The path of the font file.
 		 */
-		void RegisterFont(uint32_t fontId, const char* fileName) override;
+		void RegisterFont(uint32_t fontId, std::string_view filePath) override;
 
 		/*!
 		 * Gets the font.
@@ -97,7 +97,7 @@ namespace nador
 		bool IsLoading() const override;
 
 	private:
-		void _AddFont(FT_Library library, const DataPtr& data, uint32_t fontId, uint32_t fontSize, const char* fileName, uint32_t maxTextureSize);
+		void _AddFont(FT_Library library, const DataPtr& data, uint32_t fontId, uint32_t fontSize, std::string_view filePath, uint32_t maxTextureSize);
 
 		/*!
 		 * Register a new font.
@@ -106,9 +106,10 @@ namespace nador
 		 * \param fileName		The name of the font file.
 		 * \param maxTextureSize		The max texture size.
 		 */
-		void _RegisterFont(uint32_t fontId, const char* fileName, uint32_t maxTextureSize);
+		void _RegisterFont(uint32_t fontId, std::string filePath, uint32_t maxTextureSize);
 
 		const IVideo* _video;
+		const IFileController* _fileCtrl;
 
 		int32_t				_maxTextureSize;
 		fonts_list_t		_registeredFonts;

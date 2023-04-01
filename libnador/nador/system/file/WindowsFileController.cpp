@@ -1,9 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include <filesystem>
 
 #include "nador/log/Log.h"
 #include "nador/system/file/WindowsFileController.h"
+#include "WindowsFileController.h"
 
 namespace nador
 {
@@ -98,5 +100,10 @@ namespace nador
     bool WindowsFileController::IsExist(const std::string& fileName) const
     {
         return IsExist(fileName.c_str());
+    }
+
+    std::string nador::WindowsFileController::GetFileName(std::string_view filePath) const
+    {
+        return std::filesystem::path(filePath).filename().string();
     }
 }

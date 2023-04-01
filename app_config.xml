@@ -8,7 +8,6 @@
 	<AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 	<AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
 	<TexturesPath></TexturesPath>
-	<FontsPath> res/fonts/ </FontsPath>
 	<SoundsPath> res/sounds/ </SoundsPath>
 	<UiPath> res/ui/ </UiPath>
 	

@@ -223,12 +223,12 @@ namespace nador
         AppConfig   _config;
         TickTracker _tickTracker;
 
-        IUiAppUPtr           _uiApp;
+        IFactoryUPtr         _factory;
         IRendererUPtr        _renderer;
         IAtlasControllerUPtr _atlasCtrl;
-        IFactoryUPtr         _factory;
         IFontControllerUPtr  _fontCtrl;
         TestControllerUPtr   _testController;
+        IUiAppUPtr           _uiApp;
 
         EAppState _state { EAppState::RUNNING };
     };

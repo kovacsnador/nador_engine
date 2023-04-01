@@ -30,7 +30,7 @@ void InitFonts()
 	fontCtrl->AddFontSize(FontSize::MEDIUM);
 	fontCtrl->AddFontSize(FontSize::LARGE);
 
-	fontCtrl->RegisterFont(Fonts::FREE_SANS, "FreeSans.ttf");
+	fontCtrl->RegisterFont(Fonts::FREE_SANS, "res/fonts/FreeSans.ttf");
 
 	//Sets the default font size
 	fontCtrl->SetDefaultSystemFont(Fonts::FREE_SANS, FontSize::SMALL);

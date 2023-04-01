@@ -117,13 +117,13 @@ namespace nador
         IFactoryUPtr factory = std::make_unique<Factory>(config);
 
         const IVideo* video = factory->GetVideo(); 
+        IFileController* fileCtrl = factory->GetFileController();
 
         IRendererUPtr renderer = std::make_unique<Renderer>(video);
 
-        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video);
+        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video, fileCtrl);
         TestControllerUPtr testController = std::make_unique<TestController>(video);
 
-        IFileController* fileCtrl        = factory->GetFileController();
         DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
         IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
 

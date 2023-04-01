@@ -88,6 +88,8 @@ namespace nador
          * \return The true on exist, false otherwise.
          */
         bool IsExist(const std::string& fileName) const override;
+
+        std::string GetFileName(std::string_view filePath) const override;
 	};
 }
 

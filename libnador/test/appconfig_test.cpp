@@ -27,7 +27,6 @@ INSTANTIATE_TEST_CASE_P(
 	                <AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 	                <AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
 	                <TexturesPath></TexturesPath>
-	                <FontsPath> res/fonts/ </FontsPath>
 	                <SoundsPath> res/sounds/ </SoundsPath>
 	                <UiPath> res/ui/ </UiPath>
 	
@@ -43,7 +42,6 @@ INSTANTIATE_TEST_CASE_P(
                         "res/atlas/__atlases/atlas_config.json",
                         "res/atlas/__atlases/",
                         "",
-                        "res/fonts/",
                         "res/sounds/",
                         "res/ui/",
                         true,
