@@ -134,6 +134,6 @@ namespace nador
 
 	void Factory::_InitSoundController()
 	{
-		_soundController = new OpenAlSoundContoller();
+		_soundController = new OpenAlSoundContoller(_fileController);
 	}
 }

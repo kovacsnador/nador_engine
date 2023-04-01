@@ -27,8 +27,11 @@
 
 namespace nador
 {
-    OpenAlSoundContoller::OpenAlSoundContoller()
+    OpenAlSoundContoller::OpenAlSoundContoller(const IFileController* fileCtrl)
+    : _fileCtrl(fileCtrl)
     {
+        NADOR_ASSERT(_fileCtrl);
+
         // Create device
         const ALCchar* defaultDeviceString = alcGetString(/*device*/ nullptr, ALC_DEFAULT_DEVICE_SPECIFIER);
 
@@ -92,27 +95,27 @@ namespace nador
 		_currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING;});
 	}
 
-    void OpenAlSoundContoller::AddSound(const char* fileName, uint32_t soundId)
+    void OpenAlSoundContoller::AddSound(const char* filePath, uint32_t soundId)
     {
-        bool isMp3 = std::regex_match(fileName, std::regex("(.*)\\.mp3$"));
-        bool isWav = std::regex_match(fileName, std::regex("(.*)\\.wav$"));
+        bool isMp3 = std::regex_match(filePath, std::regex("(.*)\\.mp3$"));
+        bool isWav = std::regex_match(filePath, std::regex("(.*)\\.wav$"));
 
         if (!isMp3 && !isWav)
         {
-            ENGINE_WARNING("Sound file extension not supported: %s", fileName);
+            ENGINE_WARNING("Sound file extension not supported: %s", filePath);
             return;
         }
 
-        IApp* app = IApp::Get();
+        //IApp* app = IApp::Get();
 
-        const std::string& soundsPath = app->GetAppConfig().soundsPath;
+        //const std::string& soundsPath = app->GetAppConfig().soundsPath;
 
-        const IFileController* fileCtrl  = app->GetFileController();
-        DataPtr                soundFile = fileCtrl->Read(soundsPath + fileName);
+        //const IFileController* fileCtrl  = app->GetFileController();
+        DataPtr soundFile = _fileCtrl->Read(filePath);
 
         SoundPtr soundPtr  = std::make_shared<Sound>();
         soundPtr->soundId  = soundId;
-        soundPtr->fileName = fileName;
+        soundPtr->fileName = filePath;
 
         int16_t* pcmData = nullptr;
 
@@ -133,7 +136,7 @@ namespace nador
 
         if (pcmData == nullptr)
         {
-            ENGINE_WARNING("Failed to load audio file: %s", fileName);
+            ENGINE_WARNING("Failed to load audio file: %s", filePath);
             return;
         }
 
@@ -147,7 +150,7 @@ namespace nador
         // delete pcmData
         drwav_free(pcmData, nullptr);
 
-        ENGINE_DEBUG("Sound added from file %s with id %d", fileName, soundId);
+        ENGINE_DEBUG("Sound added from file %s with id %d", filePath, soundId);
 
         _sounds.insert_or_assign(soundId, soundPtr);
     }

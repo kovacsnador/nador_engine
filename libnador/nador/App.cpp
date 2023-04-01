@@ -51,30 +51,25 @@ namespace nador
     }
 
     //----------------------------------------------------------------------------------------------
-
-    /*App::App(const AppConfig& config)
-    : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
+    IAppUPtr App::CreateApp(const AppConfig& config)
     {
-        ENGINE_DEBUG("App initializing...");
+        IFactoryUPtr factory = std::make_unique<Factory>(config);
 
-        _config = config;
+        const IVideo* video = factory->GetVideo(); 
+        IFileController* fileCtrl = factory->GetFileController();
 
-        _factory.reset(new Factory(_config));
-        _renderer.reset(new Renderer(GetVideo()));
-        _fontCtrl.reset(new FontController(GetVideo()->GetMaxTextureSize()));
-        _testController.reset(new TestController);
+        IRendererUPtr renderer = std::make_unique<Renderer>(video);
 
-        IFileController* fileCtrl        = GetFileController();
-        DataPtr          atlasConfigData = fileCtrl->Read(_config.atlasConfigPath);
-        _atlasCtrl.reset(new AtlasController(atlasConfigData));
+        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video, fileCtrl);
+        TestControllerUPtr testController = std::make_unique<TestController>(video);
 
-        _uiApp.reset(new UiApp);
+        DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
+        IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
 
-        ShowDebugWindow(_config.showDebugWindow);
-        ShowDebugInfo(_config.showDebugInfo);
+        IUiAppUPtr uiApp = std::make_unique<UiApp>();
 
-        ENGINE_DEBUG("App initialized.");
-    }*/
+        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testController));
+    }
 
     App::App(const AppConfig&     config,
              IFactoryUPtr         factory,
@@ -110,26 +105,6 @@ namespace nador
         _factory.reset();
 
         ENGINE_DEBUG("App deinitialized.");
-    }
-
-    IAppUPtr App::CreateApp(const AppConfig& config)
-    {
-        IFactoryUPtr factory = std::make_unique<Factory>(config);
-
-        const IVideo* video = factory->GetVideo(); 
-        IFileController* fileCtrl = factory->GetFileController();
-
-        IRendererUPtr renderer = std::make_unique<Renderer>(video);
-
-        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video, fileCtrl);
-        TestControllerUPtr testController = std::make_unique<TestController>(video);
-
-        DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
-        IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
-
-        IUiAppUPtr uiApp = std::make_unique<UiApp>();
-
-        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testController));
     }
 
     bool App::ShouldClose() const

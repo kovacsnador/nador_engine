@@ -19,7 +19,6 @@ namespace nador
         std::string atlasConfigPath;
         std::string atlasImagesPath;
         std::string texturesPath;
-        std::string soundsPath;
         std::string uiPath;
 
         bool showDebugWindow { false };
@@ -34,7 +33,6 @@ namespace nador
                     && atlasConfigPath == other.atlasConfigPath
                     && atlasImagesPath == other.atlasImagesPath
                     && texturesPath == other.texturesPath
-                    && soundsPath == other.soundsPath
                     && uiPath == other.uiPath
                     && showDebugInfo == other.showDebugInfo
                     && showDebugWindow == other.showDebugWindow);
@@ -55,9 +53,7 @@ namespace nador
             appConfig.atlasConfigPath = xml::GetText(pRootElement, "AtlasConfigPath");
             appConfig.atlasImagesPath = xml::GetText(pRootElement, "AtlasImagesPath");
             appConfig.texturesPath    = xml::GetText(pRootElement, "TexturesPath");
-            appConfig.soundsPath      = xml::GetText(pRootElement, "SoundsPath");
             appConfig.uiPath          = xml::GetText(pRootElement, "UiPath");
-
             appConfig.showDebugWindow = xml::GetBoolean(pRootElement, "ShowDebugWindow", false);
             appConfig.showDebugInfo   = xml::GetBoolean(pRootElement, "ShowDebugInfo", false);
         }

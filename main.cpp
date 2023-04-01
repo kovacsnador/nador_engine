@@ -47,8 +47,8 @@ void InitSounds()
 {
 	nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
 
-	soundCtrl->AddSound("TestSound.wav", Sound::TEST_SOUND_1);
-	soundCtrl->AddSound("TestSound_Mono.wav", Sound::TEST_SOUND_2);
+	soundCtrl->AddSound("res/sounds/TestSound.wav", Sound::TEST_SOUND_1);
+	soundCtrl->AddSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
 }
 
 int main(void)

@@ -27,7 +27,6 @@ INSTANTIATE_TEST_CASE_P(
 	                <AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 	                <AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
 	                <TexturesPath></TexturesPath>
-	                <SoundsPath> res/sounds/ </SoundsPath>
 	                <UiPath> res/ui/ </UiPath>
 	
 	                <ShowDebugWindow> true </ShowDebugWindow>
@@ -42,7 +41,6 @@ INSTANTIATE_TEST_CASE_P(
                         "res/atlas/__atlases/atlas_config.json",
                         "res/atlas/__atlases/",
                         "",
-                        "res/sounds/",
                         "res/ui/",
                         true,
                         true
@@ -50,7 +48,6 @@ INSTANTIATE_TEST_CASE_P(
                 }
     ));
 
-// Demonstrate some basic assertions.
 TEST_P(NadorConfigTest, NadorConfigTest_1)
 {
     nador::AppConfig appConfig = nador::ReadAppConfig(GetParam().rawConfigData);
