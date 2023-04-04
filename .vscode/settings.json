@@ -72,7 +72,8 @@
         "valarray": "cpp",
         "variant": "cpp",
         "span": "cpp",
-        "zlib.h": "c"
+        "zlib.h": "c",
+        "any": "cpp"
     },
 
     "cmake.configureOnEdit": false,

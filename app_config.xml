@@ -7,7 +7,6 @@
 	<RootFilePath></RootFilePath>
 	<AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 	<AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
-	<TexturesPath></TexturesPath>
 	<UiPath> res/ui/ </UiPath>
 	
 	<ShowDebugWindow> true </ShowDebugWindow>

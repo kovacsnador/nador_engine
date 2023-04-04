@@ -40,6 +40,9 @@ namespace nador
 
 	void AtlasTest::OnDebugRender()
 	{
+		using LisboxPred_t = std::function<const char*(const strings_t&, size_t)>;
+		auto ListStrCallback = [](const strings_t& c, size_t i) { return c.at(i).c_str(); };
+
 		static int32_t selectedItemAtlas = 0;
 		static int32_t selectedItemImage = 0;
 
@@ -55,12 +58,14 @@ namespace nador
 		if((size_t)selectedItemAtlas < atlases.size())
 		{
 			AtlasPtr selectedAtlas = atlases.at(selectedItemAtlas);
-
+			
 			strings_t imageNames = selectedAtlas->GetImageNames();
+			auto imagesTuple = std::tuple<strings_t, LisboxPred_t>(imageNames, ListStrCallback);
 
 			ImGui::ListBox("Images", &selectedItemImage,
-						   ImGuiStrContainerIter,
-						   reinterpret_cast<void*>(&imageNames), imageNames.size(), 10);
+						   &ImGuiTupleContainerIter<strings_t, LisboxPred_t>,
+						   reinterpret_cast<void*>(&imagesTuple), imageNames.size(), 10);
+
 
 			const auto& ids = selectedAtlas->GetImageIds();
 			if((size_t)selectedItemImage >= ids.size())

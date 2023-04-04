@@ -40,7 +40,6 @@ INSTANTIATE_TEST_CASE_P(
                         "",
                         "res/atlas/__atlases/atlas_config.json",
                         "res/atlas/__atlases/",
-                        "",
                         "res/ui/",
                         true,
                         true

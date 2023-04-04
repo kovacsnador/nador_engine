@@ -1,8 +1,9 @@
 #ifndef __IMGUI_HELPER_H__
 #define __IMGUI_HELPER_H__
 
-#include "nador/utils/Types.h"
+#include <tuple>
 
+#include "nador/utils/Types.h"
 
 namespace nador
 {
@@ -12,6 +13,21 @@ namespace nador
 	bool NewFrameImGui();
 	bool EndFrameImGui(int32_t width, int32_t height);
 	bool ShutdownImGui();
+
+	template<typename ContainerTy, typename PredTy>
+	bool ImGuiTupleContainerIter(void* pairIn, int idx, const char** out_text)
+    {
+		auto tuple = reinterpret_cast<std::tuple<ContainerTy, PredTy>*>(pairIn);
+		const auto& container = std::get<ContainerTy>(*tuple);
+		const auto& pred = std::get<PredTy>(*tuple);
+
+        if (idx < 0 || (size_t)idx >= container.size())
+        {
+            return false;
+        }
+        *out_text = pred(container, idx);
+        return true;
+    }
 }
 
 
