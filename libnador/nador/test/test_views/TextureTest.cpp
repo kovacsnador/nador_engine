@@ -1,15 +1,20 @@
 #include "imgui.h"
 
 #include "nador/test/test_views/TextureTest.h"
+#include "nador/system/IFileController.h"
+#include "nador/video/IVideo.h"
+#include "nador/video/renderer/IRenderer.h"
+
 #include "nador/App.h"
 
 namespace nador
 {
-	TextureTest::TextureTest(const IVideo* video)
-	: ITest(video)
+	TextureTest::TextureTest(const IVideo* video, const IFileController* fileCtrl)
+	: _video(video)
+	, _fileCtrl(fileCtrl)
 	{
 		_material.uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		_material.texture.reset(new Texture(_video, "res/textures/test.png"));
+		_material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/test.png")));
 
 		_renderData.vertices = {
 			{0.0f,   0.0f,   0.0f, 1.0f},

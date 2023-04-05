@@ -6,7 +6,7 @@
 
 #include "common/GlobalEvents.h"
 #include "system/IFactory.h"
-#include "test/TestController.h"
+#include "test/ITestController.h"
 #include "video/renderer/IRenderer.h"
 #include "system/IFileController.h"
 #include "system/IInputController.h"
@@ -24,17 +24,18 @@ namespace nador
     protected:
         IApp();
 
-	public:
+    public:
         virtual ~IApp();
 
     public:
         static IApp* Get();
 
+        virtual void                    InitializeDefaultTests()   = 0;
         virtual bool                    ShouldClose() const        = 0;
         virtual void                    Tick()                     = 0;
         virtual void                    Run()                      = 0;
         virtual const IVideo*           GetVideo()                 = 0;
-        virtual TestController*         GetTestController()        = 0;
+        virtual ITestController*        GetTestController()        = 0;
         virtual IRenderer*              GetRenderer()              = 0;
         virtual IWindow*                GetWindow()                = 0;
         virtual void                    ShowDebugWindow(bool show) = 0;
@@ -51,141 +52,143 @@ namespace nador
     protected:
         static IApp* s_instance;
     };
-	CREATE_PTR_TYPES(IApp);
+    CREATE_PTR_TYPES(IApp);
 
     class TestController;
 
     class App : public IApp, public onWindowClose_listener_t, private NonCopyable
     {
     public:
-		static IAppUPtr CreateApp(const AppConfig& config);
+        static IAppUPtr CreateApp(const AppConfig& config);
 
         App(const AppConfig&     config,
-			IFactoryUPtr         factory,
+            IFactoryUPtr         factory,
             IUiAppUPtr           uiApp,
             IRendererUPtr        renderer,
             IAtlasControllerUPtr atlasCtrl,
             IFontControllerUPtr  fontCtrl,
-            TestControllerUPtr   testController);
+            ITestControllerUPtr  testController);
 
     public:
-        virtual ~App();	
+        virtual ~App();
 
         /*!
          * Ask API to close the window.
          *
          * \return True if the window should be closed otherwise False.
          */
-        bool ShouldClose() const;
+        bool ShouldClose() const override;
 
         /*!
          * The Tick function.
          */
-        void Tick();
+        void Tick() override;
 
         /*!
          * Run the application.
          * This function calls Tick in every frame.
          */
-        void Run();
+        void Run() override;
 
         /*!
          * Gets the video interface.
          *
          * \return The video interface.
          */
-        const IVideo* GetVideo();
+        const IVideo* GetVideo() override;
 
         /*!
          * Gets the TestController object.
          *
          * \return The test controller.
          */
-        TestController* GetTestController();
+        ITestController* GetTestController() override;
 
         /*!
          * Gets the Renderer object.
          *
          * \return The renderer.
          */
-        IRenderer* GetRenderer();
+        IRenderer* GetRenderer() override;
 
         /*!
          * Gets the Window interface.
          *
          * \return The rwindow interface.
          */
-        IWindow* GetWindow();
+        IWindow* GetWindow() override;
 
         /*!
          * Shows and hides the debug window.
          *
          * \param show	The flag.
          */
-        void ShowDebugWindow(bool show);
+        void ShowDebugWindow(bool show) override;
 
         /*!
          * Sets to show the debug infos.
          *
          * \param show	The flag.
          */
-        void ShowDebugInfo(bool show);
+        void ShowDebugInfo(bool show) override;
 
         /*!
          * Gets if shows the debug infos.
          *
          * \return	The flag.
          */
-        bool IsShowDebugInfo();
+        bool IsShowDebugInfo() override;
 
         /*!
          * Gets the file controller.
          *
          * \return	The file controller interface.
          */
-        IFileController* GetFileController() const;
+        IFileController* GetFileController() const override;
 
         /*!
          * Gets the input controller.
          *
          * \return	The file controller interface.
          */
-        const IInputController* GetInputController() const;
+        const IInputController* GetInputController() const override;
 
         /*!
          * Gets the atlas controller.
          *
          * \return	The atlas controller.
          */
-        const IAtlasController* GetAtlasController() const;
+        const IAtlasController* GetAtlasController() const override;
 
         /*!
          * Gets the font controller.
          *
          * \return	The font controller.
          */
-        IFontController* GetFontController();
+        IFontController* GetFontController() override;
 
         /*!
          * Gets the app configuration.
          *
          * \return	The base configuration.
          */
-        const AppConfig& GetAppConfig() const;
+        const AppConfig& GetAppConfig() const override;
 
         /*!
          * Gets the sound controller.
          *
          * \return	The sound controller interface.
          */
-        ISoundController* GetSoundController() const;
+        ISoundController* GetSoundController() const override;
 
         /*!
          * Gets the ui application.
          *
          * \return	The ui application.
          */
-        IUiApp* GetUiApp() const;
+        IUiApp* GetUiApp() const override;
+
+        void InitializeDefaultTests() override;
 
     private:
         enum class EAppState
@@ -227,7 +230,7 @@ namespace nador
         IRendererUPtr        _renderer;
         IAtlasControllerUPtr _atlasCtrl;
         IFontControllerUPtr  _fontCtrl;
-        TestControllerUPtr   _testController;
+        ITestControllerUPtr  _testCtrl;
         IUiAppUPtr           _uiApp;
 
         EAppState _state { EAppState::RUNNING };

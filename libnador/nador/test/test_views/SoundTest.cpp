@@ -6,8 +6,7 @@
 
 namespace nador
 {
-	SoundTest::SoundTest(const IVideo* video)
-	: ITest(video)
+	SoundTest::SoundTest()
 	{
 		_LoadSounds();
 	}

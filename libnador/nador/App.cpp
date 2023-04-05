@@ -17,6 +17,8 @@
 #include "nador/ui/UiApp.h"
 #include "nador/system/IWindow.h"
 
+#include "nador/test/Tests.h"
+
 namespace nador
 {
     //----------------------------------------------------------------------------------------------
@@ -57,18 +59,20 @@ namespace nador
 
         const IVideo* video = factory->GetVideo(); 
         IFileController* fileCtrl = factory->GetFileController();
+        IInputController* inputCtrl = factory->GetInputController();
 
         IRendererUPtr renderer = std::make_unique<Renderer>(video);
 
         IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video, fileCtrl);
-        TestControllerUPtr testController = std::make_unique<TestController>(video);
 
         DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
         IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
 
         IUiAppUPtr uiApp = std::make_unique<UiApp>();
 
-        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testController));
+        ITestControllerUPtr testCtrl = std::make_unique<TestController>(video, fileCtrl, atlasCtrl.get(), fontCtrl.get(), uiApp.get(), inputCtrl);
+
+        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testCtrl));
     }
 
     App::App(const AppConfig&     config,
@@ -77,14 +81,14 @@ namespace nador
              IRendererUPtr        renderer,
              IAtlasControllerUPtr atlasCtrl,
              IFontControllerUPtr  fontCtrl,
-             TestControllerUPtr   testController)
+             ITestControllerUPtr  testCtrl)
     : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
     , _config(config)
     , _factory(std::move(factory))
     , _renderer(std::move(renderer))
     , _atlasCtrl(std::move(atlasCtrl))
     , _fontCtrl(std::move(fontCtrl))
-    , _testController(std::move(testController))
+    , _testCtrl(std::move(testCtrl))
     , _uiApp(std::move(uiApp))
     {
         ShowDebugWindow(_config.showDebugWindow);
@@ -97,7 +101,7 @@ namespace nador
     {
         ENGINE_DEBUG("App deinitializing....");
 
-        _testController.reset();
+        _testCtrl.reset();
         _uiApp.reset();
         _atlasCtrl.reset();
         _fontCtrl.reset();
@@ -132,10 +136,10 @@ namespace nador
         g_onTickEvent(deltaTime);
 
         // Render event
-        g_onRenderEvent();
+        g_onRenderEvent(GetRenderer());
 
         // Render debug event
-        g_onDebugRenderEvent();
+        g_onDebugRenderEvent(GetRenderer());
 
         // End
         _TickEnd();
@@ -223,9 +227,9 @@ namespace nador
         return _factory->GetVideo();
     }
 
-    TestController* App::GetTestController()
+    ITestController* App::GetTestController()
     {
-        return _testController.get();
+        return _testCtrl.get();
     }
 
     IRenderer* App::GetRenderer()
@@ -240,7 +244,7 @@ namespace nador
 
     void App::ShowDebugWindow(bool show)
     {
-        _testController->Suspend(!show);
+        _testCtrl->Suspend(!show);
 
         _factory->GetWindow()->ShowDebugWindow(show);
     }
@@ -288,5 +292,20 @@ namespace nador
     IUiApp* App::GetUiApp() const
     {
         return _uiApp.get();
+    }
+
+    void App::InitializeDefaultTests()
+    {
+        _testCtrl->AddTest<ClearColorTest>("Clear Color", GetVideo());
+        _testCtrl->AddTest<BaseMaterialTest>("Base Material Test");
+        _testCtrl->AddTest<RoundEdgeMaterialTest>("Round Edge Material Test");
+        _testCtrl->AddTest<SimpleLineTest>("Simple Line Test");
+        _testCtrl->AddTest<TextureTest>("Texture Test", GetVideo(), GetFileController());
+        _testCtrl->AddTest<AtlasTest>("Atlas Test", GetAtlasController());
+        _testCtrl->AddTest<FontTest>("Font Test", GetFontController());
+        _testCtrl->AddTest<InputTest>("Input Test", GetInputController());
+        _testCtrl->AddTest<SoundTest>("Sound Test");
+        _testCtrl->AddTest<UiSquareTest>("UiSquare Test", GetVideo(), GetFileController());
+        _testCtrl->AddTest<UiElementsTest>("UiElements Test", GetUiApp(), GetFontController(), GetInputController());
     }
 } // namespace nador

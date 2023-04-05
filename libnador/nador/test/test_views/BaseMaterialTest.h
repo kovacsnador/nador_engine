@@ -10,8 +10,7 @@ namespace nador
 	class BaseMaterialTest : public ITest
 	{
 	public:
-		BaseMaterialTest(const IVideo* video)
-		: ITest(video)
+		BaseMaterialTest()
 		{
 			_renderData.vertices = {
 				{0.0f,	0.0f,	0.0f, 1.0f},

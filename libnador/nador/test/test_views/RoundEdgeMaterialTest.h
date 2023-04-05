@@ -10,8 +10,7 @@ namespace nador
 	class RoundEdgeMaterialTest : public ITest
 	{
 	public:
-		RoundEdgeMaterialTest(const IVideo* video)
-		: ITest(video)
+		RoundEdgeMaterialTest()
 		{
 			_renderData.vertices = {
 				{0.0f,	0.0f,	0.0f, 1.0f},

@@ -4,8 +4,9 @@
 #include <utility>
 
 #include "nador/test/test_views/FontTest.h"
-#include "nador/App.h"
+#include "nador/video/font/IFontController.h"
 #include "nador/utils/ImGuiHelper.h"
+#include "nador/video/renderer/IRenderer.h"
 
 
 namespace nador
@@ -45,8 +46,8 @@ namespace nador
 		return std::nullopt;
 	}
 
-	FontTest::FontTest(const IVideo* video)
-	: ITest(video)
+	FontTest::FontTest(const IFontController* fontCtrl)
+	: _fontCtrl(fontCtrl)
 	, _position(2, 500)
 	, _scale(20, 20, 1)
 	, _color(1, 0, 0, 1)
@@ -78,10 +79,8 @@ namespace nador
 
 	void FontTest::OnDebugRender()
 	{
-		IFontController* fontCtrl = IApp::Get()->GetFontController();
-
-		strings_t fontTypeNames = fontCtrl->GetRegisteredFontNames();
-		strings_t fontSizeNames = fontCtrl->GetFontSizesAsString();
+		strings_t fontTypeNames = _fontCtrl->GetRegisteredFontNames();
+		strings_t fontSizeNames = _fontCtrl->GetFontSizesAsString();
 
 		static int32_t selectedFontType = 0;
 		static int32_t selectedFontSize = 0;
@@ -102,7 +101,7 @@ namespace nador
 
 		if(reloadNeeds)
 		{
-			std::optional<uint32_t> fontType = SelectedFontTypeMap(selectedFontType, fontTypeNames, fontCtrl);
+			std::optional<uint32_t> fontType = SelectedFontTypeMap(selectedFontType, fontTypeNames, _fontCtrl);
 			if(fontType.has_value() == false)
 			{
 				ENGINE_WARNING("FontType has no value. (possible not implemented)");
@@ -131,8 +130,7 @@ namespace nador
 
 	void FontTest::_LoadFont(uint32_t fontId, uint32_t fontSize)
 	{
-		const IFontController* fontCtrl = IApp::Get()->GetFontController();
-		const FontPtr font = fontCtrl->GetFont(fontId, fontSize);
+		const FontPtr font = _fontCtrl->GetFont(fontId, fontSize);
 
 		if(font == nullptr)
 		{

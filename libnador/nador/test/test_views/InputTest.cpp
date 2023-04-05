@@ -1,16 +1,16 @@
 #include "imgui.h"
 
 #include "nador/test/test_views/InputTest.h"
-#include "nador/App.h"
 #include "nador/common/GlobalEvents.h"
 #include "nador/utils/Utils.h"
+#include "nador/system/IInputController.h"
 
 namespace nador
 {
 	const uint32_t InputTest::bufferSize;
 
-	InputTest::InputTest(const IVideo* video)
-	: ITest(video)
+	InputTest::InputTest(const IInputController* inputCtrl)
+	: _inputCtrl(inputCtrl)
 	{
 		memset(_additionalMsg, 0, bufferSize * sizeof(*_additionalMsg));
 		memset(_additionalMsgMouse, 0, bufferSize * sizeof(*_additionalMsgMouse));
@@ -39,9 +39,7 @@ namespace nador
 
 	void InputTest::OnDebugRender()
 	{
-		const nador::IInputController* inputCtrl = IApp::Get()->GetInputController();
-
-		glm::vec2 mousePosition = inputCtrl->GetMousePosition();
+		glm::vec2 mousePosition = _inputCtrl->GetMousePosition();
 
 		ImGui::Text("Mouse position: x:%f, y:%f", mousePosition.x, mousePosition.y);
 		ImGui::Text(_additionalMsg);

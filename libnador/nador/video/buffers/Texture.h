@@ -21,7 +21,7 @@ namespace nador
 		 * \param filePath			The texture file path.
 		 * \param textureSettings	The specified texture settings.
 		 */
-		Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings = {});
+		//Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings = {});
 
 		/*!
 		 * Texture constructor.

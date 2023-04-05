@@ -7,13 +7,15 @@
 
 namespace nador
 {
+	class IAtlasController;
+
 	class AtlasTest : public ITest
 	{
 	public:
 		/*!
 		 * AtlasTest constructor.
 		 */
-		AtlasTest(const IVideo* video);
+		AtlasTest(const IAtlasController* atlasCtrl);
 
 		/*!
 		 * Called on render.
@@ -26,6 +28,8 @@ namespace nador
 		void OnDebugRender() override;
 
 	private:
+		const IAtlasController* _atlasCtrl;
+
 		TextureMaterial _material;
 		RenderData		_renderData;
 	};

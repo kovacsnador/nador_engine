@@ -8,7 +8,7 @@ namespace nador
 		_onTickListener.SetCallback(std::bind(&GlobalListener::OnTick, this, arg::_1));
 
 		g_onRenderEvent += &_onRenderListener;
-		_onRenderListener.SetCallback(std::bind(&GlobalListener::OnRender, this));
+		_onRenderListener.SetCallback(std::bind(&GlobalListener::OnRender, this, arg::_1));
 
 		g_onKeyPressedEvent += &_onKeyPressedListener;
 		_onKeyPressedListener.SetCallback(std::bind(&GlobalListener::OnKeyPressed, this, arg::_1));

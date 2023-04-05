@@ -2,17 +2,16 @@
 
 #include "nador/utils/ImGuiHelper.h"
 #include "nador/test/test_views/AtlasTest.h"
-#include "nador/App.h"
 #include "EImageName.h"
+#include "nador/video/atlas/IAtlasController.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {
-	AtlasTest::AtlasTest(const IVideo* video)
-	: ITest(video)
+	AtlasTest::AtlasTest(const IAtlasController* atlasCtrl)
+	: _atlasCtrl(atlasCtrl)
 	{
-		const IAtlasController* atlasCtrl = IApp::Get()->GetAtlasController();
-
-		ImageData imageData = atlasCtrl->GetImage(video::EImageName::TEST145);
+		ImageData imageData = _atlasCtrl->GetImage(video::EImageName::TEST145);
 
 		_material.uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		_material.texture = imageData.texture;
@@ -46,10 +45,8 @@ namespace nador
 		static int32_t selectedItemAtlas = 0;
 		static int32_t selectedItemImage = 0;
 
-		const IAtlasController* atlasCtrl = IApp::Get()->GetAtlasController();
-
-		strings_t atlasNames = atlasCtrl->GetAtlasNames();
-		IAtlasController::atlases_t atlases = atlasCtrl->GetAtlases();
+		strings_t atlasNames = _atlasCtrl->GetAtlasNames();
+		IAtlasController::atlases_t atlases = _atlasCtrl->GetAtlases();
 		
 		ImGui::ListBox("Atlases", &selectedItemAtlas,
 					   ImGuiStrContainerIter,

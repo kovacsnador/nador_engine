@@ -64,8 +64,10 @@ int main(void)
 	nador::AppConfig config = nador::ReadAppConfigFromFile("app_config.xml");
 
 	// Create the main Application.
-	//nador::App app(config);
 	nador::IAppUPtr app = nador::App::CreateApp(config);
+	
+	// Adding default tests
+	app->InitializeDefaultTests();
 
 	InitFonts();
 	InitSounds();

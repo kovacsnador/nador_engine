@@ -15,7 +15,7 @@ namespace nador
 		 *
 		 * \param filePath	The texture file path.
 		 */
-		TextureData(const char* filePath);
+		//TextureData(const char* filePath);
 
 		/*!
 		 * TextureData constructor.
@@ -56,7 +56,7 @@ namespace nador
 		 *
 		 * \return		The raw texture data.
 		 */
-		static TextureDataPtr LoadFromFile(const char* filePath);
+		//static TextureDataPtr LoadFromFile(const char* filePath);
 
 		/*!
 		 * Load a texture from buffer.

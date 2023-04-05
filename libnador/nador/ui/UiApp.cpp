@@ -132,10 +132,8 @@ namespace nador
 		}
 	}
 
-	void UiApp::OnRender()
+	void UiApp::OnRender(IRenderer* renderer)
 	{
-		IRenderer* renderer = IApp::Get()->GetRenderer();
-
 		for (auto& layer : _layers)
 		{
 			for (auto& elem : layer.second)

@@ -13,8 +13,13 @@ namespace nador
 		 * FrameTracker constructor.
 		 */
 		FrameTracker()
-		: onRender_listener_t(&g_onRenderEvent, std::bind(&FrameTracker::CountUp, this))
+		: onRender_listener_t(&g_onRenderEvent, std::bind(&FrameTracker::RenderCountUp, this, arg::_1))
 		{
+		}
+
+		void RenderCountUp(IRenderer*)
+		{
+			CountUp();
 		}
 	};
 

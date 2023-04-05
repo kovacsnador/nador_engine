@@ -8,13 +8,15 @@
 
 namespace nador
 {
+	class IInputController;
+
 	class InputTest : public ITest
 	{
 	public:
 		/*!
 		 * InputTest constructor.
 		 */
-		InputTest(const IVideo* video);
+		InputTest(const IInputController* inputCtrl);
 
 		/*!
 		 * InputTest destructor.
@@ -45,6 +47,8 @@ namespace nador
 
 		char _additionalMsg[bufferSize];
 		char _additionalMsgMouse[bufferSize];
+
+		const IInputController* _inputCtrl;
 	};
 }
 

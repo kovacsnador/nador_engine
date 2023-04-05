@@ -12,13 +12,15 @@
 
 namespace nador
 {
+	class IFontController;
+
 	class FontTest : public ITest
 	{
 	public:
 		/*!
 		 * FontTest constructor.
 		 */
-		FontTest(const IVideo* video);
+		FontTest(const IFontController* fontCtrl);
 
 		/*!
 		 * Called on render.
@@ -38,6 +40,8 @@ namespace nador
 		 * \param fontSize  The size of the font.
 		 */
 		void _LoadFont(uint32_t fontId, uint32_t fontSize);
+
+		const IFontController* _fontCtrl;
 
 		FontMaterial	_fontMaterial;
 		RenderData		_renderData;

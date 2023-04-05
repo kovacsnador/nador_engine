@@ -5,6 +5,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	class GlobalListener
 	{
 	protected:
@@ -16,7 +18,7 @@ namespace nador
 		bool isListening() const noexcept { return _isListening; }
 
 		virtual void OnTick(float_t) {};
-		virtual void OnRender() {};
+		virtual void OnRender(IRenderer*) {};
 
 		virtual void OnKeyPressed(EKeyCode) {};
 		virtual void OnKeyHolded(EKeyCode) {};

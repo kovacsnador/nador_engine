@@ -5,6 +5,8 @@
 
 namespace nador
 {
+	class IVideo;
+
 	class ClearColorTest : public ITest
 	{
 	public:
@@ -25,6 +27,8 @@ namespace nador
 
 	private:
 		static float_t _clearColor[4];
+
+		const IVideo* _video;
 	};
 }
 

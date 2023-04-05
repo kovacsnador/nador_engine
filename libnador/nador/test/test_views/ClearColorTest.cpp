@@ -1,22 +1,20 @@
 #include "imgui.h"
 
 #include "nador/test/test_views/ClearColorTest.h"
-#include "nador/App.h"
+#include "nador/video/IVideo.h"
 
 float_t nador::ClearColorTest::_clearColor[4];
 
 namespace nador
 {
 	ClearColorTest::ClearColorTest(const IVideo* video)
-	: ITest(video)
+	: _video(video)
 	{
 	}
 
 	void ClearColorTest::OnRender(IRenderer*)
 	{
-		const IVideo* video = IApp::Get()->GetVideo();
-
-		video->ClearColorRGBA(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]);
+		_video->ClearColorRGBA(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]);
 	}
 
 	void ClearColorTest::OnDebugRender()

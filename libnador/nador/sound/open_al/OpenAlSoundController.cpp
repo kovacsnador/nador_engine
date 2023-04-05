@@ -106,11 +106,6 @@ namespace nador
             return;
         }
 
-        //IApp* app = IApp::Get();
-
-        //const std::string& soundsPath = app->GetAppConfig().soundsPath;
-
-        //const IFileController* fileCtrl  = app->GetFileController();
         DataPtr soundFile = _fileCtrl->Read(filePath);
 
         SoundPtr soundPtr  = std::make_shared<Sound>();

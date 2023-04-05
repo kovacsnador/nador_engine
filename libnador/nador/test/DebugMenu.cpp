@@ -7,14 +7,13 @@
 
 namespace nador
 {
-    DebugMenu::DebugMenu(const IVideo* video)
-	: ITest(video)
+    DebugMenu::DebugMenu()
 	{
 	}
 
     void DebugMenu::OnDebugRender()
     {
-        TestController* ctrl = IApp::Get()->GetTestController();
+        ITestController* ctrl = IApp::Get()->GetTestController();
 
         ImGui::SetCursorPos({ 8, 50 });
         for (auto& it : ctrl->GetTests())

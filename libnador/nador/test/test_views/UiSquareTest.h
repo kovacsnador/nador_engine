@@ -23,13 +23,16 @@ namespace nador
 	class UiSquareTest : public ITest
 	{
 	public:
-		UiSquareTest(const IVideo* video);
+		UiSquareTest(const IVideo* video, const IFileController* fileCtrl);
 
 		void OnRender(IRenderer* renderer) override;
 		void OnDebugRender() override;
 
 	private:
 		void _Update();
+
+		const IVideo* _video;
+		const IFileController* _fileCtrl;
 
 		TestImage _parent;
 		TestImage _child;

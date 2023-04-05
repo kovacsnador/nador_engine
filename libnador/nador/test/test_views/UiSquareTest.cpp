@@ -4,6 +4,8 @@
 #include "nador/test/test_views/UiSquareTest.h"
 #include "nador/ui/UiCommon.h"
 #include "nador/test/TestCommon.h"
+#include "nador/video/IVideo.h"
+#include "nador/system/IFileController.h"
 
 namespace nador
 {
@@ -31,11 +33,12 @@ namespace nador
 		return vertices;
 	}
 
-	UiSquareTest::UiSquareTest(const IVideo* video)
-	: ITest(video)
+	UiSquareTest::UiSquareTest(const IVideo* video, const IFileController* fileCtrl)
+	: _video(video)
+	, _fileCtrl(fileCtrl)
 	{
-		_parent.material.texture.reset(new Texture(_video, "res/textures/playerBtn.png"));
-		_child.material.texture.reset(new Texture(_video, "res/textures/test.png"));
+		_parent.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/playerBtn.png")));
+		_child.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/test.png")));
 
 		_parent.pos = { 100, 100 };
 		_parent.size = { 500, 500 };

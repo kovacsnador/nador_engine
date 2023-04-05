@@ -7,6 +7,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_0(onWindowClose);
 	extern onWindowClose_event_t g_onWindowCloseEvent;
@@ -39,11 +41,11 @@ namespace nador
 	extern onTickEnd_event_t g_onTickEndEvent;
 
 	//=====================================================================
-	CREATE_EVENT_TYPE_ARG_0(onRender);
+	CREATE_EVENT_TYPE_ARG_1(onRender, IRenderer*);
 	extern onRender_event_t g_onRenderEvent;
 
 	//=====================================================================
-	CREATE_EVENT_TYPE_ARG_0(onDebugRender);
+	CREATE_EVENT_TYPE_ARG_1(onDebugRender, IRenderer*);
 	extern onDebugRender_event_t g_onDebugRenderEvent;
 }
 

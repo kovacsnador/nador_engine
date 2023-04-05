@@ -8,13 +8,16 @@
 
 namespace nador
 {
+	class IVideo;
+	class IFileController;
+
 	class TextureTest : public ITest
 	{
 	public:
 		/*!
 		 * TextureTest constructor.
 		 */
-		TextureTest(const IVideo* video);
+		TextureTest(const IVideo* video, const IFileController* fileCtrl);
 
 		/*!
 		 * Called on render.
@@ -27,6 +30,9 @@ namespace nador
 		void OnDebugRender() override;
 
 	private:
+		const IVideo* 		   _video;
+		const IFileController* _fileCtrl;
+
 		TextureMaterial _material;
 		RenderData		_renderData;
 		RenderData		_renderData2;
