@@ -97,6 +97,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     # nador source
     ${NADOR_SRC_DIR}/App.cpp
+    ${NADOR_SRC_DIR}/IApp.cpp
 
     ${NADOR_SRC_DIR}/common/GlobalEvents.cpp
     ${NADOR_SRC_DIR}/common/GlobalListener.cpp
@@ -107,7 +108,6 @@ target_sources(${PROJECT_NAME}
 
     ${NADOR_SRC_DIR}/system/file/WindowsFileController.cpp
 
-    ${NADOR_SRC_DIR}/test/DebugMenu.cpp
     ${NADOR_SRC_DIR}/test/TestCommon.cpp
     ${NADOR_SRC_DIR}/test/TestController.cpp
 

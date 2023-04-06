@@ -1,71 +1,74 @@
 #include "imgui.h"
 
-#include "nador/App.h"
 #include "nador/test/TestController.h"
-#include "nador/test/DebugMenu.h"
 #include "nador/test/Tests.h"
 
 namespace nador
 {
-    TestController::TestController(const IVideo*           video,
-                                   const IFileController*  fileCtrl,
-                                   const IAtlasController* atlasCtrl,
-                                   const IFontController*  fontCtrl,
-                                   IUiApp*                 uiApp,
-                                   const IInputController* inputCtrl)
+    TestController::TestController()
     : _onTickListener(&g_onTickEvent, std::bind(&TestController::OnTick, this, arg::_1))
     , _onRenderListener(&g_onRenderEvent, std::bind(&TestController::OnRender, this, arg::_1))
     , _onDebugRenderListener(&g_onDebugRenderEvent, std::bind(&TestController::OnDebugRender, this, arg::_1))
-    , _video(video)
-    , _fileCtrl(fileCtrl)
     {
-        _currentTest.reset(new DebugMenu());
-
-        /*AddTest<ClearColorTest>("Clear Color", _video);
-        AddTest<BaseMaterialTest>("Base Material Test");
-        AddTest<RoundEdgeMaterialTest>("Round Edge Material Test");
-        AddTest<SimpleLineTest>("Simple Line Test");
-        AddTest<TextureTest>("Texture Test", _video, _fileCtrl);
-        AddTest<AtlasTest>("Atlas Test", atlasCtrl);
-        AddTest<FontTest>("Font Test", fontCtrl);
-        AddTest<InputTest>("Input Test", inputCtrl);
-        AddTest<SoundTest>("Sound Test");
-        AddTest<UiSquareTest>("UiSquare Test", _video, _fileCtrl);
-        AddTest<UiElementsTest>("UiElements Test", uiApp, fontCtrl, inputCtrl);*/
     }
 
     void TestController::OnTick(float_t deltaTime)
     {
-        _currentTest->OnTick(deltaTime);
+        if (_currentTest)
+        {
+            _currentTest->OnTick(deltaTime);
+        }
     }
 
     void TestController::OnRender(IRenderer* renderer)
     {
-        _currentTest->OnRender(renderer);
+        if (_currentTest)
+        {
+            _currentTest->OnRender(renderer);
+        }
     }
 
     void TestController::OnDebugRender(IRenderer* renderer)
-    {
-        if (dynamic_cast<DebugMenu*>(_currentTest.get()) == nullptr)
+    { 
+        if (_currentTest)
         {
             if (ImGui::Button("<-"))
             {
-                _currentTest.reset(new DebugMenu());
+                _currentTest.reset();
+                _DebugRenderStartMenu();
+            }
+            else
+            {
+                _currentTest->OnDebugRender();
             }
         }
         else
         {
-            if (ImGui::Button("Toggle Debug Info"))
-            {
-                IApp* app = IApp::Get();
-                app->ShowDebugInfo(!app->IsShowDebugInfo());
-            }
+            _DebugRenderStartMenu();
         }
-
-        _currentTest->OnDebugRender();
 
         ImGui::SetCursorPos({ 150, 20 });
         ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    }
+
+    void TestController::_DebugRenderStartMenu()
+    {
+        if (ImGui::Button("Toggle Debug Info"))
+        {
+            if (_toggleDebugTxtCb)
+            {
+                _toggleDebugTxtCb();
+            }
+        }
+
+        ImGui::SetCursorPos({ 8, 50 });
+        for (auto& it : _tests)
+        {
+            if (ImGui::Button(it.first.c_str()))
+            {
+                it.second();
+            }
+        }
     }
 
     void TestController::Suspend(bool suspend)
@@ -74,4 +77,10 @@ namespace nador
         _onDebugRenderListener.Suspend(suspend);
         _onTickListener.Suspend(suspend);
     }
+
+    void TestController::SetToggleDebugTextCallback(ToggleDebugTextCb_t cb) noexcept
+    {
+        _toggleDebugTxtCb = cb;
+    }
+
 } // namespace nador

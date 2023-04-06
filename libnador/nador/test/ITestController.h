@@ -14,6 +14,8 @@ namespace nador
         using pair_t      = std::pair<std::string, std::function<void()>>;
         using test_list_t = std::vector<pair_t>;
 
+        using ToggleDebugTextCb_t = std::function<void()>;
+
         virtual ~ITestController() = default;
 
         template <typename T, typename... Args>
@@ -48,9 +50,11 @@ namespace nador
 
         virtual void Suspend(bool suspend) = 0;
 
+        virtual void SetToggleDebugTextCallback(ToggleDebugTextCb_t cb) noexcept = 0;
+
     protected:
-        test_list_t _tests {};
-        ITestPtr    _currentTest { nullptr };
+        test_list_t         _tests {};
+        ITestPtr            _currentTest { nullptr };
     };
     CREATE_PTR_TYPES(ITestController);
 } // namespace nador

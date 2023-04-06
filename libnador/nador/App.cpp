@@ -21,45 +21,12 @@
 
 namespace nador
 {
-    //----------------------------------------------------------------------------------------------
-
-    IApp* IApp::s_instance = nullptr;
-
-    IApp::IApp()
-    {
-        if (s_instance)
-        {
-            ENGINE_FATAL("Application is already created and initialized!");
-        }
-
-        s_instance = this;
-        ENGINE_DEBUG("App instance created.");
-    }
-
-    IApp::~IApp()
-    {
-        s_instance = nullptr;
-        ENGINE_DEBUG("App instance destroyed.");
-    }
-
-    IApp* IApp::Get()
-    {
-        if (s_instance == nullptr)
-        {
-            ENGINE_FATAL("Application is not created yet!");
-        }
-
-        return s_instance;
-    }
-
-    //----------------------------------------------------------------------------------------------
     IAppUPtr App::CreateApp(const AppConfig& config)
     {
         IFactoryUPtr factory = std::make_unique<Factory>(config);
 
         const IVideo* video = factory->GetVideo(); 
         IFileController* fileCtrl = factory->GetFileController();
-        IInputController* inputCtrl = factory->GetInputController();
 
         IRendererUPtr renderer = std::make_unique<Renderer>(video);
 
@@ -70,7 +37,7 @@ namespace nador
 
         IUiAppUPtr uiApp = std::make_unique<UiApp>();
 
-        ITestControllerUPtr testCtrl = std::make_unique<TestController>(video, fileCtrl, atlasCtrl.get(), fontCtrl.get(), uiApp.get(), inputCtrl);
+        ITestControllerUPtr testCtrl = std::make_unique<TestController>();
 
         return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testCtrl));
     }
@@ -93,6 +60,8 @@ namespace nador
     {
         ShowDebugWindow(_config.showDebugWindow);
         ShowDebugInfo(_config.showDebugInfo);
+
+        _testCtrl->SetToggleDebugTextCallback([this](){ ShowDebugInfo(!IsShowDebugInfo()); });
 
         ENGINE_DEBUG("App initialized.");
     }

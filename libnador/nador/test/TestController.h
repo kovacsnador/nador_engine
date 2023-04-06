@@ -22,12 +22,7 @@ namespace nador
         /*!
          * TestController constructor.
          */
-        TestController(const IVideo*           video,
-                       const IFileController*  fileCtrl,
-                       const IAtlasController* atlasCtrl,
-                       const IFontController*  fontCtrl,
-                       IUiApp*                 uiApp,
-                       const IInputController* inputCtrl);
+        TestController();
 
         /*!
          * Get the tests.
@@ -55,13 +50,16 @@ namespace nador
 
         void Suspend(bool suspend) override;
 
+        void SetToggleDebugTextCallback(ToggleDebugTextCb_t cb) noexcept override;
+
     private:
+        void _DebugRenderStartMenu();
+
         onTick_listener_t        _onTickListener;
         onRender_listener_t      _onRenderListener;
         onDebugRender_listener_t _onDebugRenderListener;
 
-        const IVideo*          _video;
-        const IFileController* _fileCtrl;
+        ToggleDebugTextCb_t _toggleDebugTxtCb { nullptr };
     };
     CREATE_PTR_TYPES(TestController);
 
