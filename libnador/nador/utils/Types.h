@@ -23,5 +23,8 @@ using TYPE##WPtr = std::weak_ptr<TYPE>
 using strings_t = std::vector<std::string>;
 }
 
+#if __cplusplus >= 201703L
+#define NADOR_MAYBE_UNUSED [[maybe_unused]]
+#endif
 
 #endif // !__UTILS_TYPES_H__

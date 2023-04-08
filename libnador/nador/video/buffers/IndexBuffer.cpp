@@ -1,6 +1,5 @@
 #include "nador/video/buffers/IndexBuffer.h"
 #include "nador/log/Log.h"
-#include "nador/App.h"
 
 namespace nador
 {

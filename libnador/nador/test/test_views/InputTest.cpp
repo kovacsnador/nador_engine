@@ -37,7 +37,7 @@ namespace nador
 		g_onKeyReleasedEvent -= &_keyReleasedListener;
 	}
 
-	void InputTest::OnDebugRender()
+	void InputTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
 		glm::vec2 mousePosition = _inputCtrl->GetMousePosition();
 

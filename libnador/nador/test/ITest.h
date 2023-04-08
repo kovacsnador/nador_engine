@@ -38,7 +38,7 @@ namespace nador
 		/*!
 		 * Render the imgui content.
 		 */
-		virtual void OnDebugRender() {};
+		virtual void OnDebugRender(IRenderer*) {};
 	};
 }
 

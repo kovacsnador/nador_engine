@@ -21,7 +21,7 @@ namespace nador
     public:
         UiElementsTest(IUiApp* uiApp, const IFontController* fontCtrl, const IInputController* inputCtrl);
 
-        void OnDebugRender() override;
+        void OnDebugRender(IRenderer* renderer) override;
 
     private:
         void SelectElement(IUiElement* elem, std::string_view name);

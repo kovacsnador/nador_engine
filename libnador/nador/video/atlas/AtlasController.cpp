@@ -1,7 +1,6 @@
 #include <nlohmann/json.hpp>
 
 #include "nador/video/atlas/AtlasController.h"
-#include "nador/App.h"
 
 namespace nador
 {

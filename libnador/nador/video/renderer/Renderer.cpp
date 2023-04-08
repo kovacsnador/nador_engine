@@ -2,7 +2,6 @@
 
 #include "Renderer.h"
 #include "nador/log/Log.h"
-#include "nador/App.h"
 
 static constexpr size_t MAX_VERTEX_COUNT = 10000;
 

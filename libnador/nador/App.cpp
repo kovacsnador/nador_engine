@@ -27,6 +27,7 @@ namespace nador
 
         const IVideo* video = factory->GetVideo(); 
         IFileController* fileCtrl = factory->GetFileController();
+        IInputController* inputCtrl = factory->GetInputController();
 
         IRendererUPtr renderer = std::make_unique<Renderer>(video);
 
@@ -35,7 +36,7 @@ namespace nador
         DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
         IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
 
-        IUiAppUPtr uiApp = std::make_unique<UiApp>();
+        IUiAppUPtr uiApp = std::make_unique<UiApp>(video, inputCtrl);
 
         ITestControllerUPtr testCtrl = std::make_unique<TestController>();
 
@@ -273,8 +274,8 @@ namespace nador
         _testCtrl->AddTest<AtlasTest>("Atlas Test", GetAtlasController());
         _testCtrl->AddTest<FontTest>("Font Test", GetFontController());
         _testCtrl->AddTest<InputTest>("Input Test", GetInputController());
-        _testCtrl->AddTest<SoundTest>("Sound Test");
-        _testCtrl->AddTest<UiSquareTest>("UiSquare Test", GetVideo(), GetFileController());
+        _testCtrl->AddTest<SoundTest>("Sound Test", GetSoundController());
+        _testCtrl->AddTest<UiSquareTest>("UiSquare Test", GetVideo(), GetFileController(), GetUiApp());
         _testCtrl->AddTest<UiElementsTest>("UiElements Test", GetUiApp(), GetFontController(), GetInputController());
     }
 } // namespace nador

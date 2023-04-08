@@ -1,5 +1,4 @@
 #include "nador/ui/UiButton.h"
-#include "nador/App.h"
 
 namespace nador
 {

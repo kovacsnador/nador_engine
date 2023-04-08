@@ -1,7 +1,7 @@
 #ifndef __BASE_MATERIAL_TEST_H__
 #define __BASE_MATERIAL_TEST_H__
 
-#include "nador/App.h"
+#include "nador/video/renderer/IRenderer.h"
 #include "nador/test/ITest.h"
 #include "nador/video/renderer/RenderData.h"
 

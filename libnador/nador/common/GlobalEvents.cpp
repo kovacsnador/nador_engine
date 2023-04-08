@@ -1,4 +1,3 @@
-#include "nador/App.h"
 #include "nador/common/GlobalEvents.h"
 
 namespace nador

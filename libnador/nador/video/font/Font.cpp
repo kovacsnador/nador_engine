@@ -3,7 +3,6 @@
 #include <codecvt>
 
 #include "nador/video/font/Font.h"
-#include "nador/App.h"
 #include "nador/utils/Utils.h"
 
 namespace nador

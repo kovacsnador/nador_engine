@@ -13,13 +13,6 @@ namespace nador
 		/*!
 		 * TextureData constructor.
 		 *
-		 * \param filePath	The texture file path.
-		 */
-		//TextureData(const char* filePath);
-
-		/*!
-		 * TextureData constructor.
-		 *
 		 * \param data	The texture data.
 		 */
 		TextureData(const DataPtr& data);
@@ -49,14 +42,6 @@ namespace nador
 	class TextureLoader
 	{
 	public:
-		/*!
-		 * Load a texture from file.
-		 *
-		 * \param filePath	The texture file path.
-		 *
-		 * \return		The raw texture data.
-		 */
-		//static TextureDataPtr LoadFromFile(const char* filePath);
 
 		/*!
 		 * Load a texture from buffer.

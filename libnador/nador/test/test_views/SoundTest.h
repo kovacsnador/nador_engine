@@ -11,16 +11,17 @@ namespace nador
 	public:
 		using vec_t = std::vector<std::pair<SoundData, ISoundSourcePtr>>;
 
-		SoundTest();
+		SoundTest(ISoundController* soundCtrl);
 
 		/*!
 		 * Render the imgui content.
 		 */
-		void OnDebugRender() override;
+		void OnDebugRender(IRenderer* /*renderer*/) override;
 
 	private:
 		void _LoadSounds();
 
+		ISoundController* _soundCtrl;
 		vec_t _sounds;
 	};
 }

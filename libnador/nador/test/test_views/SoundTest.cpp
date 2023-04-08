@@ -2,19 +2,21 @@
 
 #include "nador/utils/ImGuiHelper.h"
 #include "nador/test/test_views/SoundTest.h"
-#include "nador/App.h"
+#include "nador/sound/ISoundController.h"
+#include "nador/log/Log.h"
 
 namespace nador
 {
-	SoundTest::SoundTest()
+	SoundTest::SoundTest(ISoundController* soundCtrl)
+	: _soundCtrl(soundCtrl)
 	{
+		NADOR_ASSERT(_soundCtrl);
+
 		_LoadSounds();
 	}
 
-	void SoundTest::OnDebugRender()
+	void SoundTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
-		nador::ISoundController* soundCtrl = IApp::Get()->GetSoundController();
-
 		static int32_t selectedSound = 0;
 
 		if (ImGui::Button("Reload"))
@@ -26,7 +28,7 @@ namespace nador
 
 		if (ImGui::Button("Stop All Sound"))
 		{
-			soundCtrl->StopAllSound();
+			_soundCtrl->StopAllSound();
 		}
 
 		ImGui::ListBox("Sounds", &selectedSound,
@@ -90,7 +92,7 @@ namespace nador
 
 			if (ImGui::Button("Play by ID"))
 			{
-				soundCtrl->PlaySound(soundSource->GetSoundId());
+				_soundCtrl->PlaySound(soundSource->GetSoundId());
 			}
 
 			glm::vec3 position = soundSource->GetPosition();
@@ -107,11 +109,9 @@ namespace nador
 	{
 		_sounds.clear();
 
-		nador::ISoundController* soundCtrl = IApp::Get()->GetSoundController();
-
-		for (auto& it : soundCtrl->GetAllSoundData())
+		for (auto& it : _soundCtrl->GetAllSoundData())
 		{
-			ISoundSourcePtr soundSource = soundCtrl->CreateSoundSource(it.soundId);
+			ISoundSourcePtr soundSource = _soundCtrl->CreateSoundSource(it.soundId);
 			
 			_sounds.push_back(std::make_pair(it, soundSource));
 		}

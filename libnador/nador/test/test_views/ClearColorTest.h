@@ -23,7 +23,7 @@ namespace nador
 		/*!
 		 * Render the imgui content.
 		 */
-		void OnDebugRender() override;
+		void OnDebugRender(IRenderer* /*renderer*/) override;
 
 	private:
 		static float_t _clearColor[4];

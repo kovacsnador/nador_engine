@@ -1,8 +1,6 @@
 #include "imgui.h"
 
-#include "nador/App.h"
 #include "nador/test/test_views/UiSquareTest.h"
-#include "nador/ui/UiCommon.h"
 #include "nador/test/TestCommon.h"
 #include "nador/video/IVideo.h"
 #include "nador/system/IFileController.h"
@@ -33,9 +31,10 @@ namespace nador
 		return vertices;
 	}
 
-	UiSquareTest::UiSquareTest(const IVideo* video, const IFileController* fileCtrl)
+	UiSquareTest::UiSquareTest(const IVideo* video, const IFileController* fileCtrl, const IUiApp* uiApp)
 	: _video(video)
 	, _fileCtrl(fileCtrl)
+	, _uiApp(uiApp)
 	{
 		_parent.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/playerBtn.png")));
 		_child.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/test.png")));
@@ -57,7 +56,7 @@ namespace nador
 		renderer->Draw(&_child.material, _child.renderData, &modelMtx);
 	}
 
-	void UiSquareTest::OnDebugRender()
+	void UiSquareTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
 		static const char* horizontal[]{ "LEFT", "RIGHT", "CENTER", "STRETCH"};
 		static const char* vertical[]{ "TOP", "BOTTOM", "CENTER", "STRETCH" };
@@ -84,7 +83,7 @@ namespace nador
 
 	void UiSquareTest::_Update()
 	{
-		auto screenVertices = IApp::Get()->GetUiApp()->GetScreenVertices();
+		auto screenVertices = _uiApp->GetScreenVertices();
 
 		auto parentAligner = ToAligner(_parentSelectedHorizontal, _parentSelectedVertical);
 		auto parentVerices = _parent.Update(parentAligner, screenVertices);

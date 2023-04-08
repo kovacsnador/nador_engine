@@ -1,6 +1,5 @@
 #include "nador/video/shader/Shader.h"
 #include "nador/log/Log.h"
-#include "nador/App.h"
 
 namespace nador
 {

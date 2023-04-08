@@ -27,7 +27,7 @@ namespace nador
 		/*!
 		 * Called on imgui render.
 		 */
-		void OnDebugRender() override;
+		void OnDebugRender(IRenderer* renderer) override;
 
 	private:
 		const IVideo* 		   _video;

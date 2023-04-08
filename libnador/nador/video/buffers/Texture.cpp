@@ -1,22 +1,7 @@
 #include "nador/video/buffers/Texture.h"
-#include "nador/App.h"
 
 namespace nador
 {
-	/*Texture::Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings)
-	: _video(video)
-	, _id(0)
-	, _width(0)
-	, _height(0)
-	, _pbb(0)
-	, _textureSettings(textureSettings)
-	{
-		NADOR_ASSERT(_video);
-
-		TextureDataPtr textureData = TextureLoader::LoadFromFile(filePath);
-		_UploadTexture(textureData);
-	}*/
-
 	Texture::Texture(const IVideo* video, const DataPtr& data, TextureSettings textureSettings)
 	: _video(video)
 	, _id(0)

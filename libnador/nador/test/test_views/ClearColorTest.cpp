@@ -17,7 +17,7 @@ namespace nador
 		_video->ClearColorRGBA(_clearColor[0], _clearColor[1], _clearColor[2], _clearColor[3]);
 	}
 
-	void ClearColorTest::OnDebugRender()
+	void ClearColorTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
 		ImGui::ColorEdit4("Clear Color", _clearColor);
 	}

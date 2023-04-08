@@ -18,7 +18,6 @@ namespace nador
 		virtual const glm::ivec2& GetScreenSize() const = 0;
 		virtual float_t GetScreenScale() const = 0;
 		virtual float_t GetAspectRatio() const = 0;
-		virtual const std::string& GetUiRootFolder() const = 0;
 		
 		virtual void BringToFront(IUiElement* elem) = 0;
 		virtual void PushToback(IUiElement* elem) = 0;

@@ -35,14 +35,14 @@ namespace nador
             if (ImGui::Button("<-"))
             {
                 _currentTest.reset();
-                _DebugRenderStartMenu();
             }
             else
             {
-                _currentTest->OnDebugRender();
+                _currentTest->OnDebugRender(renderer);
             }
         }
-        else
+        
+        if(_currentTest == nullptr)
         {
             _DebugRenderStartMenu();
         }

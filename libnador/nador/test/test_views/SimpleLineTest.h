@@ -1,9 +1,8 @@
 #ifndef __SIMPLE_LINE_TEST_H__
 #define __SIMPLE_LINE_TEST_H__
 
-#include "nador/App.h"
+#include "nador/video/renderer/IRenderer.h"
 #include "nador/test/ITest.h"
-#include "nador/video/renderer/RenderData.h"
 
 namespace nador
 {

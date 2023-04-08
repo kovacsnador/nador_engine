@@ -13,6 +13,8 @@ struct ALCcontext;
 
 namespace nador
 {
+    class IFileController;
+    
     class OpenAlSoundContoller : public ISoundController
     {
         CREATE_EVENT_TYPE_ARG_0(onStopAllSound);

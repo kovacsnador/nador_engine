@@ -5,8 +5,6 @@
 #include "nador/video/IVideo.h"
 #include "nador/video/renderer/IRenderer.h"
 
-#include "nador/App.h"
-
 namespace nador
 {
 	TextureTest::TextureTest(const IVideo* video, const IFileController* fileCtrl)
@@ -63,10 +61,8 @@ namespace nador
 		renderer->Draw(&_material, _renderData3, &modelMatrix);
 	}
 
-	void TextureTest::OnDebugRender()
+	void TextureTest::OnDebugRender(IRenderer* renderer)
 	{
-		const IRenderer* renderer = IApp::Get()->GetRenderer();
-
 		const glm::ivec2& screenSize = renderer->GetScreenSize();
 
 		ImGui::SliderFloat("Translation X", &_translation.x, 0.0f, (float)screenSize.x);

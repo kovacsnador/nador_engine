@@ -37,7 +37,7 @@ namespace nador
 		renderer->Draw(&_material, _renderData, &modelMatrix);
 	}
 
-	void AtlasTest::OnDebugRender()
+	void AtlasTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
 		using LisboxPred_t = std::function<const char*(const strings_t&, size_t)>;
 		auto ListStrCallback = [](const strings_t& c, size_t i) { return c.at(i).c_str(); };

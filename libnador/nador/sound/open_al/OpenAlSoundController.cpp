@@ -6,7 +6,7 @@
 #include "dr_libs/dr_wav.h"
 #include "dr_libs/dr_mp3.h"
 
-#include "nador/App.h"
+#include "nador/system/IFileController.h"
 #include "nador/log/Log.h"
 #include "nador/sound/open_al/OpenALSoundController.h"
 #include "OpenALSoundController.h"

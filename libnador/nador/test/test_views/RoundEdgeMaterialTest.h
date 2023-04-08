@@ -1,9 +1,8 @@
 #ifndef __ROUND_EDGE_MATERIAL_TEST_H__
 #define __ROUND_EDGE_MATERIAL_TEST_H__
 
-#include "nador/App.h"
+#include "nador/video/renderer/IRenderer.h"
 #include "nador/test/ITest.h"
-#include "nador/video/renderer/RenderData.h"
 
 namespace nador
 {

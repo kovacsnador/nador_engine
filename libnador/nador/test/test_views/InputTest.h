@@ -26,7 +26,7 @@ namespace nador
 		/*!
 		 * Render the imgui content.
 		 */
-		void OnDebugRender() override;
+		void OnDebugRender(IRenderer* /*renderer*/) override;
 
 	private:
 		const static uint32_t bufferSize = 100;

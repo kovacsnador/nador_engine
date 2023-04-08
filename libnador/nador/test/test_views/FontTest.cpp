@@ -77,7 +77,7 @@ namespace nador
 		renderer->Draw(&_fontMaterial, _renderData, &modelMatrix);
 	}
 
-	void FontTest::OnDebugRender()
+	void FontTest::OnDebugRender(IRenderer* /*renderer*/)
 	{
 		strings_t fontTypeNames = _fontCtrl->GetRegisteredFontNames();
 		strings_t fontSizeNames = _fontCtrl->GetFontSizesAsString();

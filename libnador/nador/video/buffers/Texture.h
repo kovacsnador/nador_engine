@@ -14,14 +14,6 @@ namespace nador
 	class Texture
 	{
 	public:
-		/*!
-		 * Texture constructor.
-		 *
-		 * \param video				The video api interface.
-		 * \param filePath			The texture file path.
-		 * \param textureSettings	The specified texture settings.
-		 */
-		//Texture(const IVideo* video, const char* filePath, TextureSettings textureSettings = {});
 
 		/*!
 		 * Texture constructor.

@@ -1,8 +1,11 @@
 #include "imgui.h"
 
-#include "nador/App.h"
+#include "nador/IApp.h"
 #include "nador/test/test_views/UiElementsTest.h"
 #include "nador/test/TestCommon.h"
+#include "nador/video/font/IFontController.h"
+#include "nador/system/IInputController.h"
+#include "nador/ui/IUiApp.h"
 
 namespace nador
 {
@@ -138,7 +141,7 @@ namespace nador
         _lastMousePosition = _inputCtrl->GetMousePosition();
     }
 
-    void UiElementsTest::OnDebugRender()
+    void UiElementsTest::OnDebugRender(IRenderer* renderer)
     {
         static const char* horizontal[] { "LEFT", "RIGHT", "CENTER", "STRETCH" };
         static const char* vertical[] { "TOP", "BOTTOM", "CENTER", "STRETCH" };
@@ -169,7 +172,7 @@ namespace nador
 
         if (_selectedUiElement)
         {
-            const auto& screenSize = IApp::Get()->GetRenderer()->GetScreenSize();
+            const auto& screenSize = renderer->GetScreenSize();
 
             glm::ivec2         selectedPosition = _selectedUiElement->GetPosition();
             glm::ivec2         selectedOffset   = _selectedUiElement->GetOffset();

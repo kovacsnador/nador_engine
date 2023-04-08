@@ -1,5 +1,4 @@
 #include "nador/video/font/FontController.h"
-#include "nador/App.h"
 
 namespace nador
 {

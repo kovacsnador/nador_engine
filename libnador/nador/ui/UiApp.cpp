@@ -1,19 +1,23 @@
 #include "nador/ui/UiApp.h"
-#include "nador/App.h"
 #include "nador/ui/UiLogicState.h"
 
 namespace nador
 {
 	const IUiElement* UiApp::s_pFocusedElement{ nullptr };
 
-	UiApp::UiApp()
+	UiApp::UiApp(const IVideo* video, const IInputController* inputCtrl)
+	: _video(video)
+	, _inputCtrl(inputCtrl)
 	{
+		NADOR_ASSERT(_video);
+		NADOR_ASSERT(_inputCtrl);
+
 		StartGlobalListening();
 	}
 
 	const glm::ivec2& UiApp::GetScreenSize() const
 	{
-		return IApp::Get()->GetVideo()->GetScreenSize();
+		return _video->GetScreenSize();
 	}
 
 	float_t UiApp::GetScreenScale() const
@@ -24,13 +28,8 @@ namespace nador
 
 	float_t UiApp::GetAspectRatio() const
 	{
-		glm::vec2 screenSize = IApp::Get()->GetVideo()->GetScreenSize();
+		glm::vec2 screenSize = _video->GetScreenSize();
 		return screenSize.x / screenSize.y;
-	}
-
-	const std::string& UiApp::GetUiRootFolder() const
-	{
-		return IApp::Get()->GetAppConfig().uiPath;
 	}
 
 	quadVertices_t UiApp::GetScreenVertices() const
@@ -119,8 +118,7 @@ namespace nador
 
 	void UiApp::OnTick(float_t deltaTime)
 	{
-		const IInputController* inputCtrl = IApp::Get()->GetInputController();
-		UiLogicState uiLogicState(deltaTime, inputCtrl, this);
+		UiLogicState uiLogicState(deltaTime, _inputCtrl, this);
 
 		// reverse iteration 
 		for (auto layer = _layers.rbegin(); layer != _layers.rend(); layer++)
