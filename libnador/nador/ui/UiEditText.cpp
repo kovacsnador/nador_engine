@@ -107,9 +107,8 @@ namespace nador
 	void UiEditText::OnTick(IUiLogicState* uiLogicState)
 	{
 		IUiApp* uiApp = uiLogicState->GetUiApp();
-		const IInputController* inputCtrl = uiLogicState->GetInputCtrl();
 
-		if (IsMouseOver(inputCtrl) && uiLogicState->IsMouseOverHandled() == false)
+		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
 		{
 			uiLogicState->SetMouseOverHandled(true);
 

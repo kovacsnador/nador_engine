@@ -96,7 +96,6 @@ namespace nador
 			if (size != _size)
 			{
 				_size = size;
-				UpdateVertices(GetParentVertices());
 			}
 		};
 
@@ -110,7 +109,6 @@ namespace nador
 			if (_size.x != width)
 			{
 				_size.x = width;
-				UpdateVertices(GetParentVertices());
 			}
 		};
 
@@ -119,7 +117,6 @@ namespace nador
 			if (_size.y != height)
 			{
 				_size.y = height;
-				UpdateVertices(GetParentVertices());
 			}
 		};
 
@@ -140,7 +137,6 @@ namespace nador
 			if (position != _position)
 			{
 				_position = position;
-				UpdateVertices(GetParentVertices());
 			}
 		};
 
@@ -159,7 +155,6 @@ namespace nador
 		void SetAlignment(const UiAlignment& aligner)
 		{ 
 			_alignment = aligner;
-			UpdateVertices(GetParentVertices());
 		};
 
 		/*!
@@ -245,8 +240,6 @@ namespace nador
 		void SetOffset(const glm::ivec2& offset);
 		const glm::ivec2& GetOffset() const noexcept;
 
-		quadVertices_t GetParentVertices() const;
-
 		void UpdateVertices(const quadVertices_t& parentVertices);
 
 		void SetOnMousePressedCallback(const OnMousePressedCallback_t& cb) { _onMousePressedCb = cb; }
@@ -256,13 +249,15 @@ namespace nador
 		void SetOnKeyHoldedCallback(const OnKeyHoldedCallback_t& cb) { _onKeyHoldedCb = cb; }
 		void SetOnKeyReleasedCallback(const OnKeyReleasedCallback_t& cb) { _onKeyReleasedCb = cb; }
 
-		bool IsMouseOver(const IInputController* inputCtrl) const noexcept;
+		bool IsOver(const glm::vec2& point) const noexcept;
 
 		const std::string& GetName() const noexcept;
 		void SetName(const std::string& name);
 
+		void SetUiAppHandler(IUiApp* uiApp) noexcept;
+
 	protected:
-		virtual void OnTick(IUiLogicState* /*uiLogicState*/) {}
+		virtual void OnTick(IUiLogicState* /*uiLogicState*/) {};
 		virtual void OnRender(IRenderer* /*renderer*/, const quadVertices_t& /*vertices*/) {};
 		virtual void OnRenderEnd(IRenderer* /*renderer*/) {};
 
@@ -358,6 +353,7 @@ namespace nador
 		bool _defaultMouseHandling{ true };
 
 		UiEdgeDrawer _edgeDrawer;
+		IUiApp*		_uiApp {nullptr};
 	};
 }
 

@@ -38,7 +38,7 @@ namespace nador
 	void UiOverlay::OnTick(IUiLogicState* uiLogicState)
 	{
 		// handle mouse over event
-		if (IsMouseOver(uiLogicState->GetInputCtrl()) && uiLogicState->IsMouseOverHandled() == false)
+		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
 		{
 			uiLogicState->SetMouseOverHandled(true);
 		}
@@ -96,7 +96,7 @@ namespace nador
 	void UiRoundEdgeOverlay::OnTick(IUiLogicState* uiLogicState)
 	{
 		// handle mouse over event
-		if (IsMouseOver(uiLogicState->GetInputCtrl()) && uiLogicState->IsMouseOverHandled() == false)
+		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
 		{
 			uiLogicState->SetMouseOverHandled(true);
 		}

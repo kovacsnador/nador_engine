@@ -25,8 +25,8 @@ namespace nador
 		virtual quadVertices_t GetScreenVertices() const = 0;
 
 		virtual void AddElementToLayer(EUiLayer layer, IUiElement* elem) = 0;
-		virtual void RemoveElementFromLayer(EUiLayer layer, const IUiElement* elem) = 0;
-		virtual void RemoveElement(const IUiElement* elem) = 0;
+		virtual void RemoveElementFromLayer(EUiLayer layer, IUiElement* elem) = 0;
+		virtual void RemoveElement(IUiElement* elem) = 0;
 		virtual void ClearLayer(EUiLayer layer) = 0;
 
 		virtual void DebugDrawEdge(bool draw) = 0;

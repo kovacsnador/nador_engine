@@ -17,6 +17,8 @@ namespace nador
 		const IInputController* GetInputCtrl() const noexcept override;
 		IUiApp* GetUiApp() const noexcept override;
 
+		glm::vec2 GetMousePosition() const noexcept override;
+
 	private:
 		float_t _deltaTime;
 		bool	_mouseOverHandled;

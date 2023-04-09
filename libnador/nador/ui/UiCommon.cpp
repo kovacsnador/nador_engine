@@ -12,15 +12,21 @@ namespace nador
 		{
 			vertices[0].y += pos.y;
 			vertices[1].y += pos.y;
-			vertices[2].y = vertices[0].y + size.y;
-			vertices[3].y = vertices[0].y + size.y;
+
+			auto y = vertices[0].y + size.y;
+
+			vertices[2].y = y;
+			vertices[3].y = y;
 		}
 		else if (EVerticalAlignment::TOP == eVerticAlign)
 		{
 			vertices[2].y -= pos.y;
 			vertices[3].y -= pos.y;
-			vertices[0].y = vertices[2].y - size.y;
-			vertices[1].y = vertices[2].y - size.y;
+
+			auto y = vertices[2].y - size.y;
+
+			vertices[0].y = y;
+			vertices[1].y = y;
 		}
 		else if (EVerticalAlignment::CENTER == eVerticAlign)
 		{
@@ -50,16 +56,23 @@ namespace nador
 		if (EHorizontalAlignment::LEFT == eHorizontAlign)
 		{
 			vertices[0].x += pos.x;
-			vertices[1].x = vertices[0].x + size.x;
-			vertices[2].x = vertices[0].x + size.x;
 			vertices[3].x += pos.x;
+
+			auto x = vertices[0].x + size.x;
+
+			vertices[1].x = x;
+			vertices[2].x = x;
+			
 		}
 		else if (EHorizontalAlignment::RIGHT == eHorizontAlign)
 		{
 			vertices[1].x -= pos.x;
 			vertices[2].x -= pos.x;
-			vertices[3].x = vertices[1].x - size.x;
-			vertices[0].x = vertices[1].x - size.x;
+
+			auto x = vertices[1].x - size.x;
+
+			vertices[3].x = x;
+			vertices[0].x = x;
 		}
 		else if (EHorizontalAlignment::CENTER == eHorizontAlign)
 		{

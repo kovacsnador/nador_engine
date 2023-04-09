@@ -17,6 +17,11 @@ namespace nador
         UiApp(const IVideo* video, const IInputController* inputCtrl);
 
         /*!
+         * UiApp destructor.
+         */
+        ~UiApp();
+
+        /*!
          * Gets the screen size.
          *
          * \return	The screen size.
@@ -40,8 +45,8 @@ namespace nador
         quadVertices_t GetScreenVertices() const override;
 
         void AddElementToLayer(EUiLayer layer, IUiElement* elem) override;
-        void RemoveElementFromLayer(EUiLayer layer, const IUiElement* elem) override;
-        void RemoveElement(const IUiElement* elem) override;
+        void RemoveElementFromLayer(EUiLayer layer, IUiElement* elem) override;
+        void RemoveElement(IUiElement* elem) override;
         void ClearLayer(EUiLayer layer) override;
 
         void DebugDrawEdge(bool draw) override;

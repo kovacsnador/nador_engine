@@ -33,7 +33,7 @@ namespace nador
 
 	void UiButton::OnTick(IUiLogicState* uiLogicState)
 	{
-		if (IsMouseOver(uiLogicState->GetInputCtrl()) && uiLogicState->IsMouseOverHandled() == false)
+		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
 		{
 			uiLogicState->SetMouseOverHandled(true);
 			

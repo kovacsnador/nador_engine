@@ -1,4 +1,4 @@
-#include "nador/App.h"
+#include "nador/ui/IUiApp.h"
 
 #include "nador/ui/IUiElement.h"
 
@@ -6,8 +6,6 @@ namespace nador
 {
 	IUiElement::~IUiElement()
 	{
-		IUiApp* uiApp = IApp::Get()->GetUiApp();
-
 		for (auto& it : _childrens)
 		{
 			it->SetParent(nullptr);
@@ -19,12 +17,15 @@ namespace nador
 		}
 		else
 		{
-			uiApp->RemoveElement(this);
+			if(_uiApp)
+			{
+				_uiApp->RemoveElement(this);
+			}
 		}
 
-		if (uiApp->IsInFocus(this))
+		if (_uiApp && _uiApp->IsInFocus(this))
 		{
-			uiApp->SetInFocus(nullptr);
+			_uiApp->SetInFocus(nullptr);
 		}
 	}
 
@@ -39,7 +40,7 @@ namespace nador
 			}
 		}		
 
-		UpdateVertices(GetParentVertices());
+		//UpdateVertices(GetParentVertices());
 	};
 
 	void IUiElement::BringToFront()
@@ -48,10 +49,9 @@ namespace nador
 		{
 			_parent->AddChild(this);
 		}
-		else
+		else if(_uiApp)
 		{
-			IUiApp* uiApp = IApp::Get()->GetUiApp();
-			uiApp->BringToFront(this);
+			_uiApp->BringToFront(this);
 		}
 	}
 
@@ -61,10 +61,9 @@ namespace nador
 		{
 			_parent->PushToBack(this);
 		}
-		else
+		else if(_uiApp)
 		{
-			IUiApp* uiApp = IApp::Get()->GetUiApp();
-			uiApp->PushToback(this);
+			_uiApp->PushToback(this);
 		}
 	}
 
@@ -159,22 +158,11 @@ namespace nador
 	void IUiElement::SetOffset(const glm::ivec2& offset)
 	{
 		_offset = offset;
-		UpdateVertices(GetParentVertices());
 	}
 
 	const glm::ivec2& IUiElement::GetOffset() const noexcept
 	{
 		return _offset;
-	}
-
-	quadVertices_t IUiElement::GetParentVertices() const
-	{
-		if (_parent)
-		{
-			return _parent->GetVertices();
-		}
-
-		return IApp::Get()->GetUiApp()->GetScreenVertices();
 	}
 
 	void IUiElement::UpdateVertices(const quadVertices_t& parentVertices)
@@ -191,8 +179,10 @@ namespace nador
 	{
 		if (IsPointOverOnVertices(position, _vertices))
 		{
-			IUiApp* uiApp = IApp::Get()->GetUiApp();
-			uiApp->SetInFocus(this);
+			if(_uiApp)
+			{
+				_uiApp->SetInFocus(this);
+			}
 
 			OnMousePressed(mouseButton, position);
 
@@ -246,12 +236,9 @@ namespace nador
 		return result;
 	};
 
-	bool IUiElement::IsMouseOver(const IInputController* inputCtrl) const noexcept
+	bool IUiElement::IsOver(const glm::vec2& point) const noexcept
 	{
-		NADOR_ASSERT(inputCtrl);
-
-		glm::vec2 currMousePos = inputCtrl->GetMousePosition();
-		return IsPointOverOnVertices(currMousePos, _vertices);
+		return IsPointOverOnVertices(point, _vertices);
 	}
 
 	const std::string& IUiElement::GetName() const noexcept
@@ -264,4 +251,13 @@ namespace nador
 		_name = name;
 	}
 
+	void IUiElement::SetUiAppHandler(IUiApp* uiApp) noexcept
+	{
+		_uiApp = uiApp;
+
+		for (auto& it : _childrens)
+		{
+			it->SetUiAppHandler(_uiApp);
+		}
+	}
 }

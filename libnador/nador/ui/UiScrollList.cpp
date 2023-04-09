@@ -57,12 +57,10 @@ namespace nador
 
 	void UiScrollList::OnTick(IUiLogicState* uiLogicState)
 	{
-		if (IsMouseOver(uiLogicState->GetInputCtrl()) && _state == EState::SCROLLING)
+		glm::ivec2 currentMousePos = uiLogicState->GetMousePosition();
+		if (IsOver(currentMousePos) && _state == EState::SCROLLING)
 		{
-			const IInputController* inputCtrl = uiLogicState->GetInputCtrl();
-			glm::ivec2 currMousePos = inputCtrl->GetMousePosition();
-
-			glm::vec2 offset = _lastMousePos - currMousePos;
+			glm::vec2 offset = _lastMousePos - currentMousePos;
 
 			if (glm::abs(offset.x) > 1 || glm::abs(offset.y) > 1)
 			{
@@ -82,7 +80,7 @@ namespace nador
 
 			_aligner.SetOffset(_aligner.GetOffset() + offset);
 
-			_lastMousePos = currMousePos;
+			_lastMousePos = currentMousePos;
 		}
 		else
 		{

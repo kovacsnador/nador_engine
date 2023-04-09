@@ -15,6 +15,21 @@ namespace nador
 		StartGlobalListening();
 	}
 
+	UiApp::~UiApp()
+	{
+		// remove ui app handler from all elements
+		for (auto& layer : _layers)
+		{
+			for (auto& elem : layer.second)
+			{
+				if (elem)
+				{
+					elem->SetUiAppHandler(nullptr);
+				}
+			}
+		}
+	}
+
 	const glm::ivec2& UiApp::GetScreenSize() const
 	{
 		return _video->GetScreenSize();
@@ -58,27 +73,36 @@ namespace nador
 		utils::Remove(list, elem);
 
 		list.push_back(elem);
+		elem->SetUiAppHandler(this);
 	}
 
-	void UiApp::RemoveElementFromLayer(EUiLayer eLayer, const IUiElement* elem)
+	void UiApp::RemoveElementFromLayer(EUiLayer eLayer, IUiElement* elem)
 	{
 		auto layer = _layers.find(eLayer);
 		if (layer != _layers.end())
 		{
 			utils::Remove(layer->second, elem);
+			elem->SetUiAppHandler(nullptr);
 		}
 	}
 
-	void UiApp::RemoveElement(const IUiElement* elem)
+	void UiApp::RemoveElement(IUiElement* elem)
 	{
 		for (auto& layer : _layers)
 		{
 			utils::Remove(layer.second, elem);
+			elem->SetUiAppHandler(nullptr);
 		}
 	}
 
 	void UiApp::ClearLayer(EUiLayer eLayer)
 	{
+		auto layer = _layers.find(eLayer);
+		if (layer != _layers.end())
+		{
+			std::for_each(layer->second.begin(), layer->second.end(), [](IUiElement* elem) { elem->SetUiAppHandler(nullptr); });
+		}
+
 		_layers.insert_or_assign(eLayer, ui_element_list_t());
 	}
 
@@ -119,12 +143,14 @@ namespace nador
 	void UiApp::OnTick(float_t deltaTime)
 	{
 		UiLogicState uiLogicState(deltaTime, _inputCtrl, this);
+		auto vertices = GetScreenVertices();
 
 		// reverse iteration 
 		for (auto layer = _layers.rbegin(); layer != _layers.rend(); layer++)
 		{
 			for (auto elem = layer->second.rbegin(); elem != layer->second.rend(); elem++)
 			{
+				(*elem)->UpdateVertices(vertices);
 				(*elem)->OnTickImpl(&uiLogicState);
 			}
 		}
