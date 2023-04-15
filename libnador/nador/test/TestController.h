@@ -5,7 +5,6 @@
 #include <string>
 #include <functional>
 
-#include "nador/test/ITestFwd.h"
 #include "nador/common/GlobalEvents.h"
 #include "nador/test/ITestController.h"
 

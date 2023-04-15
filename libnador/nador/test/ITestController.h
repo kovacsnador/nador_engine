@@ -2,7 +2,7 @@
 #define __I_TEST_CONTROLLER_H__
 
 #include "nador/utils/Types.h"
-#include "nador/test/ITestFwd.h"
+#include "nador/test/ITest.h"
 
 namespace nador
 {
@@ -19,9 +19,11 @@ namespace nador
         virtual ~ITestController() = default;
 
         template <typename T, typename... Args>
-        void AddTest(const std::string& name, Args... args)
+        void AddTest(const std::string& name, Args&&... args)
         {
-            _tests.push_back(std::make_pair(name, [this, args...]() { _currentTest.reset(new T(args...)); }));
+            _tests.push_back(std::make_pair(name, [this, args...]() {
+                _currentTest = std::make_unique<T>(args...);
+                }));
         }
 
         /*!
@@ -54,7 +56,7 @@ namespace nador
 
     protected:
         test_list_t         _tests {};
-        ITestPtr            _currentTest { nullptr };
+        ITestUPtr           _currentTest { nullptr };
     };
     CREATE_PTR_TYPES(ITestController);
 } // namespace nador
