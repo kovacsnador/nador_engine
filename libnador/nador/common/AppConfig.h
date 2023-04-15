@@ -10,30 +10,52 @@
 
 namespace nador
 {
-    struct AppConfig
+    struct WindowSettings
     {
         std::string appName;
         glm::uvec2  windowDimension = { 0, 0 };
         bool        vSync { true };
-        std::string rootFilePath;
-        std::string atlasConfigPath;
-        std::string atlasImagesPath;
-        std::string uiPath;
 
         bool showDebugWindow { false };
         bool showDebugInfo { false };
 
-        bool operator==(const AppConfig& other) const
+        bool operator==(const WindowSettings& other) const
         {
             return (appName == other.appName 
                     && windowDimension == other.windowDimension
                     && vSync == other.vSync
-                    && rootFilePath == other.rootFilePath
-                    && atlasConfigPath == other.atlasConfigPath
-                    && atlasImagesPath == other.atlasImagesPath
-                    && uiPath == other.uiPath
                     && showDebugInfo == other.showDebugInfo
                     && showDebugWindow == other.showDebugWindow);
+        }
+    };
+
+    struct AtlasSettings
+    {
+        std::string atlasConfigPath;
+        std::string atlasImagesPath;
+
+        bool operator==(const AtlasSettings& other) const
+        {
+            return (   atlasConfigPath == other.atlasConfigPath
+                    && atlasImagesPath == other.atlasImagesPath);
+        }
+    };
+
+    struct AppConfig
+    {
+        WindowSettings windowSettings;
+        AtlasSettings atlasSettings;
+
+        std::string rootFilePath;
+        std::string uiPath;
+
+        
+        bool operator==(const AppConfig& other) const
+        {
+            return (   windowSettings == other.windowSettings
+                    && atlasSettings == other.atlasSettings
+                    && rootFilePath == other.rootFilePath
+                    && uiPath == other.uiPath);
         }
     };
 
@@ -44,15 +66,27 @@ namespace nador
         const tinyxml2::XMLElement* pRootElement = doc.RootElement();
         if (pRootElement)
         {
-            appConfig.appName         = xml::GetText(pRootElement, "AppName");
-            appConfig.windowDimension = xml::GetUVec2(pRootElement, "WindowDimensions");
-            appConfig.vSync           = xml::GetBoolean(pRootElement, "VSync", true);
+            // Get WindowSettings
+            const tinyxml2::XMLElement* windowSettings = pRootElement->FirstChildElement("WindowSettings");
+            if(windowSettings)
+            {
+                appConfig.windowSettings.appName         = xml::GetText(windowSettings, "AppName");
+                appConfig.windowSettings.windowDimension = xml::GetUVec2(windowSettings, "WindowDimensions");
+                appConfig.windowSettings.vSync           = xml::GetBoolean(windowSettings, "VSync", true);
+                appConfig.windowSettings.showDebugWindow = xml::GetBoolean(windowSettings, "ShowDebugWindow", false);
+                appConfig.windowSettings.showDebugInfo   = xml::GetBoolean(windowSettings, "ShowDebugInfo", false);
+            }
+
+            // Get AtlasSettings
+            const tinyxml2::XMLElement* atlasSettings = pRootElement->FirstChildElement("AtlasSettings");
+            if(atlasSettings)
+            {
+                appConfig.atlasSettings.atlasConfigPath = xml::GetText(atlasSettings, "AtlasConfigPath");
+                appConfig.atlasSettings.atlasImagesPath = xml::GetText(atlasSettings, "AtlasImagesPath");
+            }
+            
             appConfig.rootFilePath    = xml::GetText(pRootElement, "RootFilePath");
-            appConfig.atlasConfigPath = xml::GetText(pRootElement, "AtlasConfigPath");
-            appConfig.atlasImagesPath = xml::GetText(pRootElement, "AtlasImagesPath");
             appConfig.uiPath          = xml::GetText(pRootElement, "UiPath");
-            appConfig.showDebugWindow = xml::GetBoolean(pRootElement, "ShowDebugWindow", false);
-            appConfig.showDebugInfo   = xml::GetBoolean(pRootElement, "ShowDebugInfo", false);
         }
 
         return appConfig;

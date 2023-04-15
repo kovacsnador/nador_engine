@@ -5,7 +5,6 @@
 #include "nador/common/GlobalEvents.h"
 #include "nador/video/renderer/Renderer.h"
 
-#include "nador/system/Factory.h"
 #include "nador/test/TestController.h"
 #include "nador/video/renderer/Renderer.h"
 #include "nador/system/IFileController.h"
@@ -23,28 +22,41 @@ namespace nador
 {
     IAppUPtr App::CreateApp(const AppConfig& config)
     {
-        IFactoryUPtr factory = std::make_unique<Factory>(config);
+        IWindowUPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
+        IVideoUPtr           video     = ModuleFactory::CreateVideo();
+        IFileControllerUPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
+        IInputControllerUPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
 
-        const IVideo* video = factory->GetVideo(); 
-        IFileController* fileCtrl = factory->GetFileController();
-        IInputController* inputCtrl = factory->GetInputController();
+        // Attach after InputController created
+        window->AttachImGuiAdapter(ModuleFactory::CreateImGuiAdapter());
 
-        IRendererUPtr renderer = std::make_unique<Renderer>(video);
+        ISoundControllerUPtr soundCtrl = ModuleFactory::CreateSoundController(fileCtrl.get());
 
-        IFontControllerUPtr fontCtrl = std::make_unique<FontController>(video, fileCtrl);
+        IRendererUPtr        renderer  = ModuleFactory::CreateRenderer(video.get());
+        IFontControllerUPtr  fontCtrl  = ModuleFactory::CreateFontController(video.get(), fileCtrl.get());
+        IAtlasControllerUPtr atlasCtrl = ModuleFactory::CreateAtlasController(video.get(), fileCtrl.get(), config.atlasSettings);
+        IUiAppUPtr           uiApp     = ModuleFactory::CreateUiApp(video.get(), inputCtrl.get());
+        ITestControllerUPtr  testCtrl  = ModuleFactory::CreateTestController();
 
-        DataPtr          atlasConfigData = fileCtrl->Read(config.atlasConfigPath);
-        IAtlasControllerUPtr atlasCtrl = std::make_unique<AtlasController>(video, fileCtrl, atlasConfigData, config.atlasImagesPath);
-
-        IUiAppUPtr uiApp = std::make_unique<UiApp>(video, inputCtrl);
-
-        ITestControllerUPtr testCtrl = std::make_unique<TestController>();
-
-        return std::make_unique<App>(config, std::move(factory), std::move(uiApp), std::move(renderer), std::move(atlasCtrl), std::move(fontCtrl), std::move(testCtrl));
+        return std::make_unique<App>(config,
+                                     std::move(window),
+                                     std::move(video),
+                                     std::move(fileCtrl),
+                                     std::move(inputCtrl),
+                                     std::move(soundCtrl),
+                                     std::move(uiApp),
+                                     std::move(renderer),
+                                     std::move(atlasCtrl),
+                                     std::move(fontCtrl),
+                                     std::move(testCtrl));
     }
 
     App::App(const AppConfig&     config,
-             IFactoryUPtr         factory,
+             IWindowUPtr          window,
+             IVideoUPtr           video,
+             IFileControllerUPtr  fileCtrl,
+             IInputControllerUPtr inputCtrl,
+             ISoundControllerUPtr soundCtrl,
              IUiAppUPtr           uiApp,
              IRendererUPtr        renderer,
              IAtlasControllerUPtr atlasCtrl,
@@ -52,17 +64,21 @@ namespace nador
              ITestControllerUPtr  testCtrl)
     : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
     , _config(config)
-    , _factory(std::move(factory))
+    , _window(std::move(window))
+    , _video(std::move(video))
+    , _fileCtrl(std::move(fileCtrl))
+    , _inputCtrl(std::move(inputCtrl))
+    , _soundCtrl(std::move(soundCtrl))
     , _renderer(std::move(renderer))
     , _atlasCtrl(std::move(atlasCtrl))
     , _fontCtrl(std::move(fontCtrl))
     , _testCtrl(std::move(testCtrl))
     , _uiApp(std::move(uiApp))
     {
-        ShowDebugWindow(_config.showDebugWindow);
-        ShowDebugInfo(_config.showDebugInfo);
+        ShowDebugWindow(_config.windowSettings.showDebugWindow);
+        ShowDebugInfo(_config.windowSettings.showDebugInfo);
 
-        _testCtrl->SetToggleDebugTextCallback([this](){ ShowDebugInfo(!IsShowDebugInfo()); });
+        _testCtrl->SetToggleDebugTextCallback([this]() { ShowDebugInfo(!IsShowDebugInfo()); });
 
         ENGINE_DEBUG("App initialized.");
     }
@@ -76,7 +92,12 @@ namespace nador
         _atlasCtrl.reset();
         _fontCtrl.reset();
         _renderer.reset();
-        _factory.reset();
+
+        _inputCtrl.reset();
+        _video.reset();
+        _window.reset();
+        _fileCtrl.reset();
+        _soundCtrl.reset();
 
         ENGINE_DEBUG("App deinitialized.");
     }
@@ -88,10 +109,10 @@ namespace nador
 
     void App::_TickBegin()
     {
-        GetRenderer()->Begin();
-        _factory->GetInputController()->TickBegin();
-        _factory->GetWindow()->TickBegin();
-        _factory->GetSoundController()->TickBegin();
+        _renderer->Begin();
+        _inputCtrl->TickBegin();
+        _window->TickBegin();
+        _soundCtrl->TickBegin();
 
         g_onTickBeginEvent();
     }
@@ -129,7 +150,7 @@ namespace nador
         _RenderDebugInfo();
 
         _renderer->End();
-        _factory->GetWindow()->TickEnd();
+        _window->TickEnd();
 
         g_onTickEndEvent();
     }
@@ -188,13 +209,13 @@ namespace nador
     }
 
     void App::_onWindowClose()
-	{
-		_state = EAppState::CLOSED;
-	}
+    {
+        _state = EAppState::CLOSED;
+    }
 
     const IVideo* App::GetVideo()
     {
-        return _factory->GetVideo();
+        return _video.get();
     }
 
     ITestController* App::GetTestController()
@@ -209,14 +230,14 @@ namespace nador
 
     IWindow* App::GetWindow()
     {
-        return _factory->GetWindow();
+        return _window.get();
     }
 
     void App::ShowDebugWindow(bool show)
     {
         _testCtrl->Suspend(!show);
 
-        _factory->GetWindow()->ShowDebugWindow(show);
+        _window->ShowDebugWindow(show);
     }
 
     void App::ShowDebugInfo(bool show)
@@ -231,12 +252,12 @@ namespace nador
 
     IFileController* App::GetFileController() const
     {
-        return _factory->GetFileController();
+        return _fileCtrl.get();
     }
 
     const IInputController* App::GetInputController() const
     {
-        return _factory->GetInputController();
+        return _inputCtrl.get();
     }
 
     const IAtlasController* App::GetAtlasController() const
@@ -251,7 +272,7 @@ namespace nador
 
     ISoundController* App::GetSoundController() const
     {
-        return _factory->GetSoundController();
+        return _soundCtrl.get();
     }
 
     const AppConfig& App::GetAppConfig() const

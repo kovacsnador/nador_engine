@@ -93,6 +93,7 @@ namespace nador
 		 */
 		virtual sound_data_list_t GetAllSoundData() const = 0;
 	};
+	CREATE_PTR_TYPES(ISoundController);
 }
 
 #endif // !__ISOUND_CONTROLLER_H__

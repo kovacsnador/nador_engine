@@ -5,6 +5,7 @@
 #include "nador/system/window/WindowGLFW.h"
 #include "nador/utils/ImGuiHelper.h"
 #include "nador/common/GlobalEvents.h"
+#include "WindowGLFW.h"
 
 namespace nador
 {
@@ -22,7 +23,10 @@ namespace nador
 
     WindowGLFW::~WindowGLFW()
     {
-        ShutdownImGui();
+        if(_imGuiAdapter)
+        {
+            _imGuiAdapter->ShutdownImGui();
+        }
 
         glfwTerminate();
 
@@ -98,7 +102,7 @@ namespace nador
         CreateWindow(0, 0, title, vSync);
     }
 
-    void* WindowGLFW::GetNativeApiWindow()
+    void* WindowGLFW::GetNativeApiWindow() const
     {
         return _window;
     }
@@ -113,12 +117,22 @@ namespace nador
         // Poll for and process events
         // glfwPollEvents();
 
-        _NewFrameImGui();
+        if (_showDebugWindow && _imGuiAdapter)
+        {
+            _imGuiAdapter->NewFrameImGui();
+        }
     }
 
     void WindowGLFW::TickEnd()
     {
-        _EndFrameImGui();
+        if (_showDebugWindow && _imGuiAdapter)
+        {
+            int32_t width;
+            int32_t height;
+            glfwGetWindowSize(_window, &width, &height);
+
+            _imGuiAdapter->EndFrameImGui(width, height);
+        }
 
         // Swap front and back buffers
         glfwSwapBuffers(_window);
@@ -129,28 +143,9 @@ namespace nador
         _showDebugWindow = show;
     }
 
-    void WindowGLFW::InitImGui()
+    void WindowGLFW::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
-        InitImGuiContext(_window);
-    }
-
-    void WindowGLFW::_NewFrameImGui()
-    {
-        if (_showDebugWindow)
-        {
-            NewFrameImGui();
-        }
-    }
-
-    void WindowGLFW::_EndFrameImGui()
-    {
-        if (_showDebugWindow)
-        {
-            int32_t width;
-            int32_t height;
-            glfwGetWindowSize(_window, &width, &height);
-
-            EndFrameImGui(width, height);
-        }
+        _imGuiAdapter = std::move(adapter);
+        _imGuiAdapter->InitImGuiContext(_window);
     }
 } // namespace nador

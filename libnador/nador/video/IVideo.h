@@ -298,6 +298,7 @@ namespace nador
 
 		virtual size_t GetMaxTextureUnits() const = 0;
 	};
+	CREATE_PTR_TYPES(IVideo);
 }
 
 #endif // !__I_VIDEO_H__

@@ -5,7 +5,6 @@
 #include "utils/NonCopyable.h"
 
 #include "common/GlobalEvents.h"
-#include "system/IFactory.h"
 #include "test/ITestController.h"
 #include "video/renderer/IRenderer.h"
 #include "system/IFileController.h"
@@ -17,6 +16,7 @@
 #include "ui/IUiApp.h"
 #include "common/AppConfig.h"
 #include "IApp.h"
+#include "system/ModuleFactory.h"
 
 namespace nador
 {
@@ -28,7 +28,11 @@ namespace nador
         static IAppUPtr CreateApp(const AppConfig& config);
 
         App(const AppConfig&     config,
-            IFactoryUPtr         factory,
+            IWindowUPtr          window,
+            IVideoUPtr           video,
+            IFileControllerUPtr  fileCtrl,
+            IInputControllerUPtr inputCtrl,
+            ISoundControllerUPtr soundCtrl,
             IUiAppUPtr           uiApp,
             IRendererUPtr        renderer,
             IAtlasControllerUPtr atlasCtrl,
@@ -192,12 +196,16 @@ namespace nador
         AppConfig   _config;
         TickTracker _tickTracker;
 
-        IFactoryUPtr         _factory;
-        IRendererUPtr        _renderer;
-        IAtlasControllerUPtr _atlasCtrl;
-        IFontControllerUPtr  _fontCtrl;
-        ITestControllerUPtr  _testCtrl;
-        IUiAppUPtr           _uiApp;
+        IWindowUPtr          _window { nullptr };
+        IVideoUPtr           _video { nullptr };
+        IFileControllerUPtr  _fileCtrl { nullptr };
+        IInputControllerUPtr _inputCtrl { nullptr };
+        ISoundControllerUPtr _soundCtrl { nullptr };
+        IRendererUPtr        _renderer { nullptr };
+        IAtlasControllerUPtr _atlasCtrl { nullptr };
+        IFontControllerUPtr  _fontCtrl { nullptr };
+        ITestControllerUPtr  _testCtrl { nullptr };
+        IUiAppUPtr           _uiApp { nullptr };
 
         EAppState _state { EAppState::RUNNING };
     };

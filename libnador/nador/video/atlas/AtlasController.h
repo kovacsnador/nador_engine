@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "nador/video/atlas/IAtlasController.h"
+#include "nador/common/AppConfig.h"
 
 namespace nador
 {
@@ -16,7 +17,7 @@ namespace nador
 		/*!
 		 * AtlasController construcor.
 		 */
-		AtlasController(const IVideo* video, const IFileController* fileCtrl, const DataPtr& fileData, const std::string& atlasImagesPath);
+		AtlasController(const IVideo* video, const IFileController* fileCtrl, const AtlasSettings& atlasSettigns);
 
 		/*!
 		 * Gets the image data.

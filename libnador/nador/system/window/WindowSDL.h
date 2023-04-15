@@ -20,17 +20,19 @@ namespace nador
         void TickBegin() override;
         void TickEnd() override;
 
-        void* GetNativeApiWindow() override;
+        void* GetNativeApiWindow() const override;
         void* GetNativeContext() override;
         void  ShowDebugWindow(bool show) override;
 
-        void InitImGui() override;
+        void AttachImGuiAdapter(IImguiAdapterUPtr adapter) override;
 
     private:
         SDL_Window*     _window {nullptr};
         SDL_GLContext   _context {nullptr};
 
         bool _showDebugWindow;
+
+        IImguiAdapterUPtr _imGuiadapter {nullptr};
     };
 } // namespace nador
 

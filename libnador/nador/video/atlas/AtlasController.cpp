@@ -4,21 +4,22 @@
 
 namespace nador
 {
-	AtlasController::AtlasController(const IVideo* video, const IFileController* fileCtrl, const DataPtr& fileData, const std::string& atlasImagesPath)
+	AtlasController::AtlasController(const IVideo* video, const IFileController* fileCtrl, const AtlasSettings& atlasSettigns)
 	{
 		NADOR_ASSERT(video);
-		NADOR_ASSERT(fileData);
 
-		if(fileData->IsValid())
+		DataPtr atlasConfigData = fileCtrl->Read(atlasSettigns.atlasConfigPath);
+
+		if(atlasConfigData->IsValid())
 		{
-			nlohmann::json json = nlohmann::json::parse(fileData->Begin(), fileData->End());
+			nlohmann::json json = nlohmann::json::parse(atlasConfigData->Begin(), atlasConfigData->End());
 			
 			for(auto& it : json["atlas_names"])
 			{
 				std::string imageName = it["i_name"].get<std::string>();
 				std::string configName = it["c_name"].get<std::string>();
 
-				AtlasPtr atlasPtr = std::make_shared<Atlas>(video, fileCtrl, atlasImagesPath, imageName, configName);
+				AtlasPtr atlasPtr = std::make_shared<Atlas>(video, fileCtrl, atlasSettigns.atlasImagesPath, imageName, configName);
 
 				_atlases.push_back(atlasPtr);
 

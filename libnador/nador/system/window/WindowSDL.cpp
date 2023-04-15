@@ -4,6 +4,7 @@
 #include "nador/log/Log.h"
 #include "nador/system/window/WindowSDL.h"
 #include "nador/utils/ImGuiHelper.h"
+#include "WindowSDL.h"
 
 namespace nador
 {
@@ -11,6 +12,11 @@ namespace nador
     {
         if (_window)
         {
+            if(_imGuiadapter)
+            {
+                _imGuiadapter->ShutdownImGui();
+            }
+
             SDL_GL_DeleteContext(_context);
             SDL_DestroyWindow(_window);
             SDL_Quit();
@@ -113,7 +119,7 @@ namespace nador
         CreateWindow(0, 0, title, vSync);
     }
 
-    void* WindowSDL::GetNativeApiWindow()
+    void* WindowSDL::GetNativeApiWindow() const
     {
         return _window;
     }
@@ -128,28 +134,29 @@ namespace nador
         _showDebugWindow = show;
     }
 
-    void WindowSDL::InitImGui()
+    void WindowSDL::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
-        InitImGuiContext(_window, _context);
+        _imGuiadapter = std::move(adapter);
+        _imGuiadapter->InitImGuiContext(_window, _context);
     }
 
     void WindowSDL::TickBegin()
     {
-        if (_showDebugWindow)
+        if (_showDebugWindow && _imGuiadapter)
         {
-            NewFrameImGui();
+            _imGuiadapter->NewFrameImGui();
         }
     }
 
     void WindowSDL::TickEnd()
     {
-        if (_showDebugWindow)
+        if (_showDebugWindow && _imGuiadapter)
         {
             int32_t width;
             int32_t height;
             SDL_GetWindowSize(_window, &width, &height);
 
-            EndFrameImGui(width, height);
+            _imGuiadapter->EndFrameImGui(width, height);
         }
 
         /* Swap front and back buffers */

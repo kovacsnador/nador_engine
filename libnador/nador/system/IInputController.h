@@ -83,6 +83,7 @@ namespace nador
 		 */
 		virtual void TickBegin() = 0;
 	};
+	CREATE_PTR_TYPES(IInputController);
 }
 
 #endif //!__IINPUT_CONTROLLER__

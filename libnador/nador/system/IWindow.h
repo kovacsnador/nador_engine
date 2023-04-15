@@ -2,6 +2,7 @@
 #define __I_WINDOW_H__
 
 #include "nador/utils/Types.h"
+#include "nador/system/window/IImGuiAdapter.h"
 
 namespace nador
 {
@@ -44,7 +45,7 @@ namespace nador
 		 *
 		 * \return	The api specific window.
 		 */
-		virtual void* GetNativeApiWindow() = 0;
+		virtual void* GetNativeApiWindow() const = 0;
 
 		virtual void* GetNativeContext() = 0;
 
@@ -55,8 +56,9 @@ namespace nador
 		 */
 		virtual void ShowDebugWindow(bool show) = 0;
 
-		virtual void InitImGui() = 0;
+		virtual void AttachImGuiAdapter(IImguiAdapterUPtr adapter) = 0;
 	};
+	CREATE_PTR_TYPES(IWindow);
 }
 
 #endif // !__I_WINDOW_H__

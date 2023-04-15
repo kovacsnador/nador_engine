@@ -215,6 +215,7 @@ namespace nador
     protected:
         std::string _rootPath;
 	};
+    CREATE_PTR_TYPES(IFileController);
 }
 
 #endif // !__IFILE_CONTROLLER_H__
