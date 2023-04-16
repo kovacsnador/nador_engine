@@ -35,7 +35,7 @@ namespace nador
         IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video);
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
-        IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl);
+        IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
         ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
 
         return std::make_unique<App>(config,
@@ -248,6 +248,7 @@ namespace nador
 
     const IInputController* App::GetInputController() const
     {
+    
         return _inputCtrl.get();
     }
 

@@ -80,29 +80,29 @@ namespace nador
         return std::make_unique<ImguiAdapter>();
     }
 
-    ISoundControllerUPtr ModuleFactory::CreateSoundController(const IFileControllerPtr fileCtrl)
+    ISoundControllerUPtr ModuleFactory::CreateSoundController(const IFileControllerPtr& fileCtrl)
 	{
 		return std::make_unique<OpenAlSoundContoller>(fileCtrl);
 	}
 
-    IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr video)
+    IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr& video)
     {
         return std::make_unique<Renderer>(video);
     }
 
-    IFontControllerUPtr ModuleFactory::CreateFontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
+    IFontControllerUPtr ModuleFactory::CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl)
     {
         return std::make_unique<FontController>(video, fileCtrl);
     }
 
-    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& settings)
+    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings)
     {
         return std::make_unique<AtlasController>(video, fileCtrl, settings);
     }
 
-    IUiAppUPtr ModuleFactory::CreateUiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl)
+    IUiAppUPtr ModuleFactory::CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl)
     {
-        return std::make_unique<UiApp>(video, inputCtrl);
+        return std::make_unique<UiApp>(video, inputCtrl, atlasCtrl);
     }
 
     ITestControllerUPtr ModuleFactory::CreateTestController()

@@ -5,12 +5,14 @@ namespace nador
 {
 	const IUiElement* UiApp::s_pFocusedElement{ nullptr };
 
-	UiApp::UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl)
+	UiApp::UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl, const IAtlasControllerPtr atlasCtrl)
 	: _video(std::move(video))
 	, _inputCtrl(std::move(inputCtrl))
+	, _atlasCtrl(std::move(atlasCtrl))
 	{
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_inputCtrl);
+		NADOR_ASSERT(_atlasCtrl);
 
 		StartGlobalListening();
 	}

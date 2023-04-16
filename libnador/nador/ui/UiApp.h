@@ -6,6 +6,7 @@
 #include "nador/ui/IUiApp.h"
 #include "nador/common/GlobalListener.h"
 #include "nador/system/IInputController.h"
+#include "nador/video/atlas/IAtlasController.h"
 
 namespace nador
 {
@@ -15,7 +16,7 @@ namespace nador
         /*!
          * UiApp default constructor.
          */
-        UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl);
+        UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl, const IAtlasControllerPtr atlasCtrl);
 
         /*!
          * UiApp destructor.
@@ -108,6 +109,7 @@ namespace nador
 
         const IVideoPtr           _video { nullptr };
         const IInputControllerPtr _inputCtrl { nullptr };
+        const IAtlasControllerPtr _atlasCtrl { nullptr };
 
         ui_layer_list_t          _layers;
         static const IUiElement* s_pFocusedElement;
