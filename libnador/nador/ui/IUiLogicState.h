@@ -7,6 +7,7 @@ namespace nador
 {
 	class IInputController;
 	class IUiApp;
+	class IAtlasController;
 
 	class IUiLogicState
 	{
@@ -18,6 +19,7 @@ namespace nador
 		virtual bool IsMouseOverHandled() const = 0;
 		virtual void SetMouseOverHandled(bool handled) = 0;
 		virtual const IInputController* GetInputCtrl() const noexcept = 0;
+		virtual const IAtlasController* GetAtlasCtrl() const noexcept = 0;
 		virtual IUiApp* GetUiApp() const noexcept = 0;
 		virtual glm::vec2 GetMousePosition() const noexcept = 0;
 	};

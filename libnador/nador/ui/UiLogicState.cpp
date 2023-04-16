@@ -1,16 +1,20 @@
 #include "nador/ui/UiLogicState.h"
 #include "nador/system/IInputController.h"
+#include "nador/video/atlas/IAtlasController.h"
 #include "nador/log/Log.h"
 
 namespace nador
 {
-    UiLogicState::UiLogicState(float_t deltaTime, const IInputController* inputCtrl, IUiApp* uiApp)
+    UiLogicState::UiLogicState(float_t deltaTime, const IInputController* inputCtrl, const IAtlasController* atlasCtrl, IUiApp* uiApp)
     : _deltaTime(deltaTime)
     , _mouseOverHandled(false)
     , _inputCtrl(inputCtrl)
+    , _atlasCtrl(atlasCtrl)
     , _uiApp(uiApp)
     {
-		NADOR_ASSERT(_inputCtrl);
+        NADOR_ASSERT(_inputCtrl);
+        NADOR_ASSERT(_atlasCtrl);
+        NADOR_ASSERT(_uiApp);
     }
 
     float_t UiLogicState::GetDeltaTime() const
@@ -33,6 +37,11 @@ namespace nador
         return _inputCtrl;
     }
 
+    const IAtlasController* UiLogicState::GetAtlasCtrl() const noexcept
+    {
+        return _atlasCtrl;
+    }
+    
     IUiApp* UiLogicState::GetUiApp() const noexcept
     {
         return _uiApp;
@@ -40,10 +49,10 @@ namespace nador
 
     glm::vec2 nador::UiLogicState::GetMousePosition() const noexcept
     {
-        if(_inputCtrl)
-		{
-			return _inputCtrl->GetMousePosition();
-		}
-		return {0, 0};
+        if (_inputCtrl)
+        {
+            return _inputCtrl->GetMousePosition();
+        }
+        return { 0, 0 };
     }
 } // namespace nador

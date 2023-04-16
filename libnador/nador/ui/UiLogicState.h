@@ -8,13 +8,14 @@ namespace nador
 	class UiLogicState : public IUiLogicState
 	{
 	public:
-		UiLogicState(float_t deltaTime, const IInputController* inputCtrl, IUiApp* uiApp);
+		UiLogicState(float_t deltaTime, const IInputController* inputCtrl, const IAtlasController* atlasCtrl, IUiApp* uiApp);
 
 		float_t GetDeltaTime() const override;
 		bool IsMouseOverHandled() const override;
 		void SetMouseOverHandled(bool handled) override;
 
 		const IInputController* GetInputCtrl() const noexcept override;
+		const IAtlasController* GetAtlasCtrl() const noexcept override;
 		IUiApp* GetUiApp() const noexcept override;
 
 		glm::vec2 GetMousePosition() const noexcept override;
@@ -24,6 +25,7 @@ namespace nador
 		bool	_mouseOverHandled;
 
 		const IInputController* _inputCtrl;
+		const IAtlasController* _atlasCtrl;
 		IUiApp*					_uiApp;
 	};
 }

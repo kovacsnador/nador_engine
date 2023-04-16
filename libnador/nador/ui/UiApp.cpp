@@ -144,7 +144,7 @@ namespace nador
 
 	void UiApp::OnTick(float_t deltaTime)
 	{
-		UiLogicState uiLogicState(deltaTime, _inputCtrl.get(), this);
+		UiLogicState uiLogicState(deltaTime, _inputCtrl.get(), _atlasCtrl.get(), this);
 		auto vertices = GetScreenVertices();
 
 		// reverse iteration 

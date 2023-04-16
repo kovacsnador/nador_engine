@@ -31,9 +31,8 @@ namespace nador
 		void MakeEmptyImage() noexcept;
 
 	protected:
+		void OnTick(IUiLogicState* uiLogicState) override;
 		void OnRender(IRenderer* renderer, const quadVertices_t& vertices) override;
-
-		void Update();
 
 	private:
 		video::EImageName	_imageName{ video::EImageName::IMAGE_NAME_COUNT };

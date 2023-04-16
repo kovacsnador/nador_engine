@@ -104,6 +104,11 @@ namespace nador
 		texCoords.clear();
 	}
 
+	bool RenderData::Empty() const noexcept
+	{
+		return vertices.empty() && indices.empty() && texCoords.empty();
+	}
+
 	void ConcatIndices(indices_list_t& indicesBase, const indices_list_t& toAdd)
 	{
 		if (indicesBase.empty())
