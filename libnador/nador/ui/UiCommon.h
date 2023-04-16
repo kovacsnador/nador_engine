@@ -4,7 +4,6 @@
 #include <array>
 
 #include "nador/video/renderer/Renderer.h"
-#include "nador/video/atlas/Atlas.h"
 
 #include "EImageName.h"
 
@@ -46,8 +45,6 @@ namespace nador
 	bool IsPointOverOnVertices(const glm::vec2& point, const quadVertices_t& vertices);
 
 	glm::vec3 GetAverage(const quadVertices_t& vertices);
-
-	ImageData GetImageData(video::EImageName name);
 
 	glm::vec4 GetPivot(const quadVertices_t& vertices);
 

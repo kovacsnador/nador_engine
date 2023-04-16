@@ -1,5 +1,4 @@
 #include "nador/ui/UiCommon.h"
-#include "nador/App.h"
 
 namespace nador
 {
@@ -99,15 +98,6 @@ namespace nador
 		}
 
 		return vertices;
-	}
-
-	ImageData GetImageData(video::EImageName name)
-	{
-		const IAtlasController* atlasCtrl = IApp::Get()->GetAtlasController();
-
-		NADOR_ASSERT(atlasCtrl);
-
-		return atlasCtrl->GetImage(name);
 	}
 
 	glm::vec4 GetPivot(const quadVertices_t& vertices)
