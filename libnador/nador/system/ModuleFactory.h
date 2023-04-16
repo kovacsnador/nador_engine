@@ -24,11 +24,11 @@ namespace nador
 		IFileControllerUPtr CreateFileController(std::string_view rootFilePath);
 		IInputControllerUPtr CreateInputController(void* nativeWindow);
 		IImguiAdapterUPtr CreateImGuiAdapter();
-		ISoundControllerUPtr CreateSoundController(const IFileController* fileCtrl);
-		IRendererUPtr CreateRenderer(const IVideo* video);
-        IFontControllerUPtr CreateFontController(const IVideo* video, const IFileController* fileCtrl);
-        IAtlasControllerUPtr CreateAtlasController(const IVideo* video, const IFileController* fileCtrl, const AtlasSettings& settings);
-        IUiAppUPtr CreateUiApp(const IVideo* video, const IInputController* inputCtrl);
+		ISoundControllerUPtr CreateSoundController(const IFileControllerPtr fileCtrl);
+		IRendererUPtr CreateRenderer(const IVideoPtr video);
+        IFontControllerUPtr CreateFontController(const IVideoPtr video, const IFileControllerPtr fileCtrl);
+        IAtlasControllerUPtr CreateAtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& settings);
+        IUiAppUPtr CreateUiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl);
         ITestControllerUPtr CreateTestController();
 	}
 }

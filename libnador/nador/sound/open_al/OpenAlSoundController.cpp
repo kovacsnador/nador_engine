@@ -27,7 +27,7 @@
 
 namespace nador
 {
-    OpenAlSoundContoller::OpenAlSoundContoller(const IFileController* fileCtrl)
+    OpenAlSoundContoller::OpenAlSoundContoller(const IFileControllerPtr fileCtrl)
     : _fileCtrl(fileCtrl)
     {
         NADOR_ASSERT(_fileCtrl);

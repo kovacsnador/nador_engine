@@ -5,9 +5,9 @@ namespace nador
 {
 	const IUiElement* UiApp::s_pFocusedElement{ nullptr };
 
-	UiApp::UiApp(const IVideo* video, const IInputController* inputCtrl)
-	: _video(video)
-	, _inputCtrl(inputCtrl)
+	UiApp::UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl)
+	: _video(std::move(video))
+	, _inputCtrl(std::move(inputCtrl))
 	{
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_inputCtrl);
@@ -142,7 +142,7 @@ namespace nador
 
 	void UiApp::OnTick(float_t deltaTime)
 	{
-		UiLogicState uiLogicState(deltaTime, _inputCtrl, this);
+		UiLogicState uiLogicState(deltaTime, _inputCtrl.get(), this);
 		auto vertices = GetScreenVertices();
 
 		// reverse iteration 
@@ -198,19 +198,5 @@ namespace nador
 	void UiApp::OnMouseReleased(EMouseButton eMouseButton, const glm::vec2& position)
 	{
 		_OnKeyAndMouseEventImpl(&IUiElement::OnMouseReleasedImpl, eMouseButton, position);
-	}
-
-	void UiApp::_PushElementInLayers(IUiElement* elem, std::function<void(ui_element_list_t&, IUiElement*)> callback)
-	{
-		for (auto& layer : _layers)
-		{
-			auto& list = layer.second;
-
-			if (std::find(list.begin(), list.end(), elem) != list.end())
-			{
-				utils::Remove(list, elem);
-				callback(list, elem);
-			}
-		}
 	}
 }

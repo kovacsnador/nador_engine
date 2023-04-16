@@ -24,7 +24,7 @@ namespace nador
 		/*!
 		 * Renderer constructor.
 		 */
-		Renderer(const IVideo* video);
+		Renderer(const IVideoPtr video);
 
 		/*!
 		 * The render begin function.
@@ -122,7 +122,7 @@ namespace nador
 
 		void _SwitchRendererIfNecessary(ISimpleRenderer* nextRenderer);
 
-		const IVideo*		_video;
+		const IVideoPtr		_video;
 		ShaderController	_shaderCtrl;
 
 		SimpleRendererUPtr _simpleRendererPtr;

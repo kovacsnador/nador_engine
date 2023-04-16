@@ -80,27 +80,27 @@ namespace nador
         return std::make_unique<ImguiAdapter>();
     }
 
-    ISoundControllerUPtr ModuleFactory::CreateSoundController(const IFileController* fileCtrl)
+    ISoundControllerUPtr ModuleFactory::CreateSoundController(const IFileControllerPtr fileCtrl)
 	{
 		return std::make_unique<OpenAlSoundContoller>(fileCtrl);
 	}
 
-    IRendererUPtr ModuleFactory::CreateRenderer(const IVideo* video)
+    IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr video)
     {
         return std::make_unique<Renderer>(video);
     }
 
-    IFontControllerUPtr ModuleFactory::CreateFontController(const IVideo* video, const IFileController* fileCtrl)
+    IFontControllerUPtr ModuleFactory::CreateFontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
     {
         return std::make_unique<FontController>(video, fileCtrl);
     }
 
-    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(const IVideo* video, const IFileController* fileCtrl, const AtlasSettings& settings)
+    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& settings)
     {
         return std::make_unique<AtlasController>(video, fileCtrl, settings);
     }
 
-    IUiAppUPtr ModuleFactory::CreateUiApp(const IVideo* video, const IInputController* inputCtrl)
+    IUiAppUPtr ModuleFactory::CreateUiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl)
     {
         return std::make_unique<UiApp>(video, inputCtrl);
     }

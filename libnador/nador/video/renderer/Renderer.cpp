@@ -7,9 +7,9 @@ static constexpr size_t MAX_VERTEX_COUNT = 10000;
 
 namespace nador
 {
-	Renderer::Renderer(const IVideo* video)
-	: _video(video)
-	, _shaderCtrl(video)
+	Renderer::Renderer(const IVideoPtr video)
+	: _video(std::move(video))
+	, _shaderCtrl(video.get())
 	, _cameraMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 	, _projectionMatrix(1.0f)
 	, _modelMatrix(1.0f)
@@ -28,8 +28,8 @@ namespace nador
 			_video->EnableBlend();
 			_video->EnableMultiSample();
 
-			_simpleRendererPtr.reset(new SimpleRenderer(_video, &_shaderCtrl, MAX_VERTEX_COUNT));
-			_batchRendererPtr.reset(new BatchRenderer(video, _shaderCtrl.Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()));
+			_simpleRendererPtr.reset(new SimpleRenderer(_video.get(), &_shaderCtrl, MAX_VERTEX_COUNT));
+			_batchRendererPtr.reset(new BatchRenderer(video.get(), _shaderCtrl.Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()));
 		}
 
 		NADOR_ASSERT(_batchRendererPtr);

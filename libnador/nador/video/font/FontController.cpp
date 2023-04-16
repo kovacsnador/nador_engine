@@ -2,9 +2,9 @@
 
 namespace nador
 {
-	FontController::FontController(const IVideo* video, const IFileController* fileCtrl)
-	: _video(video)
-	, _fileCtrl(fileCtrl)
+	FontController::FontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
+	: _video(std::move(video))
+	, _fileCtrl(std::move(fileCtrl))
 	{
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_fileCtrl);
@@ -155,7 +155,7 @@ namespace nador
 			ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
 		}
 
-		FontPtr font = std::make_shared<Font>(_video, face, fontSize, maxTextureSize, fileName.data());
+		FontPtr font = std::make_shared<Font>(_video.get(), face, fontSize, maxTextureSize, fileName.data());
 
 		FT_Done_Face(face);
 

@@ -22,21 +22,21 @@ namespace nador
 {
     IAppUPtr App::CreateApp(const AppConfig& config)
     {
-        IWindowUPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
-        IVideoUPtr           video     = ModuleFactory::CreateVideo();
-        IFileControllerUPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
-        IInputControllerUPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
+        IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
+        IVideoPtr           video     = ModuleFactory::CreateVideo();
+        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
+        IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
 
         // Attach after InputController created
         window->AttachImGuiAdapter(ModuleFactory::CreateImGuiAdapter());
 
-        ISoundControllerUPtr soundCtrl = ModuleFactory::CreateSoundController(fileCtrl.get());
+        ISoundControllerPtr soundCtrl = ModuleFactory::CreateSoundController(fileCtrl);
 
-        IRendererUPtr        renderer  = ModuleFactory::CreateRenderer(video.get());
-        IFontControllerUPtr  fontCtrl  = ModuleFactory::CreateFontController(video.get(), fileCtrl.get());
-        IAtlasControllerUPtr atlasCtrl = ModuleFactory::CreateAtlasController(video.get(), fileCtrl.get(), config.atlasSettings);
-        IUiAppUPtr           uiApp     = ModuleFactory::CreateUiApp(video.get(), inputCtrl.get());
-        ITestControllerUPtr  testCtrl  = ModuleFactory::CreateTestController();
+        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video);
+        IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
+        IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
+        IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl);
+        ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
 
         return std::make_unique<App>(config,
                                      std::move(window),
@@ -51,17 +51,17 @@ namespace nador
                                      std::move(testCtrl));
     }
 
-    App::App(const AppConfig&     config,
-             IWindowUPtr          window,
-             IVideoUPtr           video,
-             IFileControllerUPtr  fileCtrl,
-             IInputControllerUPtr inputCtrl,
-             ISoundControllerUPtr soundCtrl,
-             IUiAppUPtr           uiApp,
-             IRendererUPtr        renderer,
-             IAtlasControllerUPtr atlasCtrl,
-             IFontControllerUPtr  fontCtrl,
-             ITestControllerUPtr  testCtrl)
+    App::App(const AppConfig&    config,
+             IWindowPtr          window,
+             IVideoPtr           video,
+             IFileControllerPtr  fileCtrl,
+             IInputControllerPtr inputCtrl,
+             ISoundControllerPtr soundCtrl,
+             IUiAppPtr           uiApp,
+             IRendererPtr        renderer,
+             IAtlasControllerPtr atlasCtrl,
+             IFontControllerPtr  fontCtrl,
+             ITestControllerPtr  testCtrl)
     : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
     , _config(config)
     , _window(std::move(window))
@@ -87,17 +87,8 @@ namespace nador
     {
         ENGINE_DEBUG("App deinitializing....");
 
+        // need to be delete before other modules (not holding refcounted Ptr to others)
         _testCtrl.reset();
-        _uiApp.reset();
-        _atlasCtrl.reset();
-        _fontCtrl.reset();
-        _renderer.reset();
-
-        _inputCtrl.reset();
-        _video.reset();
-        _window.reset();
-        _fileCtrl.reset();
-        _soundCtrl.reset();
 
         ENGINE_DEBUG("App deinitialized.");
     }

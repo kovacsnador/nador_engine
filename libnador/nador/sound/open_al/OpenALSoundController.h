@@ -68,7 +68,7 @@ namespace nador
         /*!
          * OpenAlSoundController default constructor.
          */
-        OpenAlSoundContoller(const IFileController* fileCtrl);
+        OpenAlSoundContoller(const IFileControllerPtr fileCtrl);
 
         /*!
          * OpenAlSoundController destructor.
@@ -114,7 +114,7 @@ namespace nador
         sound_data_list_t GetAllSoundData() const override;
 
     private:
-        const IFileController* _fileCtrl;
+        const IFileControllerPtr _fileCtrl;
 
         ALCdevice*  _pDevice { nullptr };
         ALCcontext* _pContext { nullptr };

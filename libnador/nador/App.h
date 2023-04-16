@@ -28,16 +28,16 @@ namespace nador
         static IAppUPtr CreateApp(const AppConfig& config);
 
         App(const AppConfig&     config,
-            IWindowUPtr          window,
-            IVideoUPtr           video,
-            IFileControllerUPtr  fileCtrl,
-            IInputControllerUPtr inputCtrl,
-            ISoundControllerUPtr soundCtrl,
-            IUiAppUPtr           uiApp,
-            IRendererUPtr        renderer,
-            IAtlasControllerUPtr atlasCtrl,
-            IFontControllerUPtr  fontCtrl,
-            ITestControllerUPtr  testController);
+            IWindowPtr          window,
+            IVideoPtr           video,
+            IFileControllerPtr  fileCtrl,
+            IInputControllerPtr inputCtrl,
+            ISoundControllerPtr soundCtrl,
+            IUiAppPtr           uiApp,
+            IRendererPtr        renderer,
+            IAtlasControllerPtr atlasCtrl,
+            IFontControllerPtr  fontCtrl,
+            ITestControllerPtr  testController);
 
     public:
         virtual ~App();
@@ -196,16 +196,16 @@ namespace nador
         AppConfig   _config;
         TickTracker _tickTracker;
 
-        IWindowUPtr          _window { nullptr };
-        IVideoUPtr           _video { nullptr };
-        IFileControllerUPtr  _fileCtrl { nullptr };
-        IInputControllerUPtr _inputCtrl { nullptr };
-        ISoundControllerUPtr _soundCtrl { nullptr };
-        IRendererUPtr        _renderer { nullptr };
-        IAtlasControllerUPtr _atlasCtrl { nullptr };
-        IFontControllerUPtr  _fontCtrl { nullptr };
-        ITestControllerUPtr  _testCtrl { nullptr };
-        IUiAppUPtr           _uiApp { nullptr };
+        IWindowPtr          _window { nullptr };
+        IVideoPtr           _video { nullptr };
+        IFileControllerPtr  _fileCtrl { nullptr };
+        IInputControllerPtr _inputCtrl { nullptr };
+        ISoundControllerPtr _soundCtrl { nullptr };
+        IRendererPtr        _renderer { nullptr };
+        IAtlasControllerPtr _atlasCtrl { nullptr };
+        IFontControllerPtr  _fontCtrl { nullptr };
+        ITestControllerPtr  _testCtrl { nullptr };
+        IUiAppPtr           _uiApp { nullptr };
 
         EAppState _state { EAppState::RUNNING };
     };

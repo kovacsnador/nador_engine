@@ -17,7 +17,7 @@ namespace nador
 		/*!
 		 * AtlasController construcor.
 		 */
-		AtlasController(const IVideo* video, const IFileController* fileCtrl, const AtlasSettings& atlasSettigns);
+		AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettigns);
 
 		/*!
 		 * Gets the image data.
@@ -43,6 +43,8 @@ namespace nador
 		strings_t GetAtlasNames() const override;
 
 	private:
+		const IVideoPtr          _video;
+        const IFileControllerPtr _fileCtrl;
 
 		image_lookup_t	_imageLookup;
 		atlases_t		_atlases;

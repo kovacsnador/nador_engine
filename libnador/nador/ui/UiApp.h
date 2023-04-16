@@ -5,6 +5,7 @@
 
 #include "nador/ui/IUiApp.h"
 #include "nador/common/GlobalListener.h"
+#include "nador/system/IInputController.h"
 
 namespace nador
 {
@@ -14,7 +15,7 @@ namespace nador
         /*!
          * UiApp default constructor.
          */
-        UiApp(const IVideo* video, const IInputController* inputCtrl);
+        UiApp(const IVideoPtr video, const IInputControllerPtr inputCtrl);
 
         /*!
          * UiApp destructor.
@@ -72,7 +73,20 @@ namespace nador
         void OnMouseReleased(EMouseButton eMouseButton, const glm::vec2& position) override;
 
     private:
-        void _PushElementInLayers(IUiElement* elem, std::function<void(ui_element_list_t&, IUiElement*)> callback);
+        template <typename CallbackTy>
+        void _PushElementInLayers(IUiElement* elem, CallbackTy callback)
+        {
+            for (auto& layer : _layers)
+            {
+                auto& list = layer.second;
+
+                if (std::find(list.begin(), list.end(), elem) != list.end())
+                {
+                    utils::Remove(list, elem);
+                    callback(list, elem);
+                }
+            }
+        }
 
         template <typename... Params, typename... Args>
         void _OnKeyAndMouseEventImpl(bool (IUiElement::*onEventImpl)(Params...), Args... args)
@@ -90,12 +104,12 @@ namespace nador
             }
         }
 
-        ui_layer_list_t _layers;
+        bool _debugDrawEdge { false };
 
-        bool                    _debugDrawEdge { false };
-        const IVideo*           _video { nullptr };
-        const IInputController* _inputCtrl { nullptr };
+        const IVideoPtr           _video { nullptr };
+        const IInputControllerPtr _inputCtrl { nullptr };
 
+        ui_layer_list_t          _layers;
         static const IUiElement* s_pFocusedElement;
     };
 
