@@ -257,5 +257,5 @@ set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 option(NADOR_BUILD_UNIT_TEST    "Building unit tests"   ON)
 
 if(NADOR_BUILD_UNIT_TEST)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/unit_testing)
 endif()
