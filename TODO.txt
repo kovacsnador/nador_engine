@@ -1,3 +1,4 @@
 - Rendereröt modularizálni
 - UiImage dependency-t eltüntetni
 - Logger-t megnézni, ill kicsérélni ha spdlog jobb
+- test_app ot betenni a libnador-ba.
