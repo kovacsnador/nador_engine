@@ -1,14 +1,19 @@
 ﻿#ifndef __NADOR_I_RENDERER_H__
 #define __NADOR_I_RENDERER_H__
 
+#include <unordered_map>
+
 #include "nador/video/material/Material.h"
 #include "nador/video/renderer/RenderData.h"
+#include "nador/video/renderer/IRenderPlugin.h"
 
 namespace nador
 {
 	class IRenderer
 	{
 	public:
+		using rendererPlugins_t = std::unordered_map<ERenderPlugin, IRenderPluginUPtr>;
+
 		virtual ~IRenderer() = default;
 
 	public:

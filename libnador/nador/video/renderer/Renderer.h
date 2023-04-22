@@ -6,14 +6,9 @@
 
 #include "nador/video/IVideo.h"
 #include "nador/video/renderer/IRenderer.h"
-#include "nador/video/shader/ShaderController.h"
-#include "nador/video/buffers/VertexBuffer.h"
-#include "nador/video/buffers/IndexBuffer.h"
 #include "nador/video/material/Material.h"
 #include "nador/video/renderer/RenderData.h"
 #include "nador/utils/IntervalCounter.h"
-#include "nador/video/renderer/batch_renderer/BatchRenderer.h"
-#include "nador/video/renderer/simple_renderer/SimpleRenderer.h"
 
 namespace nador
 {
@@ -24,7 +19,7 @@ namespace nador
 		/*!
 		 * Renderer constructor.
 		 */
-		Renderer(const IVideoPtr video);
+		Renderer(const IVideoPtr video, rendererPlugins_t&& renderers);
 
 		/*!
 		 * The render begin function.
@@ -75,16 +70,6 @@ namespace nador
 		 */
 		const glm::ivec2& GetScreenSize() const override;
 
-		/*!
-		 * Gets the current material.
-		 *
-		 * \return 		The current material pointer.
-		 */
-		/*const IMaterialPtr GetCurrentMaterial() const  override
-		{
-			return _currentMaterial;
-		}*/
-
 		float_t GetRenderPerInterval(float_t interval = 1.f) const override;
 
 		// takes the left bottom corner
@@ -120,14 +105,13 @@ namespace nador
 		 */
 		void SetModelMatrix(const glm::mat4* modelMatrix);
 
-		void _SwitchRendererIfNecessary(ISimpleRenderer* nextRenderer);
+		void _SwitchRendererIfNecessary(IRenderPlugin* nextRenderer);
 
 		const IVideoPtr		_video;
-		ShaderController	_shaderCtrl;
 
-		SimpleRendererUPtr _simpleRendererPtr;
-		BatchRendererUPtr  _batchRendererPtr;
-		ISimpleRenderer*   _currentActiveRenderer{ nullptr };
+		IRenderPlugin*   _currentActiveRenderer{ nullptr };
+
+		rendererPlugins_t _attachedRenderers;
 
 		glm::mat4 _cameraMatrix;
 		glm::mat4 _projectionMatrix;

@@ -12,6 +12,11 @@ namespace nador
 	class IMaterial;
 	CREATE_PTR_TYPES(IMaterial);
 
+	enum class ERenderPlugin
+	{
+		EBaseRenderer,
+		EBatchRenderer
+	};
 
 	class IMaterial
 	{
@@ -55,6 +60,8 @@ namespace nador
 		virtual const char* GetTextureCoordName() { return "aTexCoord"; };
 
 		virtual IMaterialPtr Clone() const = 0;
+
+		virtual ERenderPlugin GetRenderPlugin() const noexcept = 0;
 	};
 
 	//==========================================================================
@@ -92,6 +99,8 @@ namespace nador
 		void Assign(const IMaterial* material) override;
 
 		IMaterialPtr Clone() const override;
+
+		ERenderPlugin GetRenderPlugin() const noexcept override;
 
 		glm::vec4 uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
@@ -132,6 +141,8 @@ namespace nador
 
 		IMaterialPtr Clone() const override;
 
+		ERenderPlugin GetRenderPlugin() const noexcept override;
+
 		TexturePtr	texture;
 		glm::vec4	uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
@@ -157,6 +168,8 @@ namespace nador
 		bool IsSame(const IMaterial* material) const override;
 
 		IMaterialPtr Clone() const override;
+
+		ERenderPlugin GetRenderPlugin() const noexcept override;
 	};
 
 	//==========================================================================
@@ -169,6 +182,8 @@ namespace nador
 		void Assign(const IMaterial* material) override;
 
 		IMaterialPtr Clone() const override;
+
+		ERenderPlugin GetRenderPlugin() const noexcept override;
 
 		glm::vec4	uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glm::vec2	uDimensions{ 0,0 };
@@ -186,6 +201,8 @@ namespace nador
 		virtual bool IsText() const noexcept;
 
 		IMaterialPtr Clone() const override;
+
+		ERenderPlugin GetRenderPlugin() const noexcept override;
 
 		TexturePtr	texture;
 		glm::vec4	uColor{ 1.0f, 1.0f, 1.0f, 1.0f };

@@ -15,6 +15,7 @@
 #include "nador/sound/ISoundController.h"
 #include "nador/ui/UiApp.h"
 #include "nador/system/IWindow.h"
+#include "nador/video/shader/ShaderController.h"
 
 #include "nador/test/Tests.h"
 
@@ -22,6 +23,8 @@ namespace nador
 {
     IAppUPtr App::CreateApp(const AppConfig& config)
     {
+        static constexpr size_t MAX_VERTEX_COUNT = 10000;
+
         IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
         IVideoPtr           video     = ModuleFactory::CreateVideo();
         IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
@@ -32,7 +35,15 @@ namespace nador
 
         ISoundControllerPtr soundCtrl = ModuleFactory::CreateSoundController(fileCtrl);
 
-        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video);
+        // Create renderer and plugins
+        IShaderControllerPtr shaderCtrl = std::make_shared<ShaderController>(video);
+
+        IRenderer::rendererPlugins_t rendererPlugins;
+        rendererPlugins.insert({ ERenderPlugin::EBaseRenderer, std::make_unique<BaseRenderer>(video, shaderCtrl, MAX_VERTEX_COUNT) });
+        rendererPlugins.insert( { ERenderPlugin::EBatchRenderer,
+              std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()) });
+
+        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, std::move(rendererPlugins));
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
@@ -248,7 +259,7 @@ namespace nador
 
     const IInputController* App::GetInputController() const
     {
-    
+
         return _inputCtrl.get();
     }
 

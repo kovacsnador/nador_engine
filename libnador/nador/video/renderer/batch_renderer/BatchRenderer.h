@@ -9,16 +9,16 @@
 #include "nador/video/renderer/batch_renderer/BatchRenderData.h"
 #include "nador/video/renderer/RenderData.h"
 #include "nador/video/material/Material.h"
-#include "nador/video/renderer/ISimpleRenderer.h"
+#include "nador/video/renderer/IRenderPlugin.h"
 
 namespace nador
 {
 	class IVideo;
 
-	class BatchRenderer : public ISimpleRenderer
+	class BatchRenderer : public IRenderPlugin
 	{
 	public:
-		BatchRenderer(const IVideo* video, ShaderPtr shader, size_t maxVertexCount, size_t maxTextureUnit);
+		BatchRenderer(const IVideoPtr video, ShaderPtr shader, size_t maxVertexCount, size_t maxTextureUnit);
 
 		void Begin() override;
 		void End() override;
@@ -31,7 +31,7 @@ namespace nador
 		void _ResetBuffers();
 		size_t _AddTexture(TexturePtr texture);
 
-		const IVideo*	_video;
+		const IVideoPtr	_video;
 		const size_t	_maxVertexCount;
 		const size_t	_maxTextureUnit;
 

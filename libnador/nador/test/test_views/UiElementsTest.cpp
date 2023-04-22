@@ -1,6 +1,5 @@
 #include "imgui.h"
 
-#include "nador/IApp.h"
 #include "nador/test/test_views/UiElementsTest.h"
 #include "nador/test/TestCommon.h"
 #include "nador/video/font/IFontController.h"

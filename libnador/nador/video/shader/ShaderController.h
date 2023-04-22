@@ -3,19 +3,11 @@
 
 #include <unordered_map>
 
-#include "nador/video/shader/Shader.h"
+#include "nador/video/shader/IShaderController.h"
+
 
 namespace nador
 {
-	class IShaderController
-	{
-	protected:
-		virtual ~IShaderController() = default;
-
-	public:
-		virtual ShaderPtr Get(EShader type) = 0;
-	};
-
 	class ShaderController : public IShaderController
 	{
 		using container_t = std::unordered_map<EShader, ShaderPtr>;
@@ -24,16 +16,24 @@ namespace nador
 		/*!
 		 * ShaderController constructor.
 		 */
-		ShaderController(const IVideo* video);
+		ShaderController(const IVideoPtr video);
 
 		/*!
 		 * Gets the specific shader program.
 		 *
 		 * \param type	The shader type.
 		 */
-		 ShaderPtr Get(EShader type);
+		 ShaderPtr Get(EShader type) override;
 
-	private:
+		 /*!
+		 * Create a new shader program.
+		 *
+		 * \param type				The shader type.
+		 * \param vertexShader		The vertex shader source.
+		 * \param fragmentShader	The fragment shader source.
+		 */
+		void Add(EShader type, const char* vertexShader, const char* fragmentShader) override;
+
 		/*!
 		 * Gets the base vertex shader source.
 		 *
@@ -82,17 +82,9 @@ namespace nador
 		static const char* BatchQuadVertexShader();
 		static std::string BatchQuadFragmentShader(size_t textureSlots);
 
-		/*!
-		 * Create a new shader program.
-		 *
-		 * \param type				The shader type.
-		 * \param vertexShader		The vertex shader source.
-		 * \param fragmentShader	The fragment shader source.
-		 */
-		void _Add(const IVideo* video, EShader type, const char* vertexShader, const char* fragmentShader);
-
+private:
 		container_t 	_shaders;
-		const IVideo* 	_video;
+		const IVideoPtr _video;
 	};
 }
 

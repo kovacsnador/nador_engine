@@ -1,29 +1,29 @@
-#include "nador/video/renderer/simple_renderer/SimpleRenderer.h"
+#include "nador/video/renderer/base_renderer/BaseRenderer.h"
 #include "nador/video/buffers/IndexBuffer.h"
 
 namespace nador
 {
-	SimpleRenderer::SimpleRenderer(const IVideo* video, IShaderController* shaderCtrl, size_t maxVertexCount)
-	: _video(video)
-	, _shaderCtrl(shaderCtrl)
+	BaseRenderer::BaseRenderer(const IVideoPtr video, IShaderControllerPtr shaderCtrl, size_t maxVertexCount)
+	: _video(std::move(video))
+	, _shaderCtrl(std::move(shaderCtrl))
 	, _uMVP(1.0f)
 	, _maxVertexCount(maxVertexCount)
 	{
-		NADOR_ASSERT(video);
-		NADOR_ASSERT(shaderCtrl);
+		NADOR_ASSERT(_video);
+		NADOR_ASSERT(_shaderCtrl);
 	}
 
-	void SimpleRenderer::Begin()
+	void BaseRenderer::Begin()
 	{
 		_drawCount = 0;
 	}
 
-	void SimpleRenderer::End()
+	void BaseRenderer::End()
 	{
 		Flush();
 	}
 
-	void SimpleRenderer::Draw(const IMaterial* material, const RenderData& renderData, const glm::mat4& uMVP)
+	void BaseRenderer::Draw(const IMaterial* material, const RenderData& renderData, const glm::mat4& uMVP)
 	{
 		bool sameMaterial = _IsSameMaterial(material);
 
@@ -48,7 +48,7 @@ namespace nador
 		_AddRenderData(renderData);
 	}
 
-	bool SimpleRenderer::Flush()
+	bool BaseRenderer::Flush()
 	{
 		if (_renderData.vertices.empty() || _renderData.indices.empty() || _currentMaterial == nullptr)
 		{
@@ -58,20 +58,20 @@ namespace nador
 
 		_currentMaterial->Activate(_currentShader, _uMVP);
 
-		VertexBuffer aPosition(_video, &_renderData.vertices.front(), utils::VectorsizeInBytes(_renderData.vertices));
+		VertexBuffer aPosition(_video.get(), &_renderData.vertices.front(), utils::VectorsizeInBytes(_renderData.vertices));
 		aPosition.Bind();
 
 		decltype (_renderData.vertices)::value_type vertex;
 		_currentShader->EnableAttribArray(_currentMaterial->GetVerticesName(), vertex.length(), nullptr);
 
-		IndexBuffer indices(_video, &_renderData.indices.front(), _renderData.indices.size());
+		IndexBuffer indices(_video.get(), &_renderData.indices.front(), _renderData.indices.size());
 		indices.Bind();
 
 		VertexBufferPtr aTexCoord;
 
 		if (_renderData.texCoords.empty() == false)
 		{
-			aTexCoord = std::make_shared<VertexBuffer>(_video, &_renderData.texCoords.front(), utils::VectorsizeInBytes(_renderData.texCoords));
+			aTexCoord = std::make_shared<VertexBuffer>(_video.get(), &_renderData.texCoords.front(), utils::VectorsizeInBytes(_renderData.texCoords));
 			aTexCoord->Bind();
 
 			decltype (_renderData.texCoords)::value_type texCoord;
@@ -89,7 +89,7 @@ namespace nador
 		return true;
 	}
 
-	bool SimpleRenderer::_IsSameMaterial(const IMaterial* material)
+	bool BaseRenderer::_IsSameMaterial(const IMaterial* material)
 	{
 		NADOR_ASSERT(material);
 
@@ -101,7 +101,7 @@ namespace nador
 		return false;
 	}
 
-	bool SimpleRenderer::_SetMaterial(const IMaterial* material)
+	bool BaseRenderer::_SetMaterial(const IMaterial* material)
 	{
 		NADOR_ASSERT(material);
 
@@ -113,7 +113,7 @@ namespace nador
 		return true;
 	}
 
-	void SimpleRenderer::_AddRenderData(const RenderData& renderData)
+	void BaseRenderer::_AddRenderData(const RenderData& renderData)
 	{
 		if (renderData.indices.empty() || renderData.vertices.empty())
 		{
@@ -127,7 +127,7 @@ namespace nador
 		ConcatIndices(_renderData.indices, renderData.indices);
 	}
 
-	void SimpleRenderer::_ResetBuffers()
+	void BaseRenderer::_ResetBuffers()
 	{
 		_renderData.Clear();
 	}

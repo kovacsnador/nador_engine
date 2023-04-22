@@ -1,5 +1,5 @@
-#ifndef __NADOR_I_SIMPLE_RENDERER_H__
-#define __NADOR_I_SIMPLE_RENDERER_H__
+#ifndef __NADOR_I_RENDER_PLUGIN_H__
+#define __NADOR_I_RENDER_PLUGIN_H__
 
 #include "nador/utils/Types.h"
 
@@ -9,12 +9,11 @@ namespace nador
 
 	struct RenderData;
 
-	class ISimpleRenderer
+	class IRenderPlugin
 	{
-	protected:
-		virtual ~ISimpleRenderer() = default;
-
 	public:
+		virtual ~IRenderPlugin() = default;
+
 		virtual void Begin() = 0;
 		virtual void End() = 0;
 		virtual bool Flush() = 0;
@@ -29,6 +28,7 @@ namespace nador
 	protected:
 		uint32_t _drawCount{ 0 };
 	};
+	CREATE_PTR_TYPES(IRenderPlugin);
 }
 
-#endif // !__NADOR_I_SIMPLE_RENDERER_H__
+#endif // !__NADOR_I_RENDER_PLUGIN_H__

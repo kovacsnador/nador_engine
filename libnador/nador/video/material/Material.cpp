@@ -1,176 +1,200 @@
 #include "nador/video/material/Material.h"
+#include "Material.h"
 
 namespace nador
 {
-	void BaseMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
-	{
-		shader->Bind();
-		shader->SetUniform4f("uColor", uColor);
-		shader->SetUniformMat4f("uMVP", uMVP);
-	}
+    void BaseMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
+    {
+        shader->Bind();
+        shader->SetUniform4f("uColor", uColor);
+        shader->SetUniformMat4f("uMVP", uMVP);
+    }
 
-	bool BaseMaterial::IsSame(const IMaterial* material) const
-	{
-		if(const BaseMaterial* mat = dynamic_cast<const BaseMaterial*>(material))
-		{
-			return uColor == mat->uColor;
-		}
+    bool BaseMaterial::IsSame(const IMaterial* material) const
+    {
+        if (const BaseMaterial* mat = dynamic_cast<const BaseMaterial*>(material))
+        {
+            return uColor == mat->uColor;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	EShader BaseMaterial::ShaderTypeNeeded() const noexcept
-	{
-		return EShader::BASE;
-	}
-	
-	void BaseMaterial::Assign(const IMaterial* material)
-	{
-		if(const BaseMaterial* mat = dynamic_cast<const BaseMaterial*>(material))
-		{
-			*this = *mat;
-		}
-	}
+    EShader BaseMaterial::ShaderTypeNeeded() const noexcept
+    {
+        return EShader::BASE;
+    }
 
-	IMaterialPtr BaseMaterial::Clone() const
-	{
-		return std::make_shared<BaseMaterial>(*this);
-	}
+    void BaseMaterial::Assign(const IMaterial* material)
+    {
+        if (const BaseMaterial* mat = dynamic_cast<const BaseMaterial*>(material))
+        {
+            *this = *mat;
+        }
+    }
 
-	void TextureMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
-	{
-		shader->Bind();
-		shader->SetUniform4f("uColor", uColor);
+    IMaterialPtr BaseMaterial::Clone() const
+    {
+        return std::make_shared<BaseMaterial>(*this);
+    }
 
-		shader->SetUniform1i("uTexture", 0);
-		texture->Bind();
+    ERenderPlugin BaseMaterial::GetRenderPlugin() const noexcept
+    {
+        return ERenderPlugin::EBaseRenderer;
+    }
 
-		shader->SetUniformMat4f("uMVP", uMVP);
-	}
+    void TextureMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
+    {
+        shader->Bind();
+        shader->SetUniform4f("uColor", uColor);
 
-	bool TextureMaterial::IsSame(const IMaterial* material) const
-	{
-		if(const TextureMaterial* mat = dynamic_cast<const TextureMaterial*>(material))
-		{
-			return uColor == mat->uColor && texture->GetId() == mat->texture->GetId();
-		}
+        shader->SetUniform1i("uTexture", 0);
+        texture->Bind();
 
-		return false;
-	}
+        shader->SetUniformMat4f("uMVP", uMVP);
+    }
 
-	EShader TextureMaterial::ShaderTypeNeeded() const noexcept
-	{
-		return EShader::TEXTURE;
-	}
+    bool TextureMaterial::IsSame(const IMaterial* material) const
+    {
+        if (const TextureMaterial* mat = dynamic_cast<const TextureMaterial*>(material))
+        {
+            return uColor == mat->uColor && texture->GetId() == mat->texture->GetId();
+        }
 
-	void TextureMaterial::Assign(const IMaterial* material)
-	{
-		if(const TextureMaterial* mat = dynamic_cast<const TextureMaterial*>(material))
-		{
-			*this = *mat;
-		}
-	}
+        return false;
+    }
 
-	IMaterialPtr TextureMaterial::Clone() const
-	{
-		return std::make_shared<TextureMaterial>(*this);
-	}
+    EShader TextureMaterial::ShaderTypeNeeded() const noexcept
+    {
+        return EShader::TEXTURE;
+    }
 
-	EShader FontMaterial::ShaderTypeNeeded() const noexcept
-	{
-		return EShader::FONT;
-	}
+    void TextureMaterial::Assign(const IMaterial* material)
+    {
+        if (const TextureMaterial* mat = dynamic_cast<const TextureMaterial*>(material))
+        {
+            *this = *mat;
+        }
+    }
 
-	bool FontMaterial::IsSame(const IMaterial* material) const
-	{
-		if (const FontMaterial* mat = dynamic_cast<const FontMaterial*>(material))
-		{
-			return uColor == mat->uColor && texture->GetId() == mat->texture->GetId();
-		}
+    IMaterialPtr TextureMaterial::Clone() const
+    {
+        return std::make_shared<TextureMaterial>(*this);
+    }
 
-		return false;
-	}
+    ERenderPlugin TextureMaterial::GetRenderPlugin() const noexcept
+    {
+        return ERenderPlugin::EBaseRenderer;
+    }
 
-	IMaterialPtr FontMaterial::Clone() const
-	{
-		return std::make_shared<FontMaterial>(*this);
-	}
+    EShader FontMaterial::ShaderTypeNeeded() const noexcept
+    {
+        return EShader::FONT;
+    }
 
-	void RoundEdgeMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
-	{
-		shader->Bind();
-		shader->SetUniform4f("uColor", uColor);
-		shader->SetUniform2f("uDimensions", uDimensions);
-		shader->SetUniform1f("uRadius", uRadius);
-		shader->SetUniformMat4f("uMVP", uMVP);
-	}
+    bool FontMaterial::IsSame(const IMaterial* material) const
+    {
+        if (const FontMaterial* mat = dynamic_cast<const FontMaterial*>(material))
+        {
+            return uColor == mat->uColor && texture->GetId() == mat->texture->GetId();
+        }
 
-	EShader RoundEdgeMaterial::ShaderTypeNeeded() const noexcept
-	{
-		return EShader::ROUND_EDGE;
-	}
+        return false;
+    }
 
-	bool RoundEdgeMaterial::IsSame(const IMaterial* material) const
-	{
-		if (const RoundEdgeMaterial* mat = dynamic_cast<const RoundEdgeMaterial*>(material))
-		{
-			return (uColor == mat->uColor &&
-					uDimensions == mat->uDimensions &&
-					uRadius == mat->uRadius);
-		}
+    IMaterialPtr FontMaterial::Clone() const
+    {
+        return std::make_shared<FontMaterial>(*this);
+    }
 
-		return false;
-	}
+    ERenderPlugin FontMaterial::GetRenderPlugin() const noexcept
+    {
+        return ERenderPlugin::EBaseRenderer;
+    }
 
-	void RoundEdgeMaterial::Assign(const IMaterial* material)
-	{
-		if (const RoundEdgeMaterial* mat = dynamic_cast<const RoundEdgeMaterial*>(material))
-		{
-			*this = *mat;
-		}
-	}
+    void RoundEdgeMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
+    {
+        shader->Bind();
+        shader->SetUniform4f("uColor", uColor);
+        shader->SetUniform2f("uDimensions", uDimensions);
+        shader->SetUniform1f("uRadius", uRadius);
+        shader->SetUniformMat4f("uMVP", uMVP);
+    }
 
-	IMaterialPtr RoundEdgeMaterial::Clone() const
-	{
-		return std::make_shared<RoundEdgeMaterial>(*this);
-	}
+    EShader RoundEdgeMaterial::ShaderTypeNeeded() const noexcept
+    {
+        return EShader::ROUND_EDGE;
+    }
 
-	void BatchMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
-	{
-		shader->Bind();
-		shader->SetUniformMat4f("uMVP", uMVP);
-	}
+    bool RoundEdgeMaterial::IsSame(const IMaterial* material) const
+    {
+        if (const RoundEdgeMaterial* mat = dynamic_cast<const RoundEdgeMaterial*>(material))
+        {
+            return (uColor == mat->uColor && uDimensions == mat->uDimensions && uRadius == mat->uRadius);
+        }
 
-	EShader BatchMaterial::ShaderTypeNeeded() const noexcept
-	{
-		return EShader::BATCH;
-	}
+        return false;
+    }
 
-	bool BatchMaterial::IsSame(const IMaterial* material) const
-	{
-		return dynamic_cast<const BatchMaterial*>(material);
-	}
+    void RoundEdgeMaterial::Assign(const IMaterial* material)
+    {
+        if (const RoundEdgeMaterial* mat = dynamic_cast<const RoundEdgeMaterial*>(material))
+        {
+            *this = *mat;
+        }
+    }
 
-	void BatchMaterial::Assign(const IMaterial* material)
-	{
-		if (const BatchMaterial* mat = dynamic_cast<const BatchMaterial*>(material))
-		{
-			*this = *mat;
-		}
-	}
+    IMaterialPtr RoundEdgeMaterial::Clone() const
+    {
+        return std::make_shared<RoundEdgeMaterial>(*this);
+    }
 
-	bool BatchMaterial::IsText() const noexcept
-	{
-		return false;
-	}
+    ERenderPlugin RoundEdgeMaterial::GetRenderPlugin() const noexcept
+    {
+        return ERenderPlugin::EBaseRenderer;
+    }
 
-	IMaterialPtr BatchMaterial::Clone() const
-	{
-		return std::make_shared<BatchMaterial>(*this);
-	}
+    void BatchMaterial::Activate(const ShaderPtr& shader, const glm::mat4& uMVP) const
+    {
+        shader->Bind();
+        shader->SetUniformMat4f("uMVP", uMVP);
+    }
 
-	bool BatchTextMaterial::IsText() const noexcept
-	{
-		return true;
-	}
-}
+    EShader BatchMaterial::ShaderTypeNeeded() const noexcept
+    {
+        return EShader::BATCH;
+    }
+
+    bool BatchMaterial::IsSame(const IMaterial* material) const
+    {
+        return dynamic_cast<const BatchMaterial*>(material);
+    }
+
+    void BatchMaterial::Assign(const IMaterial* material)
+    {
+        if (const BatchMaterial* mat = dynamic_cast<const BatchMaterial*>(material))
+        {
+            *this = *mat;
+        }
+    }
+
+    bool BatchMaterial::IsText() const noexcept
+    {
+        return false;
+    }
+
+    IMaterialPtr BatchMaterial::Clone() const
+    {
+        return std::make_shared<BatchMaterial>(*this);
+    }
+
+    ERenderPlugin BatchMaterial::GetRenderPlugin() const noexcept
+    {
+        return ERenderPlugin::EBatchRenderer;
+    }
+
+    bool BatchTextMaterial::IsText() const noexcept
+    {
+        return true;
+    }
+} // namespace nador

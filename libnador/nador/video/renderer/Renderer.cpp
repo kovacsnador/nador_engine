@@ -1,15 +1,15 @@
 ﻿#include <algorithm>
 
-#include "Renderer.h"
+#include "nador/video/renderer/Renderer.h"
 #include "nador/log/Log.h"
 
 static constexpr size_t MAX_VERTEX_COUNT = 10000;
 
 namespace nador
 {
-	Renderer::Renderer(const IVideoPtr video)
+	Renderer::Renderer(const IVideoPtr video, rendererPlugins_t&& renderers)
 	: _video(std::move(video))
-	, _shaderCtrl(video.get())
+	, _attachedRenderers(std::move(renderers))
 	, _cameraMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
 	, _projectionMatrix(1.0f)
 	, _modelMatrix(1.0f)
@@ -27,21 +27,17 @@ namespace nador
 
 			_video->EnableBlend();
 			_video->EnableMultiSample();
-
-			_simpleRendererPtr.reset(new SimpleRenderer(_video.get(), &_shaderCtrl, MAX_VERTEX_COUNT));
-			_batchRendererPtr.reset(new BatchRenderer(video.get(), _shaderCtrl.Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()));
 		}
-
-		NADOR_ASSERT(_batchRendererPtr);
-		NADOR_ASSERT(_simpleRendererPtr);
 	}
 
 	void Renderer::Begin()
 	{
 		_video->ClearColorRGBA(0, 0, 0, 1);
 
-		_simpleRendererPtr->Begin();
-		_batchRendererPtr->Begin();
+		for(auto& [key, value] : _attachedRenderers)
+		{
+			value->Begin();
+		}
 	}
 
 	void Renderer::Flush()
@@ -54,8 +50,10 @@ namespace nador
 
 	void Renderer::End()
 	{
-		_simpleRendererPtr->End();
-		_batchRendererPtr->End();
+		for(auto& [key, value] : _attachedRenderers)
+		{
+			value->End();
+		}
 	}
 
 	void Renderer::Draw(const IMaterial* pMaterial,
@@ -64,11 +62,17 @@ namespace nador
 						const glm::mat4* projectionMatrix,
 						const glm::mat4* cameraMatrix)
 	{
-		bool isBatchMaterial = dynamic_cast<const BatchMaterial*>(pMaterial);
+		ERenderPlugin rendererPlugin = pMaterial->GetRenderPlugin();
 
-		ISimpleRenderer* nextRenderer = (isBatchMaterial) ? dynamic_cast<ISimpleRenderer*>(_batchRendererPtr.get()) : dynamic_cast<ISimpleRenderer*>(_simpleRendererPtr.get());
+		auto renderer = _attachedRenderers.find(rendererPlugin);
 
-		_SwitchRendererIfNecessary(nextRenderer);
+		if(renderer == _attachedRenderers.end())
+		{
+			ENGINE_ERROR("RenderPlugin not attached %d", rendererPlugin);
+			return;
+		}
+
+		_SwitchRendererIfNecessary(renderer->second.get());
 
 		if (modelMatrix)
 		{
@@ -143,7 +147,13 @@ namespace nador
 
 	uint32_t Renderer::GetDrawCount() const noexcept
 	{
-		return _simpleRendererPtr->GetDrawCount() + _batchRendererPtr->GetDrawCount();
+		uint32_t drawCount = 0;
+		for(auto& [key, value] : _attachedRenderers)
+		{
+			drawCount += value->GetDrawCount();
+		}
+		return drawCount;
+
 	}
 
 	void Renderer::SetScissor(const glm::ivec2& position, const glm::ivec2& size) const
@@ -156,13 +166,13 @@ namespace nador
 		_video->DisableScissor();
 	}
 
-	void Renderer::_SwitchRendererIfNecessary(ISimpleRenderer* nextRenderer)
+	void Renderer::_SwitchRendererIfNecessary(IRenderPlugin* nextRenderer)
 	{
 		NADOR_ASSERT(nextRenderer);
 
 		if (_currentActiveRenderer != nextRenderer)
 		{
-			// switch to batch renderer
+			// switching renderer
 			if (_currentActiveRenderer)
 			{
 				_currentActiveRenderer->Flush();

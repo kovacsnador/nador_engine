@@ -5,11 +5,11 @@
 
 namespace nador
 {
-	BatchRenderer::BatchRenderer(const IVideo* video, ShaderPtr shader, size_t maxVertexCount, size_t maxTextureUnit)
-	: _video(video)
+	BatchRenderer::BatchRenderer(const IVideoPtr video, ShaderPtr shader, size_t maxVertexCount, size_t maxTextureUnit)
+	: _video(std::move(video))
 	, _maxVertexCount(maxVertexCount)
 	, _maxTextureUnit(maxTextureUnit)
-	, _shader(shader)
+	, _shader(std::move(shader))
 	, _uMVP(1.0f)
 	{
 		NADOR_ASSERT(_shader);
@@ -18,9 +18,9 @@ namespace nador
 		uint32_t color = 0xffffffff;
 		uint32_t width = 1;
 		uint32_t height = 1;
-		_whiteTexture.reset(new Texture(_video, &color, width, height));
+		_whiteTexture.reset(new Texture(_video.get(), &color, width, height));
 
-		_vertexBuffer.reset(new VertexBuffer(_video, nullptr, sizeof(BatchVertex) * _maxVertexCount, VertexBuffer::EBufferType::DYNAMIC));
+		_vertexBuffer.reset(new VertexBuffer(_video.get(), nullptr, sizeof(BatchVertex) * _maxVertexCount, VertexBuffer::EBufferType::DYNAMIC));
 		
 		_batchRendererData.vertices.resize(_maxVertexCount);
 		_batchRendererData.indices.resize(_maxVertexCount);
@@ -132,7 +132,7 @@ namespace nador
 			_textureSlots.at(slot)->Bind(slot);
 		}
 
-		IndexBuffer indices(_video, &_batchRendererData.indices.front(), _batchRendererData.indices.size());
+		IndexBuffer indices(_video.get(), &_batchRendererData.indices.front(), _batchRendererData.indices.size());
 		indices.Bind();
 
 		_video->DrawElements(EDrawMode::E_TRIANGLES, _batchRendererData.indices.size(), nullptr);

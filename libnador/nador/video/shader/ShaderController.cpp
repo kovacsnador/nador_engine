@@ -8,16 +8,16 @@
 
 namespace nador
 {
-	ShaderController::ShaderController(const IVideo* video)
-	: _video(video)
+	ShaderController::ShaderController(const IVideoPtr video)
+	: _video(std::move(video))
 	{
 		NADOR_ASSERT(video);
-
-		_Add(video, EShader::BASE, BaseVertexShader(), BaseFragmentShader());
-		_Add(video, EShader::TEXTURE, TextureVertexShader(), TextureFragmentShader());
-		_Add(video, EShader::FONT, FontVertexShader(), FontFragmentShader());
-		_Add(video, EShader::ROUND_EDGE, RoundEdgeVertexShader(), RoundEdgeFragmentShader());
-		_Add(video, EShader::BATCH, BatchQuadVertexShader(), BatchQuadFragmentShader(video->GetMaxTextureUnits()).c_str());
+				
+		Add(EShader::BASE, BaseVertexShader(), BaseFragmentShader());
+		Add(EShader::TEXTURE, TextureVertexShader(), TextureFragmentShader());
+		Add(EShader::FONT, FontVertexShader(), FontFragmentShader());
+		Add(EShader::ROUND_EDGE, RoundEdgeVertexShader(), RoundEdgeFragmentShader());
+		Add(EShader::BATCH, BatchQuadVertexShader(), BatchQuadFragmentShader(video->GetMaxTextureUnits()).c_str());
 	}
 
 	ShaderPtr ShaderController::Get(EShader type)
@@ -30,9 +30,9 @@ namespace nador
 		return nullptr;
 	}
 
-	void ShaderController::_Add(const IVideo* video, EShader type, const char* vertexShader, const char* fragmentShader)
+	void ShaderController::Add(EShader type, const char* vertexShader, const char* fragmentShader)
 	{
-		_shaders[type] = std::make_shared<Shader>(video, type, vertexShader, fragmentShader);
+		_shaders[type] = std::make_shared<Shader>(_video.get(), type, vertexShader, fragmentShader);
 	}
 
 	const char* ShaderController::BaseVertexShader()

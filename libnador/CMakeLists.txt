@@ -163,7 +163,7 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/video/renderer/RenderData.cpp
     ${NADOR_SRC_DIR}/video/renderer/Renderer.cpp
 
-    ${NADOR_SRC_DIR}/video/renderer/simple_renderer/SimpleRenderer.cpp
+    ${NADOR_SRC_DIR}/video/renderer/base_renderer/BaseRenderer.cpp
 
     ${NADOR_SRC_DIR}/video/renderer/batch_renderer/BatchRenderData.cpp
     ${NADOR_SRC_DIR}/video/renderer/batch_renderer/BatchRenderer.cpp

@@ -17,21 +17,20 @@
 
 namespace nador
 {
-	namespace ModuleFactory
-	{
-		IWindowUPtr CreateWindow(const WindowSettings& config);
-		IVideoUPtr CreateVideo();
-		IFileControllerUPtr CreateFileController(std::string_view rootFilePath);
-		IInputControllerUPtr CreateInputController(void* nativeWindow);
-		IImguiAdapterUPtr CreateImGuiAdapter();
-		ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
-		IRendererUPtr CreateRenderer(const IVideoPtr& video);
-        IFontControllerUPtr CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl);
+    namespace ModuleFactory
+    {
+        IWindowUPtr          CreateWindow(const WindowSettings& config);
+        IVideoUPtr           CreateVideo();
+        IFileControllerUPtr  CreateFileController(std::string_view rootFilePath);
+        IInputControllerUPtr CreateInputController(void* nativeWindow);
+        IImguiAdapterUPtr    CreateImGuiAdapter();
+        ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
+        IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t&& renderPlugins);
+        IFontControllerUPtr  CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl);
         IAtlasControllerUPtr CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings);
-        IUiAppUPtr CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl);
-        ITestControllerUPtr CreateTestController();
-	}
-}
+        IUiAppUPtr           CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl);
+        ITestControllerUPtr  CreateTestController();
+    } // namespace ModuleFactory
+} // namespace nador
 
 #endif // !__NADOR_MODULE_FACTORY_H__
-
