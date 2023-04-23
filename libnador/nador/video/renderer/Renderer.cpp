@@ -7,7 +7,7 @@ static constexpr size_t MAX_VERTEX_COUNT = 10000;
 
 namespace nador
 {
-	Renderer::Renderer(const IVideoPtr video, rendererPlugins_t&& renderers)
+	Renderer::Renderer(const IVideoPtr video, rendererPlugins_t& renderers)
 	: _video(std::move(video))
 	, _attachedRenderers(std::move(renderers))
 	, _cameraMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))

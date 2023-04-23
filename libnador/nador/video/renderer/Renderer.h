@@ -19,7 +19,7 @@ namespace nador
 		/*!
 		 * Renderer constructor.
 		 */
-		Renderer(const IVideoPtr video, rendererPlugins_t&& renderers);
+		Renderer(const IVideoPtr video, rendererPlugins_t& renderers);
 
 		/*!
 		 * The render begin function.

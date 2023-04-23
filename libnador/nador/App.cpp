@@ -16,6 +16,8 @@
 #include "nador/ui/UiApp.h"
 #include "nador/system/IWindow.h"
 #include "nador/video/shader/ShaderController.h"
+#include "nador/video/renderer/base_renderer/BaseRenderer.h"
+#include "nador/video/renderer/batch_renderer/BatchRenderer.h"
 
 #include "nador/test/Tests.h"
 
@@ -43,7 +45,7 @@ namespace nador
         rendererPlugins.insert( { ERenderPlugin::EBatchRenderer,
               std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()) });
 
-        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, std::move(rendererPlugins));
+        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins);
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
