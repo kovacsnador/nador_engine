@@ -22,6 +22,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     main.cpp
     appconfig_test.cpp
+    eventListener_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

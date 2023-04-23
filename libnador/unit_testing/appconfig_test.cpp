@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "nador/App.h"
+#include "nador/common/AppConfig.h"
 
 struct NadorConfigTestValue
 {
@@ -37,17 +37,19 @@ INSTANTIATE_TEST_CASE_P(
 	                    <UiPath> res/ui/ </UiPath>
                     </AppConfig>)",
                     {
-                        {
-                            "Nador Application",
-                            { 1024, 768 },
-                            false,
-                            true,
-                            true
+                        {   /*WindowSettings*/
+                            "Nador Application",    /*AppName*/
+                            { 1024, 768 },          /*WindowDimensions*/
+                            false,                  /*vSync*/
+                            true,                   /*ShowDebugWindow*/
+                            true                    /*ShowDebugInfo*/
                         },
-                        "",
-                        "res/atlas/__atlases/atlas_config.json",
-                        "res/atlas/__atlases/",
-                        "res/ui/",
+                        {   /*AtlasSettings*/
+                            "res/atlas/__atlases/atlas_config.json",    /*AtlasConfigPath*/
+                            "res/atlas/__atlases/"                      /*AtlasImagesPath*/
+                        },
+                        "",         /*RootFilePath*/
+                        "res/ui/",  /*UiPath*/
                     }
                 }
     ));
