@@ -4,260 +4,420 @@
 
 namespace nador
 {
-	IUiElement::~IUiElement()
-	{
-		for (auto& it : _childrens)
-		{
-			it->SetParent(nullptr);
-		}
+    IUiElement::IUiElement(const glm::ivec2& position, const glm::ivec2& size, UiAlignment alignment, IUiElement* parent, bool isShow)
+    : _alignment(alignment)
+    , _isShow(isShow)
+    , _position(position)
+    , _size(size)
+    {
+        SetParent(parent);
+    }
 
-		if (_parent)
-		{
-			_parent->RemoveChild(this);
-		}
-		else
-		{
-			if(_uiApp)
-			{
-				_uiApp->RemoveElement(this);
-			}
-		}
+    IUiElement::~IUiElement()
+    {
+        for (auto& it : _childrens)
+        {
+            it->SetParent(nullptr);
+        }
 
-		if (_uiApp && _uiApp->IsInFocus(this))
-		{
-			_uiApp->SetInFocus(nullptr);
-		}
-	}
+        if (_parent)
+        {
+            _parent->RemoveChild(this);
+        }
+        else
+        {
+            if (_uiApp)
+            {
+                _uiApp->RemoveElement(this);
+            }
+        }
 
-	void IUiElement::SetParent(IUiElement* elem)
-	{
-		if (_parent != elem)
-		{
-			_parent = elem;
-			if (elem)
-			{
-				elem->AddChild(this);
-			}
-		}		
+        if (_uiApp && _uiApp->IsInFocus(this))
+        {
+            _uiApp->SetInFocus(nullptr);
+        }
+    }
 
-		//UpdateVertices(GetParentVertices());
-	};
+    void IUiElement::Show()
+    {
+        _isShow = true;
+    };
 
-	void IUiElement::BringToFront()
-	{
-		if (_parent)
-		{
-			_parent->AddChild(this);
-		}
-		else if(_uiApp)
-		{
-			_uiApp->BringToFront(this);
-		}
-	}
+    void IUiElement::Hide()
+    {
+        _isShow = false;
+    };
 
-	void IUiElement::PushToBack()
-	{
-		if (_parent)
-		{
-			_parent->PushToBack(this);
-		}
-		else if(_uiApp)
-		{
-			_uiApp->PushToback(this);
-		}
-	}
+    bool IUiElement::IsShow() const noexcept
+    {
+        return _isShow;
+    };
 
-	void IUiElement::AddChild(IUiElement* elem)
-	{
-		elem->SetParent(this);
+    bool IUiElement::IsHide() const noexcept
+    {
+        return !_isShow;
+    };
 
-		utils::Remove(_childrens, elem);
-		_childrens.push_back(elem);
+    const glm::ivec2& IUiElement::GetSize() const noexcept
+    {
+        return _size;
+    };
 
-	}
+    void IUiElement::SetSize(const glm::ivec2& size)
+    {
+        if (size != _size)
+        {
+            _size = size;
+        }
+    };
 
-	void IUiElement::PushToBack(IUiElement* elem)
-	{
-		elem->SetParent(this);
+    void IUiElement::SetSize(int32_t width, int32_t height)
+    {
+        SetSize({ width, height });
+    };
 
-		utils::Remove(_childrens, elem);
-		_childrens.push_front(elem);
-	}
+    void IUiElement::SetWidth(int32_t width)
+    {
+        if (_size.x != width)
+        {
+            _size.x = width;
+        }
+    };
 
-	void IUiElement::RemoveChild(IUiElement* elem)
-	{
-		if (utils::Find(_childrens, elem))
-		{
-			elem->SetParent(nullptr);
-			utils::Remove(_childrens, elem);
-		}
-		else
-		{
-			ENGINE_WARNING("Element not as child attached.");
-		}
-	}
+    void IUiElement::SetHeight(int32_t height)
+    {
+        if (_size.y != height)
+        {
+            _size.y = height;
+        }
+    };
 
-	void IUiElement::SuspendInputEvents(bool suspend)
-	{ 
-		_inputEventSuspended = suspend;
-	}
+    const glm::ivec2& IUiElement::GetPosition() const noexcept
+    {
+        return _position;
+    };
 
-	void IUiElement::SuspendInputEventsForChildrens(bool suspend)
-	{
-		for (auto& it : _childrens)
-		{
-			it->SuspendInputEvents(suspend);
-		}
-	}
+    void IUiElement::SetPosition(const glm::ivec2& position)
+    {
+        if (position != _position)
+        {
+            _position = position;
+        }
+    };
 
-	void IUiElement::SetScale(const glm::vec3& scale)
-	{
-		_scale = scale;
+    const UiAlignment& IUiElement::GetAligner() const noexcept
+    {
+        return _alignment;
+    };
 
-		for (auto& it : _childrens)
-		{
-			it->SetScale(scale);
-		}
-	}
+    void IUiElement::SetAlignment(const UiAlignment& aligner)
+    {
+        _alignment = aligner;
+    };
 
-	void IUiElement::OnTickImpl(IUiLogicState* uiLogicState)
-	{
-		OnTick(uiLogicState);
+    IUiElement* IUiElement::GetParent() const noexcept
+    {
+        return _parent;
+    };
 
-		// tick in reverse order
-		for (auto it = _childrens.rbegin(); it != _childrens.rend(); ++it)
-		{
-			NADOR_ASSERT(*it);
+    void IUiElement::SetParent(IUiElement* elem)
+    {
+        if (_parent != elem)
+        {
+            _parent = elem;
+            if (elem)
+            {
+                elem->AddChild(this);
+            }
+        }
+    };
 
-			(*it)->OnTickImpl(uiLogicState);
-		}
-	}
+    void IUiElement::BringToFront()
+    {
+        if (_parent)
+        {
+            _parent->AddChild(this);
+        }
+        else if (_uiApp)
+        {
+            _uiApp->BringToFront(this);
+        }
+    }
 
-	void IUiElement::OnRenderImpl(IRenderer* renderer, bool drawDebugEdge)
-	{
-		if (IsHide())
-		{
-			return;
-		}
+    void IUiElement::PushToBack()
+    {
+        if (_parent)
+        {
+            _parent->PushToBack(this);
+        }
+        else if (_uiApp)
+        {
+            _uiApp->PushToback(this);
+        }
+    }
 
-		OnRender(renderer, _vertices);
+    void IUiElement::AddChild(IUiElement* elem)
+    {
+        elem->SetParent(this);
 
-		if (drawDebugEdge)
-		{
-			_edgeDrawer.Render(renderer, _vertices, _scale);
-		}
+        utils::Remove(_childrens, elem);
+        _childrens.push_back(elem);
+    }
 
-		for (auto& it : _childrens)
-		{
-			it->OnRenderImpl(renderer, drawDebugEdge);
-		}
+    void IUiElement::PushToBack(IUiElement* elem)
+    {
+        elem->SetParent(this);
 
-		OnRenderEnd(renderer);
-	}
+        utils::Remove(_childrens, elem);
+        _childrens.push_front(elem);
+    }
 
-	void IUiElement::SetOffset(const glm::ivec2& offset)
-	{
-		_offset = offset;
-	}
+    void IUiElement::RemoveChild(IUiElement* elem)
+    {
+        if (utils::Find(_childrens, elem))
+        {
+            elem->SetParent(nullptr);
+            utils::Remove(_childrens, elem);
+        }
+        else
+        {
+            ENGINE_WARNING("Element not as child attached.");
+        }
+    }
 
-	const glm::ivec2& IUiElement::GetOffset() const noexcept
-	{
-		return _offset;
-	}
+    void IUiElement::SuspendInputEvents(bool suspend)
+    {
+        _inputEventSuspended = suspend;
+    }
 
-	void IUiElement::UpdateVertices(const quadVertices_t& parentVertices)
-	{
-		_vertices = _alignment.GenerateVertices(_position + _offset, _size, parentVertices);
+    void IUiElement::SuspendInputEventsForChildrens(bool suspend)
+    {
+        for (auto& it : _childrens)
+        {
+            it->SuspendInputEvents(suspend);
+        }
+    }
 
-		for (auto& it : _childrens)
-		{
-			it->UpdateVertices(_vertices);
-		}
-	}
+    void IUiElement::HandleInputEventBeforeChildren(bool beforeChildren)
+    {
+        _handleInputEventBeforeChildren = beforeChildren;
+    }
 
-	bool IUiElement::OnMousePressedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
-	{
-		if (IsPointOverOnVertices(position, _vertices))
-		{
-			if(_uiApp)
-			{
-				_uiApp->SetInFocus(this);
-			}
+    void IUiElement::SetDefaultMouseHandling(bool handled)
+    {
+        _defaultMouseHandling = handled;
+    }
 
-			OnMousePressed(mouseButton, position);
+    const glm::vec3& IUiElement::GetScale() const noexcept
+    {
+        return _scale;
+    }
 
-			// Call user defined callback
-			return InvokeCallback(_onMousePressedCb, _defaultMouseHandling, mouseButton, position, this);
-		}
+    void IUiElement::SetScale(const glm::vec3& scale)
+    {
+        _scale = scale;
 
-		return false;
-	}
-	
-	bool IUiElement::OnMouseReleasedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
-	{
-		if (IsPointOverOnVertices(position, _vertices))
-		{
-			OnMouseReleased(mouseButton, position);
+        for (auto& it : _childrens)
+        {
+            it->SetScale(scale);
+        }
+    }
 
-			// Call user defined callback
-			return InvokeCallback(_onMouseReleasedCb, _defaultMouseHandling, mouseButton, position, this);
-		}
+    void IUiElement::OnTickImpl(IUiLogicState* uiLogicState)
+    {
+        OnTick(uiLogicState);
 
-		return false;
-	}
+        // tick in reverse order
+        for (auto it = _childrens.rbegin(); it != _childrens.rend(); ++it)
+        {
+            NADOR_ASSERT(*it);
 
-	bool IUiElement::OnKeyPressedLogic(EKeyCode keyCode)
-	{
-		bool result = false;
+            (*it)->OnTickImpl(uiLogicState);
+        }
+    }
 
-		result |= OnKeyPressed(keyCode);
-		result |= InvokeCallback(_onKeyPressedCb, false, keyCode);
+    void IUiElement::OnRenderImpl(IRenderer* renderer, bool drawDebugEdge)
+    {
+        if (IsHide())
+        {
+            return;
+        }
 
-		return result;
-	};
+        OnRender(renderer, _vertices);
 
-	bool IUiElement::OnKeyHoldedLogic(EKeyCode keyCode)
-	{
-		bool result = false;
+        if (drawDebugEdge)
+        {
+            _edgeDrawer.Render(renderer, _vertices, _scale);
+        }
 
-		result |= OnKeyHolded(keyCode);
-		result |= InvokeCallback(_onKeyHoldedCb, false, keyCode);
+        for (auto& it : _childrens)
+        {
+            it->OnRenderImpl(renderer, drawDebugEdge);
+        }
 
-		return result;
-	};
+        OnRenderEnd(renderer);
+    }
 
-	bool IUiElement::OnKeyReleasedLogic(EKeyCode keyCode) 
-	{ 
-		bool result = false;
+    bool IUiElement::OnMousePressedImpl(EMouseButton mouseButton, const glm::vec2& position)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnMousePressedImpl, &IUiElement::OnMousePressedWithPositionCheck, mouseButton, position);
+    }
 
-		result |= OnKeyReleased(keyCode);
-		result |= InvokeCallback(_onKeyReleasedCb, false, keyCode);
+    bool IUiElement::OnMouseReleasedImpl(EMouseButton mouseButton, const glm::vec2& position)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnMouseReleasedImpl, &IUiElement::OnMouseReleasedWithPositionCheck, mouseButton, position);
+    }
 
-		return result;
-	};
+    bool IUiElement::OnKeyPressedImpl(EKeyCode keyCode)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnKeyPressedImpl, &IUiElement::OnKeyPressedLogic, keyCode);
+    }
 
-	bool IUiElement::IsOver(const glm::vec2& point) const noexcept
-	{
-		return IsPointOverOnVertices(point, _vertices);
-	}
+    bool IUiElement::OnKeyHoldedImpl(EKeyCode keyCode)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnKeyHoldedImpl, &IUiElement::OnKeyHoldedLogic, keyCode);
+    }
 
-	const std::string& IUiElement::GetName() const noexcept
-	{
-		return _name;
-	}
+    bool IUiElement::OnKeyReleasedImpl(EKeyCode keyCode)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnKeyReleasedImpl, &IUiElement::OnKeyReleasedLogic, keyCode);
+    }
 
-	void IUiElement::SetName(const std::string& name)
-	{
-		_name = name;
-	}
+    bool IUiElement::OnCharImpl(const std::string& text)
+    {
+        return OnKeyAndMouseEventImpl(&IUiElement::OnCharImpl, &IUiElement::OnCharPressed, text);
+    }
 
-	void IUiElement::SetUiAppHandler(IUiApp* uiApp) noexcept
-	{
-		_uiApp = uiApp;
+    const quadVertices_t& IUiElement::GetVertices() const noexcept
+    {
+        return _vertices;
+    }
 
-		for (auto& it : _childrens)
-		{
-			it->SetUiAppHandler(_uiApp);
-		}
-	}
-}
+    void IUiElement::SetOffset(const glm::ivec2& offset)
+    {
+        _offset = offset;
+    }
+
+    const glm::ivec2& IUiElement::GetOffset() const noexcept
+    {
+        return _offset;
+    }
+
+    void IUiElement::UpdateVertices(const quadVertices_t& parentVertices)
+    {
+        _vertices = _alignment.GenerateVertices(_position + _offset, _size, parentVertices);
+
+        for (auto& it : _childrens)
+        {
+            it->UpdateVertices(_vertices);
+        }
+    }
+
+    void IUiElement::SetOnMousePressedCallback(const OnMousePressedCallback_t& cb)
+    {
+        _onMousePressedCb = cb;
+    }
+    void IUiElement::SetOnMouseReleasedCallback(const OnMouseReleasedCallback_t& cb)
+    {
+        _onMouseReleasedCb = cb;
+    }
+
+    void IUiElement::SetOnKeyPressedCallback(const OnKeyPressedCallback_t& cb)
+    {
+        _onKeyPressedCb = cb;
+    }
+    void IUiElement::SetOnKeyHoldedCallback(const OnKeyHoldedCallback_t& cb)
+    {
+        _onKeyHoldedCb = cb;
+    }
+    void IUiElement::SetOnKeyReleasedCallback(const OnKeyReleasedCallback_t& cb)
+    {
+        _onKeyReleasedCb = cb;
+    }
+
+    bool IUiElement::OnMousePressedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
+    {
+        if (IsPointOverOnVertices(position, _vertices))
+        {
+            if (_uiApp)
+            {
+                _uiApp->SetInFocus(this);
+            }
+
+            OnMousePressed(mouseButton, position);
+
+            // Call user defined callback
+            return InvokeCallback(_onMousePressedCb, _defaultMouseHandling, mouseButton, position, this);
+        }
+
+        return false;
+    }
+
+    bool IUiElement::OnMouseReleasedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
+    {
+        if (IsPointOverOnVertices(position, _vertices))
+        {
+            OnMouseReleased(mouseButton, position);
+
+            // Call user defined callback
+            return InvokeCallback(_onMouseReleasedCb, _defaultMouseHandling, mouseButton, position, this);
+        }
+
+        return false;
+    }
+
+    bool IUiElement::OnKeyPressedLogic(EKeyCode keyCode)
+    {
+        bool result = false;
+
+        result |= OnKeyPressed(keyCode);
+        result |= InvokeCallback(_onKeyPressedCb, false, keyCode);
+
+        return result;
+    };
+
+    bool IUiElement::OnKeyHoldedLogic(EKeyCode keyCode)
+    {
+        bool result = false;
+
+        result |= OnKeyHolded(keyCode);
+        result |= InvokeCallback(_onKeyHoldedCb, false, keyCode);
+
+        return result;
+    };
+
+    bool IUiElement::OnKeyReleasedLogic(EKeyCode keyCode)
+    {
+        bool result = false;
+
+        result |= OnKeyReleased(keyCode);
+        result |= InvokeCallback(_onKeyReleasedCb, false, keyCode);
+
+        return result;
+    };
+
+    bool IUiElement::IsOver(const glm::vec2& point) const noexcept
+    {
+        return IsPointOverOnVertices(point, _vertices);
+    }
+
+    const std::string& IUiElement::GetName() const noexcept
+    {
+        return _name;
+    }
+
+    void IUiElement::SetName(const std::string& name)
+    {
+        _name = name;
+    }
+
+    void IUiElement::SetUiAppHandler(IUiApp* uiApp) noexcept
+    {
+        _uiApp = uiApp;
+
+        for (auto& it : _childrens)
+        {
+            it->SetUiAppHandler(_uiApp);
+        }
+    }
+} // namespace nador

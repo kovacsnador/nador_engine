@@ -13,6 +13,7 @@ namespace nador
 	bool NewFrameImGui();
 	bool EndFrameImGui(int32_t width, int32_t height);
 	bool ShutdownImGui();
+    bool WantCaptureMouse();
 
 	template<typename ContainerTy, typename PredTy>
 	bool ImGuiTupleContainerIter(void* pairIn, int idx, const char** out_text)

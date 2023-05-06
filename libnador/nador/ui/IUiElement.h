@@ -44,14 +44,7 @@ namespace nador
 		 * \param parent		The parent ui element
 		 * \param isShow		Set the show flag.
 		 */
-		IUiElement(const glm::ivec2& position, const glm::ivec2& size, UiAlignment alignment, IUiElement* parent = nullptr, bool isShow = true)
-		: _alignment(alignment)
-		, _isShow(isShow)
-		, _position(position)
-		, _size(size)
-		{
-			SetParent(parent);
-		}
+		IUiElement(const glm::ivec2& position, const glm::ivec2& size, UiAlignment alignment, IUiElement* parent = nullptr, bool isShow = true);
 
 	protected:
 		/*!
@@ -63,106 +56,76 @@ namespace nador
 		/*!
 		 * Shows the ui element.
 		 */
-		void Show() { _isShow = true; };
+		void Show();
 		
 		/*!
 		 * Hides the ui element.
 		 */
-		void Hide() { _isShow = false; };
+		void Hide();
 
 		/*!
 		 * Gets if the ui element is showing.
 		 * 
 		 * \return True if showing false otherwise.
 		 */
-		bool IsShow() { return _isShow; };
+		bool IsShow() const noexcept;
 
-		bool IsHide() { return !_isShow; };
+		bool IsHide() const noexcept;
 
 		/*!
 		 * Gets the ui element size.
 		 *
 		 * \return	The size.
 		 */
-		const glm::ivec2& GetSize() const { return _size; };
+		const glm::ivec2& GetSize() const noexcept;
 
 		/*!
 		 * Sets the ui element size.
 		 *
 		 * \param size	The new size.
 		 */
-		void SetSize(const glm::ivec2& size)
-		{
-			if (size != _size)
-			{
-				_size = size;
-			}
-		};
+		void SetSize(const glm::ivec2& size);
 
-		void SetSize(int32_t width, int32_t height)
-		{
-			SetSize({ width, height });
-		};
+		void SetSize(int32_t width, int32_t height);
 
-		void SetWidth(int32_t width)
-		{
-			if (_size.x != width)
-			{
-				_size.x = width;
-			}
-		};
+		void SetWidth(int32_t width);
 
-		void SetHeight(int32_t height)
-		{
-			if (_size.y != height)
-			{
-				_size.y = height;
-			}
-		};
+		void SetHeight(int32_t height);
 
 		/*!
 		 * Gets the ui element position.
 		 *
 		 * \return	The position.
 		 */
-		const glm::ivec2& GetPosition() const { return _position; };
+		const glm::ivec2& GetPosition() const noexcept;
 
 		/*!
 		 * Sets the ui element position.
 		 *
 		 * \param position	The new position.
 		 */
-		void SetPosition(const glm::ivec2& position)
-		{
-			if (position != _position)
-			{
-				_position = position;
-			}
-		};
+		void SetPosition(const glm::ivec2& position);
 
 		/*!
 		 * Gets the ui element alignment.
 		 *
 		 * \return	The alignment.
 		 */
-		const UiAlignment& GetAligner() const { return _alignment; };
+		const UiAlignment& GetAligner() const noexcept;
 
 		/*!
 		 * Sets the ui element orientation.
 		 *
 		 * \param alignment	The new alignment.
 		 */
-		void SetAlignment(const UiAlignment& aligner)
-		{ 
-			_alignment = aligner;
-		};
+		void SetAlignment(const UiAlignment& aligner);
 
 		/*!
 		 * Gets the parent ui element.
 		 *
 		 * \return	The parent ui element.
 		 */
-		IUiElement* GetParent() { return _parent; };
+		IUiElement* GetParent() const noexcept;
 
 		void BringToFront();
 		void PushToBack();
@@ -193,61 +156,40 @@ namespace nador
 		void SuspendInputEvents(bool suspend);
 		void SuspendInputEventsForChildrens(bool suspend);
 
-		void HandleInputEventBeforeChildren(bool beforeChildren) { _handleInputEventBeforeChildren = beforeChildren; }
-		void SetDefaultMouseHandling(bool handled) { _defaultMouseHandling = handled; }
+		void HandleInputEventBeforeChildren(bool beforeChildren);
+		void SetDefaultMouseHandling(bool handled);
 
 		void SetScale(const glm::vec3& scale);
-		const glm::vec3& GetScale() const { return _scale; }
+		const glm::vec3& GetScale() const noexcept;
 
 		void OnTickImpl(IUiLogicState* uiLogicState);
 		void OnRenderImpl(IRenderer* renderer, bool drawDebugEdge);
 
-		bool OnMousePressedImpl(EMouseButton mouseButton, const glm::vec2& position)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnMousePressedImpl, &IUiElement::OnMousePressedWithPositionCheck, mouseButton, position);
-		}
+		bool OnMousePressedImpl(EMouseButton mouseButton, const glm::vec2& position);
 
-		bool OnMouseReleasedImpl(EMouseButton mouseButton, const glm::vec2& position)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnMouseReleasedImpl, &IUiElement::OnMouseReleasedWithPositionCheck, mouseButton, position);
-		}
+		bool OnMouseReleasedImpl(EMouseButton mouseButton, const glm::vec2& position);
 
-		bool OnKeyPressedImpl(EKeyCode keyCode)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnKeyPressedImpl, &IUiElement::OnKeyPressedLogic, keyCode);
-		}
+		bool OnKeyPressedImpl(EKeyCode keyCode);
 
-		bool OnKeyHoldedImpl(EKeyCode keyCode)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnKeyHoldedImpl, &IUiElement::OnKeyHoldedLogic, keyCode);
-		}
+		bool OnKeyHoldedImpl(EKeyCode keyCode);
 
-		bool OnKeyReleasedImpl(EKeyCode keyCode)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnKeyReleasedImpl, &IUiElement::OnKeyReleasedLogic, keyCode);
-		}
+		bool OnKeyReleasedImpl(EKeyCode keyCode);
 
-		bool OnCharImpl(const std::string& text)
-		{
-			return OnKeyAndMouseEventImpl(&IUiElement::OnCharImpl, &IUiElement::OnCharPressed, text);
-		}
+		bool OnCharImpl(const std::string& text);
 
-		const quadVertices_t& GetVertices()
-		{
-			return _vertices;
-		}
+		const quadVertices_t& GetVertices() const noexcept;
 
 		void SetOffset(const glm::ivec2& offset);
 		const glm::ivec2& GetOffset() const noexcept;
 
 		void UpdateVertices(const quadVertices_t& parentVertices);
 
-		void SetOnMousePressedCallback(const OnMousePressedCallback_t& cb) { _onMousePressedCb = cb; }
-		void SetOnMouseReleasedCallback(const OnMouseReleasedCallback_t& cb) { _onMouseReleasedCb = cb; }
+		void SetOnMousePressedCallback(const OnMousePressedCallback_t& cb);
+		void SetOnMouseReleasedCallback(const OnMouseReleasedCallback_t& cb);
 
-		void SetOnKeyPressedCallback(const OnKeyPressedCallback_t& cb) { _onKeyPressedCb = cb; }
-		void SetOnKeyHoldedCallback(const OnKeyHoldedCallback_t& cb) { _onKeyHoldedCb = cb; }
-		void SetOnKeyReleasedCallback(const OnKeyReleasedCallback_t& cb) { _onKeyReleasedCb = cb; }
+		void SetOnKeyPressedCallback(const OnKeyPressedCallback_t& cb);
+		void SetOnKeyHoldedCallback(const OnKeyHoldedCallback_t& cb);
+		void SetOnKeyReleasedCallback(const OnKeyReleasedCallback_t& cb);
 
 		bool IsOver(const glm::vec2& point) const noexcept;
 

@@ -14,6 +14,7 @@
 
 #include "nador/log/Log.h"
 #include "nador/utils/ImGuiHelper.h"
+#include "ImGuiHelper.h"
 
 namespace nador
 {
@@ -152,4 +153,12 @@ namespace nador
 #endif
     }
 
+    bool WantCaptureMouse()
+    {
+#ifdef  USE_IMGUI
+        return ImGui::GetIO().WantCaptureMouse;
+#else //  USE_IMGUI
+        return false;
+#endif
+    }
 }

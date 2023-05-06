@@ -15,6 +15,7 @@ namespace nador
 	    virtual bool NewFrameImGui() = 0;
 	    virtual bool EndFrameImGui(int32_t width, int32_t height) = 0;
 	    virtual bool ShutdownImGui() = 0;
+        virtual bool WantCaputreMouse() const = 0;
     };
     CREATE_PTR_TYPES(IImguiAdapter);
 
@@ -39,6 +40,11 @@ namespace nador
 	    bool ShutdownImGui() override
         {
             return nador::ShutdownImGui();
+        }
+
+        virtual bool WantCaputreMouse() const
+        {
+            return nador::WantCaptureMouse();
         }
     };
 } // namespace nador
