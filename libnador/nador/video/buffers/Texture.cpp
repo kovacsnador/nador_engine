@@ -1,4 +1,5 @@
 #include "nador/video/buffers/Texture.h"
+#include "nador/video/StbImageLoadStrategy.h"
 
 namespace nador
 {
@@ -10,8 +11,13 @@ namespace nador
 	, _pbb(0)
 	, _textureSettings(textureSettings)
 	{
-		TextureDataPtr textureData = TextureLoader::LoadFromBuffer(data);
-		_UploadTexture(textureData);
+		auto textureData = TextureLoader::LoadFromBuffer<StbImageLoadStrategy>(data);
+
+		_id = _video->UploadTexture(textureData->localBuffer, textureData->height, textureData->width, _textureSettings);
+
+		_width = textureData->width;
+		_height = textureData->height;
+		_pbb = textureData->pbb;
 	}
 
 	Texture::Texture(const IVideo* video, const void* data, uint32_t width, uint32_t height, TextureSettings textureSettings)
@@ -50,14 +56,5 @@ namespace nador
 	uint32_t Texture::GetId() const
 	{
 		return _id;
-	}
-
-	void Texture::_UploadTexture(const TextureDataPtr& textureData)
-	{
-		_id = _video->UploadTexture(textureData->localBuffer, textureData->height, textureData->width, _textureSettings);
-
-		_width = textureData->width;
-		_height = textureData->height;
-		_pbb = textureData->pbb;
 	}
 }

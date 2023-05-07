@@ -141,7 +141,7 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/utils/TinyXmlHelper.cpp
     ${NADOR_SRC_DIR}/utils/Utils.cpp
 
-    ${NADOR_SRC_DIR}/video/TextureLoader.cpp
+    ${NADOR_SRC_DIR}/video/StbImageLoadStrategy.cpp
 
     ${NADOR_SRC_DIR}/video/atlas/Atlas.cpp
     ${NADOR_SRC_DIR}/video/atlas/AtlasController.cpp

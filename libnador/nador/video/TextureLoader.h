@@ -5,54 +5,55 @@
 
 #include "nador/utils/Types.h"
 #include "nador/system/IFileController.h"
+#include "nador/log/Log.h"
 
 namespace nador
 {
-	struct TextureData
-	{
-		/*!
-		 * TextureData constructor.
-		 *
-		 * \param data	The texture data.
-		 */
-		TextureData(const DataPtr& data);
+    template <typename LoadStrategyTy>
+    struct TextureData
+    {
+        /*!
+         * TextureData constructor.
+         *
+         * \param data	The texture data.
+         */
+        TextureData(const DataPtr& data)
+        {
+            NADOR_ASSERT(data->IsValid());
 
-		/*!
-		 * TextureData destructor.
-		 */
-		~TextureData();
+            localBuffer = _loadStrategy.Load(reinterpret_cast<const uint8_t*>(data->GetData()), data->GetSize(), &width, &height, &pbb, 4);
+        }
 
-		uint8_t* localBuffer;
-		int32_t  width;
-		int32_t  height;
-		int32_t  pbb;
+        /*!
+         * TextureData destructor.
+         */
+        ~TextureData() { _loadStrategy.Free(localBuffer); }
 
-	private:
-		/*!
-		 * Creates the texture data.
-		 *
-		 * \param data	The texture data.
-		 */
-		void _CreateTextureData(const DataPtr& data);
-	};
+        uint8_t* localBuffer { nullptr };
+        int32_t  width { 0 };
+        int32_t  height { 0 };
+        int32_t  pbb { 0 }; // channels_in_file
 
-	CREATE_PTR_TYPES(TextureData);
+    private:
+        LoadStrategyTy _loadStrategy;
+    };
 
-
-	class TextureLoader
-	{
-	public:
-
-		/*!
-		 * Load a texture from buffer.
-		 *
-		 * \param data	The texture buffer.
-		 *
-		 * \return		The raw texture data.
-		 */
-		static TextureDataPtr LoadFromBuffer(const DataPtr& data);
-	};
-}
+    class TextureLoader
+    {
+    public:
+        /*!
+         * Load a texture from buffer.
+         *
+         * \param data	The texture buffer.
+         *
+         * \return		The raw texture data.
+         */
+        template <typename LoadStrategyTy>
+        static auto LoadFromBuffer(const DataPtr& data)
+        {
+            return std::make_unique<TextureData<LoadStrategyTy>>(data);
+        }
+    };
+} // namespace nador
 
 #endif // !__TEXTURE_LOADER_H__
-
