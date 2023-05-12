@@ -4,14 +4,14 @@
 
 namespace nador
 {
-	AtlasController::AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettigns)
+	AtlasController::AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings)
 	: _video(std::move(video))
 	, _fileCtrl(std::move(fileCtrl))
 	{
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_fileCtrl);
 
-		DataPtr atlasConfigData = fileCtrl->Read(atlasSettigns.atlasConfigPath);
+		DataPtr atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
 
 		if(atlasConfigData->IsValid())
 		{
@@ -22,7 +22,7 @@ namespace nador
 				std::string imageName = it["i_name"].get<std::string>();
 				std::string configName = it["c_name"].get<std::string>();
 
-				AtlasPtr atlasPtr = std::make_shared<Atlas>(_video.get(), _fileCtrl.get(), atlasSettigns.atlasImagesPath, imageName, configName);
+				AtlasPtr atlasPtr = std::make_shared<Atlas>(_video.get(), _fileCtrl.get(), atlasSettings.atlasImagesPath, imageName, configName);
 
 				_atlases.push_back(atlasPtr);
 

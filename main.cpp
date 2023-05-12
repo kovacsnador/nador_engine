@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include "nador/App.h"
 
@@ -37,6 +38,7 @@ void InitFonts()
 
 	while (fontCtrl->IsLoading())
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	auto diff = std::chrono::system_clock::now() - start;

@@ -77,6 +77,8 @@
     },
 
     "cmake.configureOnEdit": false,
+    "cmake.generator": "Ninja",
+    "cmake.parallelJobs": 8,
 
     "C_Cpp.clang_format_style": "file",
     "editor.tokenColorCustomizations": {

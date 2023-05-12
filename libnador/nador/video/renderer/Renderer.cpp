@@ -34,7 +34,7 @@ namespace nador
 	{
 		_video->ClearColorRGBA(0, 0, 0, 1);
 
-		for(auto& [key, value] : _attachedRenderers)
+		for(auto& [_, value] : _attachedRenderers)
 		{
 			value->Begin();
 		}
@@ -50,7 +50,7 @@ namespace nador
 
 	void Renderer::End()
 	{
-		for(auto& [key, value] : _attachedRenderers)
+		for(auto& [_, value] : _attachedRenderers)
 		{
 			value->End();
 		}

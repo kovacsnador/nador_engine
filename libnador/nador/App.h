@@ -27,7 +27,7 @@ namespace nador
     public:
         static IAppUPtr CreateApp(const AppConfig& config);
 
-        App(const AppConfig&     config,
+        App(const AppConfig&    config,
             IWindowPtr          window,
             IVideoPtr           video,
             IFileControllerPtr  fileCtrl,
