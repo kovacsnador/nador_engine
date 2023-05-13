@@ -9,6 +9,12 @@ namespace nador
 {
 	struct SoundData
 	{
+		SoundData(std::string fileName, uint32_t soundId)
+		: fileName(std::move(fileName))
+		, soundId(soundId)
+		{
+		}
+
 		std::string fileName;
 		uint32_t soundId;
 	};
@@ -63,7 +69,7 @@ namespace nador
 		 * \param fileName    The sound file name.
 		 * \param soundId     The sound id.
 		 */
-		virtual void AddSound(const char* fileName, uint32_t soundId) = 0;
+		virtual bool AddSound(const char* fileName, uint32_t soundId) = 0;
 
 		/*!
 		 * Creates a sound source from the sound id.
@@ -72,7 +78,7 @@ namespace nador
 		 * 
 		 * \return		The new Sound source id.
 		 */
-		virtual ISoundSourcePtr CreateSoundSource(uint32_t soundId) = 0;
+		virtual ISoundSourceUPtr CreateSoundSource(uint32_t soundId) = 0;
 
 		/*!
 		 * Plays the sound by the id.

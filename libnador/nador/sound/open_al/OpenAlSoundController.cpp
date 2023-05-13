@@ -95,7 +95,7 @@ namespace nador
 		_currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING;});
 	}
 
-    void OpenAlSoundContoller::AddSound(const char* filePath, uint32_t soundId)
+    bool OpenAlSoundContoller::AddSound(const char* filePath, uint32_t soundId)
     {
         bool isMp3 = std::regex_match(filePath, std::regex("(.*)\\.mp3$"));
         bool isWav = std::regex_match(filePath, std::regex("(.*)\\.wav$"));
@@ -103,7 +103,7 @@ namespace nador
         if (!isMp3 && !isWav)
         {
             ENGINE_WARNING("Sound file extension not supported: %s", filePath);
-            return;
+            return false;
         }
 
         DataPtr soundFile = _fileCtrl->Read(filePath);
@@ -132,7 +132,7 @@ namespace nador
         if (pcmData == nullptr)
         {
             ENGINE_WARNING("Failed to load audio file: %s", filePath);
-            return;
+            return false;
         }
 
         alec(alGenBuffers(1, &soundPtr->bufferId));
@@ -147,10 +147,12 @@ namespace nador
 
         ENGINE_DEBUG("Sound added from file %s with id %d", filePath, soundId);
 
-        _sounds.insert_or_assign(soundId, soundPtr);
+        auto [_, inserted] = _sounds.insert_or_assign(soundId, soundPtr);
+        
+        return inserted; // on "inserted" true on "assign" false
     }
 
-    ISoundSourcePtr OpenAlSoundContoller::CreateSoundSource(uint32_t soundId)
+    ISoundSourceUPtr OpenAlSoundContoller::CreateSoundSource(uint32_t soundId)
     {
         auto iter = _sounds.find(soundId);
 
@@ -169,7 +171,7 @@ namespace nador
         alec(alSourcei(sourceId, AL_LOOPING, AL_FALSE));
         alec(alSourcei(sourceId, AL_BUFFER, iter->second->bufferId));
 
-        return std::make_shared<SoundSourceImpl>(soundId, sourceId, &_onStopAllSoundEvent);
+        return std::make_unique<SoundSourceImpl>(soundId, sourceId, &_onStopAllSoundEvent);
     }
 
     void OpenAlSoundContoller::PlaySound(uint32_t soundId)
@@ -178,7 +180,7 @@ namespace nador
 		if(soundSource)
 		{
 			soundSource->Play();
-			_currentSoundSources.push_back(soundSource);
+			_currentSoundSources.push_back(std::move(soundSource));
 		}
 	}
 
@@ -193,7 +195,7 @@ namespace nador
 
         for (auto& it : _sounds)
         {
-            allSoundData.push_back({ it.second->fileName, it.second->soundId });
+            allSoundData.emplace_back(it.second->fileName, it.second->soundId);
         }
 
         return allSoundData;

@@ -7,6 +7,7 @@
 
 #include "nador/sound/ISoundController.h"
 #include "nador/utils/event/Event.h"
+#include "nador/utils/NonCopyable.h"
 
 struct ALCdevice;
 struct ALCcontext;
@@ -19,7 +20,7 @@ namespace nador
     {
         CREATE_EVENT_TYPE_ARG_0(onStopAllSound);
 
-        struct Sound
+        struct Sound : private NonCopyable
         {
             ~Sound();
 
@@ -83,7 +84,7 @@ namespace nador
          * \param fileName    The sound file name.
          * \param soundId     The sound id.
          */
-        void AddSound(const char* fileName, uint32_t soundId) override;
+        bool AddSound(const char* fileName, uint32_t soundId) override;
 
         /*!
          * Creates a sound source from the sound id.
@@ -92,7 +93,7 @@ namespace nador
          *
          * \return		The new Sound source.
          */
-        ISoundSourcePtr CreateSoundSource(uint32_t soundId) override;
+        ISoundSourceUPtr CreateSoundSource(uint32_t soundId) override;
 
         /*!
          * Plays the sound by the ID.
