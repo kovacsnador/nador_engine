@@ -5,6 +5,7 @@
 - unit teszteket írni
 - TextureLoader async-ra csinálni
 - Többszálúsítani mindent amit lehet
+- Implement threadpool
 
 
 

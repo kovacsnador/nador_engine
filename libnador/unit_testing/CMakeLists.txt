@@ -23,6 +23,7 @@ target_sources(${PROJECT_NAME}
     main.cpp
     appconfig_test.cpp
     eventListener_test.cpp
+    threadpool_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

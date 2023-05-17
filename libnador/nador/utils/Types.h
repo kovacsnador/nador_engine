@@ -25,6 +25,12 @@ using strings_t = std::vector<std::string>;
 
 #if __cplusplus >= 201703L
 #define NADOR_MAYBE_UNUSED [[maybe_unused]]
+#define NADOR_NODISCARD [[nodiscard]]
+#else
+#define NADOR_MAYBE_UNUSED
+#define NADOR_NODISCARD
 #endif
+
+
 
 #endif // !__UTILS_TYPES_H__
