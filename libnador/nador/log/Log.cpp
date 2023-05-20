@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <ctime>
 #include <cstring>
+#include <iostream>
 
 #include "nador/log/Log.h"
 #include "Log.h"
@@ -54,15 +55,30 @@ namespace nador
         std::array<char, sizeof(timeString) + sizeof(millisecondsString) + 1> result;
 
         std::strcpy(result.data(), timeString);
-        strcat (result.data(), ".");
-        strcat (result.data(), millisecondsString);
+        strcat(result.data(), ".");
+        strcat(result.data(), millisecondsString);
 
         return result;
     }
 
-    void Log::RegisterCallback(ELogType type, log_cb callback)
+    Log::Log()
     {
-        _logCallbacks.insert_or_assign(type, callback);
+        // setup default standard logging
+        RegisterCallback(nador::ELogType::ENGINE_DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::ENGINE_WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::ENGINE_ERROR, [](const char* msg) { std::cerr << "\033[1;31m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::ENGINE_FATAL, [](const char* msg) { std::cerr << "\033[1;35m" << msg << "\033[0m\n"; });
+
+        RegisterCallback(nador::ELogType::DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::ERROR, [](const char* msg) { std::cerr << "\033[1;31m" << msg << "\033[0m\n"; });
+        RegisterCallback(nador::ELogType::FATAL, [](const char* msg) { std::cerr << "\033[1;35m" << msg << "\033[0m\n"; });
+    }
+
+    bool Log::RegisterCallback(ELogType type, log_cb callback)
+    {
+        auto [_, inserted] = _logCallbacks.insert_or_assign(type, callback);
+        return inserted;
     }
 
     void Log::SetLevel(nador::ELogLevel level) noexcept
@@ -97,7 +113,7 @@ namespace nador
 
             int32_t next = 0;
 
-            auto timeString = GetCurrentTimestamp();
+            auto timeString  = GetCurrentTimestamp();
             auto logTypeName = GetLogTypeName(type);
 
             if (_enableLine)

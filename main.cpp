@@ -55,16 +55,6 @@ void InitSounds()
 
 int main(void)
 {
-	NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m" << std::endl; });
-	NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m" << std::endl; });
-	NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_ERROR, [](const char* msg) { std::cout << "\033[1;31m" << msg << "\033[0m" << std::endl; });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_FATAL, [](const char* msg) { std::cout << "\033[1;31m" << msg << "\033[0m" << std::endl; });
-
-    NADOR_LOG.RegisterCallback(nador::ELogType::DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m" << std::endl; });
-	NADOR_LOG.RegisterCallback(nador::ELogType::WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m" << std::endl; });
-	NADOR_LOG.RegisterCallback(nador::ELogType::ERROR, [](const char* msg) { std::cout << "\033[1;31m" << msg << "\033[0m" << std::endl; });
-    NADOR_LOG.RegisterCallback(nador::ELogType::FATAL, [](const char* msg) { std::cout << "\033[1;31m" << msg << "\033[0m" << std::endl; });
-
 	NADOR_LOG.EnableFileName(true);
 	NADOR_LOG.EnableFuncName(false);
 

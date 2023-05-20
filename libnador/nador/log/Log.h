@@ -114,8 +114,10 @@ namespace nador
 		 *
 		 * \param type The log type.
 		 * \param callback The callback.
+		 * 
+		 * \return  True if inserted.
 		 */
-		void RegisterCallback(ELogType type, log_cb callback);
+		bool RegisterCallback(ELogType type, log_cb callback);
 
 		/*!
 		 * Set the log level.
@@ -195,7 +197,7 @@ namespace nador
 		/*!
 		 * Log constructor
 		 */
-		Log() = default;
+		Log();
 
 		std::mutex _mtx;
 
