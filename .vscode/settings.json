@@ -73,7 +73,8 @@
         "variant": "cpp",
         "span": "cpp",
         "zlib.h": "c",
-        "any": "cpp"
+        "any": "cpp",
+        "charconv": "cpp"
     },
 
     "cmake.configureOnEdit": false,
