@@ -141,7 +141,10 @@ namespace nador
             if (iter != _logCallbacks.end())
             {
                 // call the message callback
-                iter->second(log_temp);
+                if(iter->second)
+                {
+                    iter->second(log_temp);
+                }
             }
 
             // throw exception on FATAL always
