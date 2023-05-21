@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "nador/log/Log.h"
-#include "Log.h"
+#include "nador/log/StandardLogger.h"
 
 namespace nador
 {
@@ -49,6 +49,8 @@ namespace nador
         char timeString[100];
         std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", localTime);
 
+
+
         char millisecondsString[4];
         std::snprintf(millisecondsString, sizeof(millisecondsString), "%.3d", static_cast<int>(milliseconds % 1000));
 
@@ -63,20 +65,24 @@ namespace nador
 
     Log::Log()
     {
-        // setup default standard logging
-        RegisterCallback(nador::ELogType::ENGINE_DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::ENGINE_WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::ENGINE_ERROR, [](const char* msg) { std::cerr << "\033[1;31m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::ENGINE_FATAL, [](const char* msg) { std::cerr << "\033[1;35m" << msg << "\033[0m\n"; });
+        nador::StandardLogger standardLogger;
 
-        RegisterCallback(nador::ELogType::DEBUG, [](const char* msg) { std::cout << "\033[1;32m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::WARNING, [](const char* msg) { std::cout << "\033[1;33m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::ERROR, [](const char* msg) { std::cerr << "\033[1;31m" << msg << "\033[0m\n"; });
-        RegisterCallback(nador::ELogType::FATAL, [](const char* msg) { std::cerr << "\033[1;35m" << msg << "\033[0m\n"; });
+        // setup default standard logging
+        RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger](const char* msg) { standardLogger.Debug(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger](const char* msg) { standardLogger.Warning(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger](const char* msg) { standardLogger.Error(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger](const char* msg) { standardLogger.Fatal(msg); });
+
+        RegisterCallback(nador::ELogType::DEBUG, [standardLogger](const char* msg) { standardLogger.Debug(msg); });
+        RegisterCallback(nador::ELogType::WARNING, [standardLogger](const char* msg) { standardLogger.Warning(msg); });
+        RegisterCallback(nador::ELogType::ERROR, [standardLogger](const char* msg) { standardLogger.Error(msg); });
+        RegisterCallback(nador::ELogType::FATAL, [standardLogger](const char* msg) { standardLogger.Fatal(msg); });
     }
 
     bool Log::RegisterCallback(ELogType type, log_cb callback)
     {
+        std::scoped_lock<std::mutex> lock(_mtx);
+
         auto [_, inserted] = _logCallbacks.insert_or_assign(type, callback);
         return inserted;
     }
@@ -105,8 +111,8 @@ namespace nador
     {
         if (level >= _level)
         {
-            const size_t buff_size = NADOR_LOG_MAX_MESSAGE_SIZE;
-            char         log_temp[buff_size];
+            const size_t buffSize = NADOR_LOG_MAX_MESSAGE_SIZE;
+            char         logTemp[buffSize];
 
             const char* functionName = _enableFuncName ? func : "";
             const char* fileName     = _enableFileName ? file : "";
@@ -118,11 +124,11 @@ namespace nador
 
             if (_enableLine)
             {
-                next = snprintf(log_temp, buff_size, "(%s) [%s] {%s %s: %d} => ", timeString.data(), logTypeName, fileName, functionName, line);
+                next = snprintf(logTemp, buffSize, "(%s) [%s] {%s %s: %d} => ", timeString.data(), logTypeName, fileName, functionName, line);
             }
             else
             {
-                next = snprintf(log_temp, buff_size, "(%s) [%s] {%s %s} => ", timeString.data(), logTypeName, fileName, functionName);
+                next = snprintf(logTemp, buffSize, "(%s) [%s] {%s %s} => ", timeString.data(), logTypeName, fileName, functionName);
             }
 
             if (next < 0)
@@ -132,10 +138,21 @@ namespace nador
 
             va_list va;
             va_start(va, msg);
-            vsnprintf(log_temp + next, buff_size - next, msg, va);
+            next += vsnprintf(logTemp + next, buffSize - next, msg, va);
             va_end(va);
 
-            std::lock_guard<std::mutex> lock(_mtx);
+            if (next < 0)
+            {
+                throw std::runtime_error("Message encoding error occurs");
+            }
+
+            // add new line
+            if(snprintf(logTemp + next, buffSize - next, "\n") < 0)
+            {
+                throw std::runtime_error("New line encoding error occurs");
+            }
+
+            std::scoped_lock<std::mutex> lock(_mtx);
 
             auto iter = _logCallbacks.find(type);
             if (iter != _logCallbacks.end())
@@ -143,14 +160,14 @@ namespace nador
                 // call the message callback
                 if(iter->second)
                 {
-                    iter->second(log_temp);
+                    iter->second(logTemp);
                 }
             }
 
             // throw exception on FATAL always
             if (type == ELogType::ENGINE_FATAL || type == ELogType::FATAL)
             {
-                throw std::runtime_error(log_temp);
+                throw std::runtime_error(logTemp);
             }
         }
     }
