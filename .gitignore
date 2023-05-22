@@ -3,4 +3,4 @@
 /imgui.ini
 /libnador/Config.cmake.in
 /libnador/dep/glew/glew.pc
-*.log
+/logs

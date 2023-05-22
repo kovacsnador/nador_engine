@@ -58,7 +58,8 @@ void InitSounds()
 int main(void)
 {
     nador::StandardLogger standardLogger;
-    nador::StreamLogger   engineStreamLogger(std::make_shared<std::ofstream>("engine.log"));
+    nador::StreamLogger   engineStreamLogger(nador::GetStream<std::ofstream>("logs/nador_engine.log"));
+    nador::StreamLogger   userstreamLogger(nador::GetStream<std::ofstream>("logs/nador.log"));
 
     // setup default standard logging
     NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger, engineStreamLogger](const char* msg) mutable {
@@ -78,21 +79,21 @@ int main(void)
         engineStreamLogger.Log(msg);
     });
 
-    NADOR_LOG.RegisterCallback(nador::ELogType::DEBUG, [standardLogger, engineStreamLogger](const char* msg) mutable {
+    NADOR_LOG.RegisterCallback(nador::ELogType::DEBUG, [standardLogger, userstreamLogger](const char* msg) mutable {
         standardLogger.Debug(msg);
-        engineStreamLogger.Log(msg);
+        userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::WARNING, [standardLogger, engineStreamLogger](const char* msg) mutable {
+    NADOR_LOG.RegisterCallback(nador::ELogType::WARNING, [standardLogger, userstreamLogger](const char* msg) mutable {
         standardLogger.Warning(msg);
-        engineStreamLogger.Log(msg);
+        userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ERROR, [standardLogger, engineStreamLogger](const char* msg) mutable {
+    NADOR_LOG.RegisterCallback(nador::ELogType::ERROR, [standardLogger, userstreamLogger](const char* msg) mutable {
         standardLogger.Error(msg);
-        engineStreamLogger.Log(msg);
+        userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::FATAL, [standardLogger, engineStreamLogger](const char* msg) mutable {
+    NADOR_LOG.RegisterCallback(nador::ELogType::FATAL, [standardLogger, userstreamLogger](const char* msg) mutable {
         standardLogger.Fatal(msg);
-        engineStreamLogger.Log(msg);
+        userstreamLogger.Log(msg);
     });
 
     NADOR_LOG.EnableFileName(true);
