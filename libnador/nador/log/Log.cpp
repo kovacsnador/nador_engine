@@ -33,7 +33,7 @@ namespace nador
         }
     }
 
-    auto GetCurrentTimestamp()
+    auto GetCurrentTimestamp(std::string_view format)
     {
         auto currentTime = std::chrono::system_clock::now();
 
@@ -47,9 +47,7 @@ namespace nador
 
         // Format the time string including milliseconds
         char timeString[100];
-        std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", localTime);
-
-
+        std::strftime(timeString, sizeof(timeString), format.data(), localTime);
 
         char millisecondsString[4];
         std::snprintf(millisecondsString, sizeof(millisecondsString), "%.3d", static_cast<int>(milliseconds % 1000));
@@ -68,15 +66,26 @@ namespace nador
         nador::StandardLogger standardLogger;
 
         // setup default standard logging
-        RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger](const char* msg) { standardLogger.Debug(msg); });
-        RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger](const char* msg) { standardLogger.Warning(msg); });
-        RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger](const char* msg) { standardLogger.Error(msg); });
-        RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger](const char* msg) { standardLogger.Fatal(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger](std::string_view msg) { standardLogger.Debug(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger](std::string_view msg) { standardLogger.Warning(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger](std::string_view msg) { standardLogger.Error(msg); });
+        RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger](std::string_view msg) { standardLogger.Fatal(msg); });
 
-        RegisterCallback(nador::ELogType::DEBUG, [standardLogger](const char* msg) { standardLogger.Debug(msg); });
-        RegisterCallback(nador::ELogType::WARNING, [standardLogger](const char* msg) { standardLogger.Warning(msg); });
-        RegisterCallback(nador::ELogType::ERROR, [standardLogger](const char* msg) { standardLogger.Error(msg); });
-        RegisterCallback(nador::ELogType::FATAL, [standardLogger](const char* msg) { standardLogger.Fatal(msg); });
+        RegisterCallback(nador::ELogType::DEBUG, [standardLogger](std::string_view msg) { standardLogger.Debug(msg); });
+        RegisterCallback(nador::ELogType::WARNING, [standardLogger](std::string_view msg) { standardLogger.Warning(msg); });
+        RegisterCallback(nador::ELogType::ERROR, [standardLogger](std::string_view msg) { standardLogger.Error(msg); });
+        RegisterCallback(nador::ELogType::FATAL, [standardLogger](std::string_view msg) { standardLogger.Fatal(msg); });
+    }
+
+    int32_t Log::DefaultLogFormat(char*            buff,
+                                  size_t           size,
+                                  std::string_view time,
+                                  std::string_view type,
+                                  std::string_view file,
+                                  std::string_view function,
+                                  int32_t          line)
+    {
+        return snprintf(buff, size, "(%s) [%s] {%s %s: %d} => ", time.data(), type.data(), file.data(), function.data(), line);
     }
 
     bool Log::RegisterCallback(ELogType type, log_cb callback)
@@ -92,43 +101,35 @@ namespace nador
         _level = level;
     }
 
-    void Log::EnableFuncName(bool enable) noexcept
+    void Log::SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept
     {
-        _enableFuncName = enable;
+        _logFormatStrategy = strategy;
     }
 
-    void Log::EnableFileName(bool enable) noexcept
+    void Log::SetTimeFormat(std::string_view timeFormat) noexcept
     {
-        _enableFileName = enable;
+        _timeFormat = timeFormat;
     }
 
-    void Log::EnableLine(bool enable) noexcept
-    {
-        _enableLine = enable;
-    }
-
-    void Log::LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, const char* msg, ...)
+    void Log::LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...)
     {
         if (level >= _level)
         {
             const size_t buffSize = NADOR_LOG_MAX_MESSAGE_SIZE;
             char         logTemp[buffSize];
 
-            const char* functionName = _enableFuncName ? func : "";
-            const char* fileName     = _enableFileName ? file : "";
-
             int32_t next = 0;
 
-            auto timeString  = GetCurrentTimestamp();
+            auto timeString  = GetCurrentTimestamp(_timeFormat);
             auto logTypeName = GetLogTypeName(type);
 
-            if (_enableLine)
+            if(_logFormatStrategy)
             {
-                next = snprintf(logTemp, buffSize, "(%s) [%s] {%s %s: %d} => ", timeString.data(), logTypeName, fileName, functionName, line);
+                next = _logFormatStrategy(logTemp, buffSize, timeString.data(), logTypeName, file, func, line);
             }
             else
             {
-                next = snprintf(logTemp, buffSize, "(%s) [%s] {%s %s} => ", timeString.data(), logTypeName, fileName, functionName);
+                next = DefaultLogFormat(logTemp, buffSize, timeString.data(), logTypeName, file, func, line);
             }
 
             if (next < 0)
@@ -138,7 +139,7 @@ namespace nador
 
             va_list va;
             va_start(va, msg);
-            next += vsnprintf(logTemp + next, buffSize - next, msg, va);
+            next += vsnprintf(logTemp + next, buffSize - next, msg.data(), va);
             va_end(va);
 
             if (next < 0)
@@ -147,7 +148,7 @@ namespace nador
             }
 
             // add new line
-            if(snprintf(logTemp + next, buffSize - next, "\n") < 0)
+            if (snprintf(logTemp + next, buffSize - next, "\n") < 0)
             {
                 throw std::runtime_error("New line encoding error occurs");
             }
@@ -158,7 +159,7 @@ namespace nador
             if (iter != _logCallbacks.end())
             {
                 // call the message callback
-                if(iter->second)
+                if (iter->second)
                 {
                     iter->second(logTemp);
                 }

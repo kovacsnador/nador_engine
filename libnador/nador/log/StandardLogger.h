@@ -4,19 +4,19 @@
 namespace nador
 {
     class StandardLogger
-	{
+    {
     public:
-		void Debug(const char* logMsg) const noexcept;
-		void Warning(const char* logMsg) const noexcept;
-		void Error(const char* logMsg) const noexcept;
-		void Fatal(const char* logMsg) const noexcept;
+        void Debug(std::string_view logMsg) const noexcept;
+        void Warning(std::string_view logMsg) const noexcept;
+        void Error(std::string_view logMsg) const noexcept;
+        void Fatal(std::string_view logMsg) const noexcept;
 
-        void EngineDebug(const char* logMsg) const noexcept;
-		void EngineWarning(const char* logMsg) const noexcept;
-		void EngineError(const char* logMsg) const noexcept;
-		void EngineFatal(const char* logMsg) const noexcept;
-	};
+        void EngineDebug(std::string_view logMsg) const noexcept;
+        void EngineWarning(std::string_view logMsg) const noexcept;
+        void EngineError(std::string_view logMsg) const noexcept;
+        void EngineFatal(std::string_view logMsg) const noexcept;
+    };
 
-}
+} // namespace nador
 
 #endif //!__NADOR_STANDARD_LOGGER_H__

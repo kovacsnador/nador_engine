@@ -105,7 +105,6 @@ target_sources(${PROJECT_NAME}
 
     ${NADOR_SRC_DIR}/log/Log.cpp
     ${NADOR_SRC_DIR}/log/StandardLogger.cpp
-    ${NADOR_SRC_DIR}/log/StreamLogger.cpp
 
     ${NADOR_SRC_DIR}/sound/open_al/OpenAlSoundController.cpp
 

@@ -5,6 +5,7 @@
 #include <mutex>
 #include <cstdarg>
 #include <functional>
+#include <string_view>
 
 #define NADOR_LOG_MAX_MESSAGE_SIZE 2000
 
@@ -106,7 +107,9 @@ namespace nador
     class Log
     {
     public:
-        using log_cb = std::function<void(const char* const)>;
+        using log_cb = std::function<void(std::string_view)>;
+        using logFormatStrategy_cb
+            = std::function<int32_t(char*, size_t, std::string_view, std::string_view, std::string_view, std::string_view, int32_t)>;
 
         /*!
          * Get the Log instance.
@@ -136,44 +139,9 @@ namespace nador
          */
         void SetLevel(nador::ELogLevel level) noexcept;
 
-        /*!
-         * Enable funtion name to add to log message.
-         *
-         * \param enable	The enable flag.
-         */
-        void EnableFuncName(bool enable) noexcept;
+        void SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept;
 
-        /*!
-         * Enable file name to add to log message.
-         *
-         * \param enable	The enable flag.
-         */
-        void EnableFileName(bool enable) noexcept;
-
-        /*!
-         * Enable line count to add to log message.
-         *
-         * \param enable	The enable flag.
-         */
-        void EnableLine(bool enable) noexcept;
-
-        template <typename... Args>
-        void LogMessage(ELogType           type,
-                        const char*        file,
-                        int32_t            line,
-                        const char*        func,
-                        nador::ELogLevel   level,
-                        const std::string& msg,
-                        const Args&... args)
-        {
-            LogMessageImpl(type, file, line, func, level, msg.c_str(), args...);
-        }
-
-        template <typename... Args>
-        void LogMessage(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, const char* msg, const Args&... args)
-        {
-            LogMessageImpl(type, file, line, func, level, msg, args...);
-        }
+        void SetTimeFormat(std::string_view timeFormat) noexcept;
 
         /*!
          * Log the message with the additional callback.
@@ -186,7 +154,7 @@ namespace nador
          * \param msg	The message to log.
          * \param ...	Additional params.
          */
-        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, const char* msg, ...);
+        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...);
 
         /*!
          * Wrapper function to log messages.
@@ -201,7 +169,7 @@ namespace nador
         template <typename... Args>
         void LogWrapper(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, const Args&... args)
         {
-            LogMessage(type, file, line, func, level, args...);
+            LogMessageImpl(type, file, line, func, level, args...);
         }
 
         // delete copy stuffs
@@ -214,15 +182,22 @@ namespace nador
          */
         Log();
 
+        int32_t DefaultLogFormat(char*            buff,
+                                 size_t           size,
+                                 std::string_view time,
+                                 std::string_view type,
+                                 std::string_view file,
+                                 std::string_view function,
+                                 int32_t          line);
+
         std::mutex _mtx;
 
         ELogLevel _level { ELogLevel::DEBUG };
 
         std::unordered_map<ELogType, log_cb> _logCallbacks;
 
-        bool _enableFuncName { true };
-        bool _enableFileName { true };
-        bool _enableLine { true };
+        logFormatStrategy_cb _logFormatStrategy { nullptr };
+        std::string          _timeFormat { "%Y-%m-%d %H:%M:%S" };
     };
 } // namespace nador
 
