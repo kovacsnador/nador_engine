@@ -103,6 +103,7 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/common/GlobalListener.cpp
     ${NADOR_SRC_DIR}/common/ThreadPool.cpp
 
+    ${NADOR_SRC_DIR}/log/ILog.cpp
     ${NADOR_SRC_DIR}/log/Log.cpp
     ${NADOR_SRC_DIR}/log/StandardLogger.cpp
 

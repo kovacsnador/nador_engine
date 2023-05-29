@@ -4,8 +4,8 @@
 #include <memory>
 #include <mutex>
 #include <cstdarg>
-#include <functional>
-#include <string_view>
+
+#include "nador/log/ILog.h"
 
 #define NADOR_LOG_MAX_MESSAGE_SIZE 2000
 
@@ -14,17 +14,6 @@
 #endif
 
 #define __FUNCTION_NAME__ __PRETTY_FUNCTION__
-
-namespace nador
-{
-    enum class ELogLevel : uint32_t
-    {
-        DEBUG = 0,
-        WARNING,
-        ERROR,
-        FATAL,
-    };
-}
 
 #if defined(DISABLE_NADOR_LOG)
 #define NADOR_DEBUG(...)
@@ -36,28 +25,27 @@ namespace nador
 #define ENGINE_ERROR(...)
 #else
 #define NADOR_DEBUG(...)                                                                                                                             \
-    nador::Log::Get().LogWrapper(nador::ELogType::DEBUG, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::DEBUG, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::DEBUG, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::DEBUG, __VA_ARGS__)
 #define NADOR_WARNING(...)                                                                                                                           \
-    nador::Log::Get().LogWrapper(nador::ELogType::WARNING, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::WARNING, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::WARNING, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::WARNING, __VA_ARGS__)
 #define NADOR_ERROR(...)                                                                                                                             \
-    nador::Log::Get().LogWrapper(nador::ELogType::ERROR, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::ERROR, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::ERROR, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::ERROR, __VA_ARGS__)
 
 #define ENGINE_DEBUG(...)                                                                                                                            \
-    nador::Log::Get().LogWrapper(nador::ELogType::ENGINE_DEBUG, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::DEBUG, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::ENGINE_DEBUG, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::DEBUG, __VA_ARGS__)
 #define ENGINE_WARNING(...)                                                                                                                          \
-    nador::Log::Get().LogWrapper(nador::ELogType::ENGINE_WARNING, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::WARNING, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::ENGINE_WARNING, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::WARNING, __VA_ARGS__)
 #define ENGINE_ERROR(...)                                                                                                                            \
-    nador::Log::Get().LogWrapper(nador::ELogType::ENGINE_ERROR, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::ERROR, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::ENGINE_ERROR, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::ERROR, __VA_ARGS__)
 
 #endif // DISABLE_NADOR_LOG
 
 // Fatal always enabled
 #define ENGINE_FATAL(...)                                                                                                                            \
-    nador::Log::Get().LogWrapper(nador::ELogType::ENGINE_FATAL, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::FATAL, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::ENGINE_FATAL, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::FATAL, __VA_ARGS__)
 #define NADOR_FATAL(...)                                                                                                                             \
-    nador::Log::Get().LogWrapper(nador::ELogType::FATAL, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::FATAL, __VA_ARGS__)
+    nador::GetLoggingInterface()->LogMessage(nador::ELogType::FATAL, __FILE__, __LINE__, __FUNCTION_NAME__, nador::ELogLevel::FATAL, __VA_ARGS__)
 
-#define NADOR_LOG nador::Log::Get()
 
 #ifdef DISABLE_NADOR_ASSERT
 
@@ -88,99 +76,18 @@ namespace nador
 
 namespace nador
 {
-    enum class ELogType
-    {
-        DEBUG,
-        WARNING,
-        ERROR,
-        FATAL,
-
-        ENGINE_DEBUG,
-        ENGINE_WARNING,
-        ENGINE_ERROR,
-        ENGINE_FATAL,
-    };
-
-    /*!
-     * Presents a simple logger class (singleton)
-     */
-    class Log
+    class Log : public ILog
     {
     public:
-        using log_cb = std::function<void(std::string_view)>;
-        using logFormatStrategy_cb
-            = std::function<int32_t(char*, size_t, std::string_view, std::string_view, std::string_view, std::string_view, int32_t)>;
+        Log();
 
-        /*!
-         * Get the Log instance.
-         *
-         * \return The instance.
-         */
-        static Log& Get()
-        {
-            static Log s_log;
-            return s_log;
-        }
-
-        /*!
-         * Registers a callback touched to a log type.
-         *
-         * \param type The log type.
-         * \param callback The callback.
-         *
-         * \return  True if inserted.
-         */
-        bool RegisterCallback(ELogType type, log_cb callback);
-
-        /*!
-         * Set the log level.
-         *
-         * \param level The level.
-         */
-        void SetLevel(nador::ELogLevel level) noexcept;
-
-        void SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept;
-
-        void SetTimeFormat(std::string_view timeFormat) noexcept;
-
-        /*!
-         * Log the message with the additional callback.
-         *
-         * \param type	The log type.
-         * \param file  Name of the file.
-         * \param line	Line count.
-         * \param func	Name of the function.
-         * \param level	The log level.
-         * \param msg	The message to log.
-         * \param ...	Additional params.
-         */
-        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...);
-
-        /*!
-         * Wrapper function to log messages.
-         *
-         * \param type	The type of the log.
-         * \param file	The name of the file.
-         * \param line	Line count.
-         * \param func	The function name.
-         * \param level	The log level.
-         * \param ...args	The specific arguments.
-         */
-        template <typename... Args>
-        void LogWrapper(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, const Args&... args)
-        {
-            LogMessageImpl(type, file, line, func, level, args...);
-        }
-
-        // delete copy stuffs
-        Log(const Log&)            = delete;
-        Log& operator=(const Log&) = delete;
+        bool RegisterCallback(ELogType type, log_cb callback) override;        
+        void SetLevel(nador::ELogLevel level) noexcept override;
+        void SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept override;
+        void SetTimeFormat(std::string_view timeFormat) noexcept override;
 
     private:
-        /*!
-         * Log constructor
-         */
-        Log();
+        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...) override;
 
         int32_t DefaultLogFormat(char*            buff,
                                  size_t           size,

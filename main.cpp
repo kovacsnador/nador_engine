@@ -55,46 +55,56 @@ void InitSounds()
     soundCtrl->AddSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
 }
 
-int main(void)
+void SetupLogging()
 {
+    auto log = std::make_unique<nador::Log>();
+
     nador::StandardLogger standardLogger;
     nador::StreamLogger<std::chrono::system_clock>   engineStreamLogger(nador::GetStream<std::ofstream>("logs/nador_engine.log"), std::chrono::milliseconds(100));
     nador::StreamLogger<std::chrono::system_clock>   userstreamLogger(nador::GetStream<std::ofstream>("logs/nador.log"), std::chrono::seconds(2));
 
     // setup default standard logging
-    NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Debug(msg);
         engineStreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Warning(msg);
         engineStreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Error(msg);
         engineStreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Fatal(msg);
         engineStreamLogger.Log(msg);
     });
 
-    NADOR_LOG.RegisterCallback(nador::ELogType::DEBUG, [standardLogger, userstreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::DEBUG, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Debug(msg);
         userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::WARNING, [standardLogger, userstreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::WARNING, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Warning(msg);
         userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::ERROR, [standardLogger, userstreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::ERROR, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Error(msg);
         userstreamLogger.Log(msg);
     });
-    NADOR_LOG.RegisterCallback(nador::ELogType::FATAL, [standardLogger, userstreamLogger](std::string_view msg) mutable {
+    log->RegisterCallback(nador::ELogType::FATAL, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Fatal(msg);
         userstreamLogger.Log(msg);
     });
+
+    nador::SetLoggingInterface(std::move(log));
+}
+
+int main(void)
+{
+    // Logger setup
+    SetupLogging();
 
     // Initialize the app with the config settings.
     nador::AppConfig config = nador::ReadAppConfigFromFile("app_config.xml");
