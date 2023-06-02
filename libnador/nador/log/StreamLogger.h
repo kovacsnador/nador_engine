@@ -5,6 +5,7 @@
 #include <fstream>
 #include <filesystem>
 #include <chrono>
+#include <future>
 
 namespace nador
 {
@@ -20,17 +21,13 @@ namespace nador
         return std::make_unique<StreamTy>(path.generic_string());
     }
 
-    template <typename ClockTy>
     class StreamLogger
     {
     public:
         using value_type = std::shared_ptr<std::ofstream>;
 
-        template <typename DurationTy>
-        explicit StreamLogger(value_type&& stream, DurationTy flushFrequency)
+        explicit StreamLogger(value_type&& stream)
         : _streamPtr(std::forward<value_type>(stream))
-        , _flushFrequency(flushFrequency)
-        , _lastFlush(ClockTy::now())
         {
             if (_streamPtr == nullptr)
             {
@@ -43,33 +40,17 @@ namespace nador
             }
         }
 
-        void Log(std::string_view logMsg)
+        void Write(std::string_view logMsg)
         {
             if (_streamPtr && _streamPtr->is_open())
             {
                 (*_streamPtr) << logMsg;
-
-                auto now = ClockTy::now();
-                if (now - _lastFlush >= _flushFrequency)
-                {
-                    Flush();
-                }
-            }
-        }
-
-        void Flush()
-        {
-            if (_streamPtr && _streamPtr->is_open())
-            {
                 _streamPtr->flush();
-                _lastFlush = ClockTy::now();
             }
         }
 
     private:
-        value_type                                _streamPtr;
-        std::chrono::duration<double, std::milli> _flushFrequency;
-        std::chrono::time_point<ClockTy>          _lastFlush;
+        value_type _streamPtr;
     };
 } // namespace nador
 

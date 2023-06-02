@@ -34,44 +34,34 @@ namespace nador
         ENGINE_FATAL,
     };
 
+    inline const char* GetLogTypeName(ELogType type)
+    {
+        switch (type)
+        {
+        case ELogType::DEBUG:
+            return "DEBUG";
+        case ELogType::WARNING:
+            return "WARNING";
+        case ELogType::ERROR:
+            return "ERROR";
+        case ELogType::FATAL:
+            return "FATAL";
+        case ELogType::ENGINE_DEBUG:
+            return "ENGINE_DEBUG";
+        case ELogType::ENGINE_WARNING:
+            return "ENGINE_WARNING";
+        case ELogType::ENGINE_ERROR:
+            return "ENGINE_ERROR";
+        case ELogType::ENGINE_FATAL:
+            return "ENGINE_FATAL";
+        default:
+            return "UNKNOW";
+        }
+    }
+
     class ILog
     {
     public:
-        using log_cb = std::function<void(std::string_view)>;
-        using logFormatStrategy_cb
-            = std::function<int32_t(char*, size_t, std::string_view, std::string_view, std::string_view, std::string_view, int32_t)>;
-
-        /*!
-         * Registers a callback touched to a log type.
-         *
-         * \param type The log type.
-         * \param callback The callback.
-         *
-         * \return  True if inserted.
-         */
-        virtual bool RegisterCallback(ELogType type, log_cb callback) = 0;
-
-        /*!
-         * Set the log level.
-         *
-         * \param level The level.
-         */
-        virtual void SetLevel(nador::ELogLevel level) noexcept = 0;
-
-        /*!
-         * Set the log format strategy.
-         *
-         * \param strategy The strategy callback.
-         */
-        virtual void SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept = 0;
-
-        /*!
-         * Set the time format.
-         *
-         * \param timeFormat The time format string.
-         */
-        virtual void SetTimeFormat(std::string_view timeFormat) noexcept = 0;
-
         /*!
          * Wrapper function to log messages.
          *
