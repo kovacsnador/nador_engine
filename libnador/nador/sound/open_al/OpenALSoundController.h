@@ -4,10 +4,14 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <mutex>
+#include <vector>
+#include <future>
 
 #include "nador/sound/ISoundController.h"
 #include "nador/utils/event/Event.h"
 #include "nador/utils/NonCopyable.h"
+#include "nador/common/MoveableObjWrapper.h"
 
 struct ALCdevice;
 struct ALCcontext;
@@ -84,7 +88,7 @@ namespace nador
          * \param fileName    The sound file name.
          * \param soundId     The sound id.
          */
-        bool AddSound(const char* fileName, uint32_t soundId) override;
+        bool LoadSound(const char* fileName, uint32_t soundId) override;
 
         /*!
          * Creates a sound source from the sound id.
@@ -107,6 +111,8 @@ namespace nador
          */
         void StopAllSound() override;
 
+        void Wait() override;
+
         /*!
          * Gets all registered sound data.
          *
@@ -115,6 +121,17 @@ namespace nador
         sound_data_list_t GetAllSoundData() const override;
 
     private:
+        struct FutureWaiter
+        {
+            void operator()(std::future<bool>& future)
+            {
+                if(future.valid())
+                {
+                    future.wait();
+                }
+            }
+        };
+
         const IFileControllerPtr _fileCtrl;
 
         ALCdevice*  _pDevice { nullptr };
@@ -126,6 +143,9 @@ namespace nador
 		uint32_t _maxSoundSource {32};	// the default value
 
         onStopAllSound_event_t _onStopAllSoundEvent;
+
+        mutable std::mutex _mtx;
+        std::vector<MoveableObjWrapper<std::future<bool>, FutureWaiter>> _pendingSoundLoading;
     };
 } // namespace nador
 

@@ -69,7 +69,7 @@ namespace nador
 		 * \param fileName    The sound file name.
 		 * \param soundId     The sound id.
 		 */
-		virtual bool AddSound(const char* fileName, uint32_t soundId) = 0;
+		virtual bool LoadSound(const char* fileName, uint32_t soundId) = 0;
 
 		/*!
 		 * Creates a sound source from the sound id.
@@ -91,6 +91,8 @@ namespace nador
 		 * Stops all sounds.
 		 */
 		virtual void StopAllSound() = 0;
+
+		virtual void Wait() = 0;
 
 		/*!
 		 * Gets all registered sound data.

@@ -98,6 +98,9 @@ namespace nador
         bool                    _stop { false };
     };
 
+    ThreadPool* GetThreadPool();
+    void SetThreadPool(std::unique_ptr<ThreadPool> threadPool);
+
 } // namespace nador
 
 #endif //!__NADOR_THREAD_POOL_H__

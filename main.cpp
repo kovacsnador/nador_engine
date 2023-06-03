@@ -19,7 +19,7 @@ enum FontSize : uint32_t
 
 enum Sound : uint32_t
 {
-    TEST_SOUND_1,
+    TEST_SOUND_1 = 1,
     TEST_SOUND_2,
 };
 
@@ -51,8 +51,8 @@ void InitSounds()
 {
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
 
-    soundCtrl->AddSound("res/sounds/TestSound.wav", Sound::TEST_SOUND_1);
-    soundCtrl->AddSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
+    soundCtrl->LoadSound("res/sounds/TestSound.wav", Sound::TEST_SOUND_1);
+    soundCtrl->LoadSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
 }
 
 void SetupLogging()

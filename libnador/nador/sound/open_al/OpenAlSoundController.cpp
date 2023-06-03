@@ -9,7 +9,7 @@
 #include "nador/system/IFileController.h"
 #include "nador/log/Log.h"
 #include "nador/sound/open_al/OpenALSoundController.h"
-#include "OpenALSoundController.h"
+#include "nador/common/ThreadPool.h"
 
 // OpenAL error checking
 #define OpenAL_ErrorCheck(message)                                                                                                                   \
@@ -46,7 +46,7 @@ namespace nador
         // Create context
         _pContext = alcCreateContext(_pDevice, /*attrlist*/ nullptr);
 
-		// Get the max source number
+        // Get the max source number
         ALCint size;
         alcGetIntegerv(_pDevice, ALC_ATTRIBUTES_SIZE, 1, &size);
         std::vector<ALCint> attrs(size);
@@ -55,11 +55,11 @@ namespace nador
         {
             if (it == ALC_MONO_SOURCES)
             {
-				_maxSoundSource = it;
+                _maxSoundSource = it;
             }
         }
 
-		ENGINE_DEBUG("Max mono source: %d", _maxSoundSource);
+        ENGINE_DEBUG("Max mono source: %d", _maxSoundSource);
 
         // Activate this context so that OpenAL state modifications are applied to the context
         if (!alcMakeContextCurrent(_pContext))
@@ -76,84 +76,105 @@ namespace nador
                                           /* up = */ 0.f,     1.f, 0.f };
         alec(alListenerfv(AL_ORIENTATION, forwardAndUpVectors));
 
-		ENGINE_DEBUG("OpenAlSoundControl initialized.");
+        ENGINE_DEBUG("OpenAlSoundControl initialized.");
     }
 
     OpenAlSoundContoller::~OpenAlSoundContoller()
     {
-        _sounds.clear();
+        Wait();
+
+        {
+            std::scoped_lock<std::mutex> lock(_mtx);
+            _sounds.clear();
+        }
+
         alcMakeContextCurrent(nullptr);
         alcDestroyContext(_pContext);
         alcCloseDevice(_pDevice);
 
-		ENGINE_DEBUG("OpenAlSoundControl destroyed.");
+        ENGINE_DEBUG("OpenAlSoundControl destroyed.");
     }
 
     void OpenAlSoundContoller::TickBegin()
-	{
-		// remove sounds if not playing any more.
-		_currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING;});
-	}
-
-    bool OpenAlSoundContoller::AddSound(const char* filePath, uint32_t soundId)
     {
-        bool isMp3 = std::regex_match(filePath, std::regex("(.*)\\.mp3$"));
-        bool isWav = std::regex_match(filePath, std::regex("(.*)\\.wav$"));
+        // remove sounds if not playing any more.
+        _currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING; });
 
-        if (!isMp3 && !isWav)
-        {
-            ENGINE_WARNING("Sound file extension not supported: %s", filePath);
-            return false;
-        }
+        // remove pending sound loads
+        std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [this](const auto& it) { return it.obj.wait_for(std::chrono::seconds(0)) == std::future_status::ready; });
+    }
 
-        DataPtr soundFile = _fileCtrl->Read(filePath);
+    bool OpenAlSoundContoller::LoadSound(const char* filePath, uint32_t soundId)
+    {
+        auto threadPool = GetThreadPool();
 
-        SoundPtr soundPtr  = std::make_shared<Sound>();
-        soundPtr->soundId  = soundId;
-        soundPtr->fileName = filePath;
+        auto addSound = [this](std::string filePath, uint32_t soundId) {
+            bool isMp3 = std::regex_match(filePath, std::regex("(.*)\\.mp3$"));
+            bool isWav = std::regex_match(filePath, std::regex("(.*)\\.wav$"));
 
-        int16_t* pcmData = nullptr;
+            if (!isMp3 && !isWav)
+            {
+                ENGINE_WARNING("Sound file extension not supported: %s", filePath.c_str());
+                return false;
+            }
 
-        if (isWav)
-        {
-            pcmData = drwav_open_memory_and_read_pcm_frames_s16(
-                soundFile->Begin(), soundFile->GetSize(), &soundPtr->channels, &soundPtr->sampleRate, &soundPtr->totalPcmFrameCount, nullptr);
-        }
-        else if (isMp3)
-        {
-            drmp3_config mp3Config;
-            pcmData = drmp3_open_memory_and_read_pcm_frames_s16(
-                soundFile->Begin(), soundFile->GetSize(), &mp3Config, &soundPtr->totalPcmFrameCount, nullptr);
+            DataPtr soundFile = _fileCtrl->Read(filePath);
 
-            soundPtr->channels   = mp3Config.channels;
-            soundPtr->sampleRate = mp3Config.sampleRate;
-        }
+            SoundPtr soundPtr  = std::make_shared<Sound>();
+            soundPtr->soundId  = soundId;
+            soundPtr->fileName = filePath;
 
-        if (pcmData == nullptr)
-        {
-            ENGINE_WARNING("Failed to load audio file: %s", filePath);
-            return false;
-        }
+            int16_t* pcmData = nullptr;
 
-        alec(alGenBuffers(1, &soundPtr->bufferId));
-        alec(alBufferData(soundPtr->bufferId,
-                          soundPtr->channels > 1 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16,
-                          pcmData,
-                          (ALsizei)soundPtr->getPcmDataSize(),
-                          soundPtr->sampleRate));
+            if (isWav)
+            {
+                pcmData = drwav_open_memory_and_read_pcm_frames_s16(
+                    soundFile->Begin(), soundFile->GetSize(), &soundPtr->channels, &soundPtr->sampleRate, &soundPtr->totalPcmFrameCount, nullptr);
+            }
+            else if (isMp3)
+            {
+                drmp3_config mp3Config;
+                pcmData = drmp3_open_memory_and_read_pcm_frames_s16(
+                    soundFile->Begin(), soundFile->GetSize(), &mp3Config, &soundPtr->totalPcmFrameCount, nullptr);
 
-        // delete pcmData
-        drwav_free(pcmData, nullptr);
+                soundPtr->channels   = mp3Config.channels;
+                soundPtr->sampleRate = mp3Config.sampleRate;
+            }
 
-        ENGINE_DEBUG("Sound added from file %s with id %d", filePath, soundId);
+            if (pcmData == nullptr)
+            {
+                ENGINE_WARNING("Failed to load audio file: %s", filePath.c_str());
+                return false;
+            }
 
-        auto [_, inserted] = _sounds.insert_or_assign(soundId, soundPtr);
-        
-        return inserted; // on "inserted" true on "assign" false
+            std::scoped_lock<std::mutex> lock(_mtx);
+
+            alec(alGenBuffers(1, &soundPtr->bufferId));
+            alec(alBufferData(soundPtr->bufferId,
+                              soundPtr->channels > 1 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16,
+                              pcmData,
+                              (ALsizei)soundPtr->getPcmDataSize(),
+                              soundPtr->sampleRate));
+
+            // delete pcmData
+            drwav_free(pcmData, nullptr);
+
+            ENGINE_DEBUG("Sound added from file %s with id %d", filePath.c_str(), soundId);
+
+            auto [_, inserted] = _sounds.insert_or_assign(soundId, soundPtr);
+
+            return inserted; // on "inserted" true on "assign" false
+        };
+
+        auto future = threadPool->enqueue(addSound, ETaskPriority::HIGH, filePath, soundId);
+        _pendingSoundLoading.emplace_back(std::move(future));
+        return true;
     }
 
     ISoundSourceUPtr OpenAlSoundContoller::CreateSoundSource(uint32_t soundId)
     {
+        std::scoped_lock<std::mutex> lock(_mtx);
+
         auto iter = _sounds.find(soundId);
 
         if (iter == _sounds.end())
@@ -175,22 +196,29 @@ namespace nador
     }
 
     void OpenAlSoundContoller::PlaySound(uint32_t soundId)
-	{
-		auto soundSource = CreateSoundSource(soundId);
-		if(soundSource)
-		{
-			soundSource->Play();
-			_currentSoundSources.push_back(std::move(soundSource));
-		}
-	}
+    {
+        auto soundSource = CreateSoundSource(soundId);
+        if (soundSource)
+        {
+            soundSource->Play();
+            _currentSoundSources.push_back(std::move(soundSource));
+        }
+    }
 
     void OpenAlSoundContoller::StopAllSound()
     {
         _onStopAllSoundEvent();
     }
 
+    void OpenAlSoundContoller::Wait()
+    {
+        _pendingSoundLoading.clear();
+    }
+
     sound_data_list_t OpenAlSoundContoller::GetAllSoundData() const
     {
+        std::scoped_lock<std::mutex> lock(_mtx);
+
         sound_data_list_t allSoundData;
 
         for (auto& it : _sounds)

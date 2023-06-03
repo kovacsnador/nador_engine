@@ -2,6 +2,22 @@
 #include "nador/log/Log.h"
 #include "nador/common/ThreadUtils.h"
 
+namespace nador
+{
+    static std::unique_ptr<ThreadPool> g_threadPool = std::make_unique<ThreadPool>(std::thread::hardware_concurrency());
+
+    ThreadPool* GetThreadPool()
+    {
+        return g_threadPool.get();
+    }
+
+    void SetThreadPool(std::unique_ptr<ThreadPool> threadPool)
+    {
+        g_threadPool = std::move(threadPool);
+    }
+
+} // namespace nador
+
 nador::ThreadPool::ThreadPool(uint32_t nrThreads)
 {
     if(nrThreads == 0)
