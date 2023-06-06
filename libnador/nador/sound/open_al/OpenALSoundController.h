@@ -18,8 +18,14 @@ struct ALCcontext;
 
 namespace nador
 {
+    template <typename T>
+    concept FutureConcept = requires(T t) {
+        { t.valid() };
+        { t.wait() };
+    };
+
     class IFileController;
-    
+
     class OpenAlSoundContoller : public ISoundController
     {
         CREATE_EVENT_TYPE_ARG_0(onStopAllSound);
@@ -80,7 +86,7 @@ namespace nador
          */
         ~OpenAlSoundContoller();
 
-		void TickBegin() override;
+        void TickBegin() override;
 
         /*!
          * Add sound to the sound contoller with the given sound id.
@@ -123,9 +129,10 @@ namespace nador
     private:
         struct FutureWaiter
         {
-            void operator()(std::future<bool>& future)
+            template <FutureConcept T>
+            void operator()(T& future)
             {
-                if(future.valid())
+                if (future.valid())
                 {
                     future.wait();
                 }
@@ -140,11 +147,12 @@ namespace nador
         sound_list_t       _sounds;
         soundSource_list_t _currentSoundSources;
 
-		uint32_t _maxSoundSource {32};	// the default value
+        uint32_t _maxSoundSource { 32 }; // the default value
 
         onStopAllSound_event_t _onStopAllSoundEvent;
 
         mutable std::mutex _mtx;
+
         std::vector<MoveableObjWrapper<std::future<bool>, FutureWaiter>> _pendingSoundLoading;
     };
 } // namespace nador

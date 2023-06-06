@@ -5,8 +5,8 @@
 
 namespace nador
 {
-    template<typename ObjTy, typename Cleanup>
-    requires std::invocable<Cleanup, ObjTy&>
+    template <typename ObjTy, typename CleanupStrategy>
+        requires std::invocable<CleanupStrategy, ObjTy&>
     struct MoveableObjWrapper
     {
         MoveableObjWrapper(ObjTy&& obj)
@@ -14,24 +14,21 @@ namespace nador
         {
         }
 
-        ~MoveableObjWrapper()
-        {
-            cleanup(obj);
-        }
+        ~MoveableObjWrapper() { cleanupStrategy(obj); }
 
         // default
-        MoveableObjWrapper(MoveableObjWrapper&&) = default;
+        MoveableObjWrapper(MoveableObjWrapper&&)            = default;
         MoveableObjWrapper& operator=(MoveableObjWrapper&&) = default;
 
         // delete
-        MoveableObjWrapper(MoveableObjWrapper&) = delete;
+        MoveableObjWrapper(MoveableObjWrapper&)            = delete;
         MoveableObjWrapper& operator=(MoveableObjWrapper&) = delete;
 
         ObjTy obj;
 
     private:
-        Cleanup cleanup; 
+        CleanupStrategy cleanupStrategy;
     };
-}
+} // namespace nador
 
 #endif //!__MOVEABLE_OBJ_WRAPPER_H__
