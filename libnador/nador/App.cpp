@@ -18,6 +18,7 @@
 #include "nador/video/shader/ShaderController.h"
 #include "nador/video/renderer/base_renderer/BaseRenderer.h"
 #include "nador/video/renderer/batch_renderer/BatchRenderer.h"
+#include "nador/common/Stopwatch.h"
 
 #include "nador/test/Tests.h"
 
@@ -25,11 +26,13 @@ namespace nador
 {
     IAppUPtr App::CreateApp(const AppConfig& config)
     {
+        nador::Stopwatch<std::chrono::system_clock> sw;
+
         static constexpr size_t MAX_VERTEX_COUNT = 10000;
 
         IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
-        IVideoPtr           video     = ModuleFactory::CreateVideo();
-        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
+        IVideoPtr           video     = ModuleFactory::CreateVideo();   //m
+        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);   //m
         IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
 
         // Attach after InputController created
@@ -51,7 +54,7 @@ namespace nador
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
         ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
 
-        return std::make_unique<App>(config,
+        auto app = std::make_unique<App>(config,
                                      std::move(window),
                                      std::move(video),
                                      std::move(fileCtrl),
@@ -62,6 +65,10 @@ namespace nador
                                      std::move(atlasCtrl),
                                      std::move(fontCtrl),
                                      std::move(testCtrl));
+
+        ENGINE_DEBUG("App creation duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
+
+        return app;
     }
 
     App::App(const AppConfig&    config,

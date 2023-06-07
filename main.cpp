@@ -4,6 +4,7 @@
 #include "nador/App.h"
 #include "nador/log/StandardLogger.h"
 #include "nador/log/StreamLogger.h"
+#include "nador/common/Stopwatch.h"
 
 enum Fonts : uint32_t
 {
@@ -25,7 +26,7 @@ enum Sound : uint32_t
 
 void InitFonts()
 {
-    auto start = std::chrono::system_clock::now();
+    nador::Stopwatch<std::chrono::system_clock> sw;
 
     nador::IFontController* fontCtrl = nador::IApp::Get()->GetFontController();
 
@@ -43,16 +44,19 @@ void InitFonts()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    auto diff = std::chrono::system_clock::now() - start;
-    NADOR_DEBUG("InitFonts duration: %d ms", std::chrono::duration_cast<std::chrono::milliseconds>(diff));
+    NADOR_DEBUG("InitFonts duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }
 
 void InitSounds()
 {
+    nador::Stopwatch<std::chrono::system_clock> sw;
+
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
 
     soundCtrl->LoadSound("res/sounds/TestSound.wav", Sound::TEST_SOUND_1);
     soundCtrl->LoadSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
+
+    NADOR_DEBUG("InitSounds duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }
 
 void SetupLogging()
