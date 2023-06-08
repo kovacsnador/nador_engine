@@ -22,7 +22,7 @@ namespace nador
          *
          * \return The file data.
          */
-        DataPtr Read(const char* fileName) const override;
+        FileDataPtr Read(const char* fileName) const override;
 
         /*!
          * Read a file.
@@ -31,7 +31,7 @@ namespace nador
          *
          * \return The file data.
          */
-        DataPtr Read(const std::string& fileName) const override;
+        FileDataPtr Read(const std::string& fileName) const override;
 
         /*!
          * Writes a file.
@@ -41,7 +41,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        bool Write(const char* fileName, const DataPtr& data) const override;
+        bool Write(const char* fileName, const FileDataPtr& data) const override;
 
         /*!
          * Writes a file.
@@ -51,7 +51,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        bool Write(const std::string& fileName, const DataPtr& data) const override;
+        bool Write(const std::string& fileName, const FileDataPtr& data) const override;
 
         /*!
          * Deletes a file.

@@ -11,7 +11,7 @@ namespace nador
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_fileCtrl);
 
-		DataPtr atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
+		auto atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
 
 		if(atlasConfigData->IsValid())
 		{

@@ -17,7 +17,7 @@ namespace nador
          *
          * \param data	The texture data.
          */
-        TextureData(const DataPtr& data)
+        TextureData(const FileDataPtr& data)
         {
             NADOR_ASSERT(data->IsValid());
 
@@ -49,7 +49,7 @@ namespace nador
          * \return		The raw texture data.
          */
         template <typename LoadStrategyTy>
-        static auto LoadFromBuffer(const DataPtr& data)
+        static auto LoadFromBuffer(const FileDataPtr& data)
         {
             return std::make_unique<TextureData<LoadStrategyTy>>(data);
         }

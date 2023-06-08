@@ -10,6 +10,7 @@
 #include "nador/log/Log.h"
 #include "nador/sound/open_al/OpenALSoundController.h"
 #include "nador/common/ThreadPool.h"
+#include "nador/utils/Utils.h"
 
 // OpenAL error checking
 #define OpenAL_ErrorCheck(message)                                                                                                                   \
@@ -101,7 +102,7 @@ namespace nador
         _currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING; });
 
         // remove pending sound loads
-        std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [this](const auto& it) { return it.obj.wait_for(std::chrono::seconds(0)) == std::future_status::ready; });
+        std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [this](const auto& it) { return nador::utils::isReadyFuture(it.obj); });
     }
 
     bool OpenAlSoundContoller::LoadSound(const char* filePath, uint32_t soundId)
@@ -118,7 +119,7 @@ namespace nador
                 return false;
             }
 
-            DataPtr soundFile = _fileCtrl->Read(filePath);
+            auto soundFile = _fileCtrl->Read(filePath);
 
             SoundPtr soundPtr  = std::make_shared<Sound>();
             soundPtr->soundId  = soundId;

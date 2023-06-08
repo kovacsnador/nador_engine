@@ -1,5 +1,4 @@
 #include "nador/common/ThreadPool.h"
-#include "nador/log/Log.h"
 #include "nador/common/ThreadUtils.h"
 
 namespace nador
@@ -79,7 +78,7 @@ void nador::ThreadPool::enqueue(const std::vector<ThreadPoolTask>& batchTasks)
     }
 
     // notify thread
-    _wakeUpWorkersCv.notify_one();
+    _wakeUpWorkersCv.notify_all();
 }
 
 void nador::ThreadPool::wait()

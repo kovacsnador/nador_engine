@@ -33,7 +33,7 @@ namespace nador
         NADOR_ASSERT(_video);
         NADOR_ASSERT(_fileCtrl);
 
-        DataPtr configData = _fileCtrl->Read((_atlasImagePath + configName));
+        auto configData = _fileCtrl->Read((_atlasImagePath + configName));
 
         nlohmann::json json = nlohmann::json::parse(configData->Begin(), configData->End());
 
@@ -72,7 +72,7 @@ namespace nador
             return;
         }
 
-        DataPtr textureData = _fileCtrl->Read((_atlasImagePath + _textureName));
+        auto textureData = _fileCtrl->Read((_atlasImagePath + _textureName));
 
         _texture.reset(new Texture(_video, textureData));
     }

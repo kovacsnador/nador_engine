@@ -9,29 +9,30 @@
 
 namespace nador
 {
-    struct Data
+    struct FileData
     {
         using data_t = char;
         using deleter_t = std::function<void(const data_t*)>;
 
         /*!
-         * Data constructor.
+         * FileData constructor.
          *
          * \param data      The raw data.
          * \param size      The size if the data.
          * \param deleter   The deleter if the data.
          */
-        Data(const data_t* data, size_t size, deleter_t deleter = [](const data_t* data) { delete[] data; })
+        FileData(const data_t* data, size_t size, std::string_view path, deleter_t deleter = [](const data_t* data) { delete[] data; })
         : _data(data)
         , _size(size)
         , _deleter(deleter)
+        , _path(path)
         {
         }
 
         /*!
-         * Data destructor. 
+         * FileData destructor. 
          */
-        ~Data()
+        ~FileData()
         {
             if(_data)
             {
@@ -89,13 +90,24 @@ namespace nador
             return (_data && _size);
         }
 
+        /*!
+         * Gets the original file path.
+         *
+         * \return      The file path.
+         */
+        const std::string& GetPath() const
+        {
+            return _path;
+        }
+
     private:
         const data_t*   _data;
         const size_t    _size;
         deleter_t       _deleter;
+        std::string     _path;
     };
 
-    CREATE_PTR_TYPES(Data);
+    CREATE_PTR_TYPES(FileData);
 
 
 	class IFileController
@@ -123,7 +135,7 @@ namespace nador
          *
          * \return The file data.
          */
-        virtual DataPtr Read(const char* fileName) const = 0;
+        virtual FileDataPtr Read(const char* fileName) const = 0;
 
         /*!
          * Read a file.
@@ -132,7 +144,7 @@ namespace nador
          *
          * \return The file data.
          */
-        virtual DataPtr Read(const std::string& fileName) const = 0;
+        virtual FileDataPtr Read(const std::string& fileName) const = 0;
         
         /*!
          * Writes a file.
@@ -142,7 +154,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        virtual bool Write(const char* fileName, const DataPtr& data) const = 0;
+        virtual bool Write(const char* fileName, const FileDataPtr& data) const = 0;
 
         /*!
          * Writes a file.
@@ -152,7 +164,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        virtual bool Write(const std::string& fileName, const DataPtr& data) const = 0;
+        virtual bool Write(const std::string& fileName, const FileDataPtr& data) const = 0;
 
         /*!
          * Deletes a file.

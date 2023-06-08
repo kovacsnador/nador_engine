@@ -21,7 +21,7 @@ namespace nador
          * \param data				The texture buffer.
          * \param textureSettings	The specified texture settings.
          */
-        Texture(const IVideo* video, const DataPtr& data, TextureSettings textureSettings = {});
+        Texture(const IVideo* video, const FileDataPtr& data, TextureSettings textureSettings = {});
 
         /*!
          * Texture constructor.

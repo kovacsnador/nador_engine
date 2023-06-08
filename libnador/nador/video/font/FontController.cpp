@@ -1,166 +1,199 @@
 #include "nador/video/font/FontController.h"
+#include "nador/common/ThreadPool.h"
+#include "nador/common/Stopwatch.h"
 
 namespace nador
 {
-	FontController::FontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
-	: _video(std::move(video))
-	, _fileCtrl(std::move(fileCtrl))
-	{
-		NADOR_ASSERT(_video);
-		NADOR_ASSERT(_fileCtrl);
-	}
+    FontController::FontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
+    : _video(std::move(video))
+    , _fileCtrl(std::move(fileCtrl))
+    {
+        NADOR_ASSERT(_video);
+        NADOR_ASSERT(_fileCtrl);
+    }
 
-	void FontController::AddFontSize(uint32_t fontSize)
-	{
-		_fontSizes.push_back(fontSize);
+    bool FontController::AddFontSize(uint32_t fontSize)
+    {
+        auto [_, inserted] = _fontSizes.insert(fontSize);
+        return inserted;
+    }
 
-		//make unique the vector
-		std::sort(_fontSizes.begin(), _fontSizes.end());
-		_fontSizes.erase(std::unique(_fontSizes.begin(), _fontSizes.end()), _fontSizes.end());
-	}
+    void FontController::CreateFont(uint32_t fontId, std::string_view filePath)
+    {
+        // clear outdated futures
+        std::remove_if(_pendingFutures.begin(), _pendingFutures.end(), [this](const auto& it) {
+            return nador::utils::isReadyFuture(it.obj);
+        });
 
-	void FontController::RegisterFont(uint32_t fontId, std::string_view filePath)
-	{
-		if(_fontSizes.empty())
-		{
-			ENGINE_FATAL("No font size registered! Use AddFontSize before!");
-		}
+        if (_fontSizes.empty())
+        {
+            ENGINE_ERROR("No font size registered! Use AddFontSize before!");
+            return;
+        }
 
-		std::future<void> future = std::async(std::launch::async, &FontController::_RegisterFont, this, fontId, std::string(filePath), _video->GetMaxTextureSize());
-		_pending_futures.push_back(std::move(future));
-	}
+        uint32_t maxTextureSize = _video->GetMaxTextureSize();
 
-	const FontPtr FontController::GetFont(uint32_t fontId, uint32_t fontSize) const
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
+        auto threadPool = GetThreadPool();
 
-		if(_registeredFonts.find(fontSize) != _registeredFonts.end())
-		{
-			if(_registeredFonts.at(fontSize).find(fontId) != _registeredFonts.at(fontSize).end())
+        auto future = threadPool->enqueue(
+            [this, fontId, threadPool, maxTextureSize](std::string filePath) {
+                // read the font file
+                auto        file = _fileCtrl->Read(filePath);
+                std::string fileName { _fileCtrl->GetFileName(filePath) };
+
+                std::vector<nador::ThreadPoolTask> batchTasks;
+
+                std::vector<nador::MoveableObjWrapper<std::future<void>, nador::FutureWaiter>> futures; // implicit waiting for tasks
+
+                for (auto fontSize : _fontSizes)
+                {
+                    auto task = nador::CreatePackagedTask([this, fontId, fontSize, file, filePath, maxTextureSize] {
+                        // loading the real font
+                        _RegisterFont(fontId, fontSize, file, filePath, maxTextureSize);
+                    });
+                    futures.emplace_back(task->get_future());
+                    batchTasks.emplace_back(std::move(task), nador::ETaskPriority::VERY_HIGH);
+                }
+
+                threadPool->enqueue(batchTasks);
+            },
+            nador::ETaskPriority::VERY_HIGH,
+            std::string(filePath));
+
+        _pendingFutures.emplace_back(std::move(future));
+    }
+
+    const FontPtr FontController::GetFont(uint32_t fontId, uint32_t fontSize) const
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+
+        if (_registeredFonts.find(fontSize) != _registeredFonts.end())
+        {
+            if (_registeredFonts.at(fontSize).find(fontId) != _registeredFonts.at(fontSize).end())
+            {
+                return _registeredFonts.at(fontSize).at(fontId);
+            }
+        }
+        ENGINE_WARNING("Font %d not found with size: %d!", fontId, fontSize);
+        return nullptr;
+    }
+
+    strings_t FontController::GetRegisteredFontNames() const
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+
+        strings_t fontNames;
+        for (const auto& it : _fontNamesToIds)
+        {
+            fontNames.push_back(it.first);
+        }
+
+        return fontNames;
+    }
+
+    uint32_t FontController::GetFontIdByName(const std::string& fontName) const
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+
+        auto iterator = _fontNamesToIds.find(fontName);
+        if (iterator != _fontNamesToIds.end())
+        {
+            return iterator->second;
+        }
+
+        return INVALID_FONT_VALUE;
+    }
+
+    strings_t FontController::GetFontSizesAsString() const
+    {
+        strings_t fontSizesStr;
+        for (const auto& it : _fontSizes)
+        {
+            fontSizesStr.push_back(std::to_string(it));
+        }
+
+        return fontSizesStr;
+    }
+
+    const FontController::FontSizesList_t& FontController::GetFontSizes() const
+    {
+        return _fontSizes;
+    }
+
+    void FontController::SetDefaultSystemFont(uint32_t fontId, uint32_t fontSize)
+    {
+        _defaultFontSize = fontSize;
+        _defaultFontId   = fontId;
+    }
+
+    const FontPtr FontController::GetDefaultSystemFont() const
+    {
+        if (_defaultFontSize != INVALID_FONT_VALUE && _defaultFontId != INVALID_FONT_VALUE)
+        {
+            return GetFont(_defaultFontId, _defaultFontSize);
+        }
+        ENGINE_DEBUG("Default font is not defined yet!");
+        return nullptr;
+    }
+
+    bool FontController::IsLoading() const
+    {
+        for (auto& it : _pendingFutures)
+        {
+        	if(utils::isReadyFuture(it.obj) == false)
 			{
-				return _registeredFonts.at(fontSize).at(fontId);
+				return true;
 			}
-		}
-		ENGINE_WARNING("Font %d not found with size: %d!", fontId, fontSize);
-		return nullptr;
-	}
+        }
+        return false;
+    }
 
-	strings_t FontController::GetRegisteredFontNames() const
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
+    void FontController::_RegisterFont(uint32_t fontId, uint32_t fontSize, FileDataPtr file, std::string_view fileName, uint32_t maxTextureSize)
+    {
+        FT_Library library;
 
-		strings_t fontNames;
-		for(const auto& it : _fontNamesToIds)
-		{
-			fontNames.push_back(it.first);
-		}
+        if (FT_Init_FreeType(&library))
+        {
+            ENGINE_ERROR("FT_Init_FreeType failed");
+            return;
+        }
 
-		return fontNames;
-	}
+        auto font = _CreateFont(library, file, fontSize, fileName, maxTextureSize);
 
-	uint32_t FontController::GetFontIdByName(const std::string& fontName) const
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
+        FT_Done_FreeType(library);
 
-		auto iterator = _fontNamesToIds.find(fontName);
-		if(iterator != _fontNamesToIds.end())
-		{
-			return iterator->second;
-		}
+        std::scoped_lock<std::mutex> lock(_mutex);
 
-		return INVALID_FONT_VALUE;
-	}
+        _registeredFonts[fontSize][fontId]        = std::move(font);
+        _fontNamesToIds[std::string { fileName }] = fontId;
+    }
 
-	strings_t FontController::GetFontSizesAsString() const
-	{
-		strings_t fontSizesStr;
-		for(const auto& it : _fontSizes)
-		{
-			fontSizesStr.push_back(std::to_string(it));
-		}
+    void FontController::Wait()
+    {
+        _pendingFutures.clear();
+    }
 
-		return fontSizesStr;
-	}
+    FontUPtr FontController::_CreateFont(FT_Library         library,
+                                         const FileDataPtr& file,
+                                         uint32_t           fontSize,
+                                         std::string_view   filePath,
+                                         uint32_t           maxTextureSize)
+    {
+        nador::Stopwatch<std::chrono::system_clock> sw;
 
-	const FontController::font_sizes_t& FontController::GetFontSizes() const
-	{
-		return _fontSizes;
-	}
+        FT_Face face;
 
-	void FontController::SetDefaultSystemFont(uint32_t fontId, uint32_t fontSize)
-	{
-		_defaultFontSize = fontSize;
-		_defaultFontId = fontId;
-	}
+        if (FT_New_Memory_Face(library, (const FT_Byte*)file->GetData(), file->GetSize(), 0, &face))
+        {
+            ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
+        }
 
-	const FontPtr FontController::GetDefaultSystemFont() const
-	{
-		if (_defaultFontSize != INVALID_FONT_VALUE &&
-			_defaultFontId != INVALID_FONT_VALUE)
-		{
-			return GetFont(_defaultFontId, _defaultFontSize);
-		}
-		ENGINE_DEBUG("Default font is not defined yet!");
-		return nullptr;
-	}
+        auto font = std::make_unique<Font>(_video.get(), face, fontSize, maxTextureSize, filePath.data());
 
-	bool FontController::IsLoading() const
-	{
-		bool loading = false;
+        FT_Done_Face(face);
 
-		for (auto& it : _pending_futures)
-		{
-			loading	|= !utils::isReadyFuture(it);
-		}
-		
-		return loading;
-	}
+        ENGINE_DEBUG("_CreateFont duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 
-	void FontController::_RegisterFont(uint32_t fontId, std::string filePath, uint32_t maxTextureSize)
-	{
-		FT_Library library;
-
-		if (FT_Init_FreeType(&library))
-		{
-			ENGINE_FATAL("FT_Init_FreeType failed");
-		}
-
-		DataPtr file = _fileCtrl->Read(filePath);
-
-		std::string fileName{_fileCtrl->GetFileName(filePath)};
-
-		std::vector<std::future<void>> futures;
-
-		for(const auto& fontSize : _fontSizes)
-		{
-			futures.emplace_back(std::async(&FontController::_AddFont, this, library, file, fontId, fontSize, fileName, maxTextureSize));
-		}
-
-		// wait for futures
-		std::for_each(futures.cbegin(), futures.cend(), [](const std::future<void>& f) { f.wait(); });
-
-		std::lock_guard<std::mutex> lock(_mutex);
-
-		_fontNamesToIds[fileName] = fontId;
-
-		FT_Done_FreeType(library);
-	}
-
-	void FontController::_AddFont(FT_Library library, const DataPtr& file, uint32_t fontId, uint32_t fontSize, std::string_view fileName, uint32_t maxTextureSize)
-	{
-		FT_Face face;
-
-		if (FT_New_Memory_Face(library, (const FT_Byte*)file->GetData(), file->GetSize(), 0, &face))
-		{
-			ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
-		}
-
-		FontPtr font = std::make_shared<Font>(_video.get(), face, fontSize, maxTextureSize, fileName.data());
-
-		FT_Done_Face(face);
-
-		std::lock_guard<std::mutex> lock(_mutex);
-
-		_registeredFonts[fontSize][fontId] = font;
-	}
-}
+        return font;
+    }
+} // namespace nador

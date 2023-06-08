@@ -77,8 +77,8 @@ namespace nador
                 _taskQueue.emplace(ThreadPoolTask(std::move(packagedTask), priority));
             }
 
-            // notify thread
-            _wakeUpWorkersCv.notify_one();
+            // notify threads
+            _wakeUpWorkersCv.notify_all();
 
             return future;
         }
@@ -99,7 +99,7 @@ namespace nador
     };
 
     ThreadPool* GetThreadPool();
-    void SetThreadPool(std::unique_ptr<ThreadPool> threadPool);
+    void        SetThreadPool(std::unique_ptr<ThreadPool> threadPool);
 
 } // namespace nador
 

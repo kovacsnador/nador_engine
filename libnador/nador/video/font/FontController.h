@@ -6,14 +6,16 @@
 #include <future>
 
 #include "nador/video/font/IFontController.h"
+#include "nador/common/MoveableObjWrapper.h"
+#include "nador/common/FutureWaiter.h"
 
 namespace nador
 {
     class FontController : public IFontController
     {
-        using fonts_list_t      = std::map<uint32_t, std::map<uint32_t, FontPtr>>;
-        using font_name_to_id_t = std::map<std::string, uint32_t>;
-        using pending_futures_t = std::vector<std::future<void>>;
+        using FontsList_t      = std::map<uint32_t, std::map<uint32_t, FontPtr>>;
+        using FontNameToId_t   = std::map<std::string, uint32_t>;
+        using PendingFutures_t = std::vector<nador::MoveableObjWrapper<std::future<void>, nador::FutureWaiter>>;
 
     public:
         const uint32_t INVALID_FONT_VALUE = (uint32_t)-1;
@@ -30,15 +32,15 @@ namespace nador
          *
          * \param fontSize		The actual font size.
          */
-        void AddFontSize(uint32_t fontSize) override;
+        bool AddFontSize(uint32_t fontSize) override;
 
         /*!
-         * Register a new font.
+         * Creates a new font.
          *
          * \param fontId		The id of the font.
          * \param filePath		The path of the font file.
          */
-        void RegisterFont(uint32_t fontId, std::string_view filePath) override;
+        void CreateFont(uint32_t fontId, std::string_view filePath) override;
 
         /*!
          * Gets the font.
@@ -76,7 +78,7 @@ namespace nador
          *
          * \return	The font sizes.
          */
-        const font_sizes_t& GetFontSizes() const override;
+        const FontSizesList_t& GetFontSizes() const override;
 
         /*!
          * Sets the default system font for debug purpose.
@@ -96,32 +98,25 @@ namespace nador
          */
         bool IsLoading() const override;
 
-    private:
-        void _AddFont(FT_Library       library,
-                      const DataPtr&   data,
-                      uint32_t         fontId,
-                      uint32_t         fontSize,
-                      std::string_view filePath,
-                      uint32_t         maxTextureSize);
-
         /*!
-         * Register a new font.
-         *
-         * \param fontId		The id of the font.
-         * \param fileName		The name of the font file.
-         * \param maxTextureSize		The max texture size.
+         * Waits until the pending requests are done.
          */
-        void _RegisterFont(uint32_t fontId, std::string filePath, uint32_t maxTextureSize);
+        void Wait() override;
+
+    private:
+        FontUPtr _CreateFont(FT_Library library, const FileDataPtr& data, uint32_t fontSize, std::string_view filePath, uint32_t maxTextureSize);
+
+        void _RegisterFont(uint32_t fontId, uint32_t fontSize, FileDataPtr file, std::string_view fileName, uint32_t maxTextureSize);
 
         const IVideoPtr          _video;
         const IFileControllerPtr _fileCtrl;
 
-        int32_t           _maxTextureSize;
-        fonts_list_t      _registeredFonts;
-        font_name_to_id_t _fontNamesToIds;
-        font_sizes_t      _fontSizes;
+        int32_t        _maxTextureSize;
+        FontsList_t    _registeredFonts;
+        FontNameToId_t _fontNamesToIds;
+        FontSizesList_t   _fontSizes;
 
-        pending_futures_t _pending_futures;
+        PendingFutures_t _pendingFutures;
 
         uint32_t _defaultFontId { INVALID_FONT_VALUE };
         uint32_t _defaultFontSize { INVALID_FONT_VALUE };

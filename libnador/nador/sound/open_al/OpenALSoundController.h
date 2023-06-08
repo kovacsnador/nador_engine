@@ -12,18 +12,13 @@
 #include "nador/utils/event/Event.h"
 #include "nador/utils/NonCopyable.h"
 #include "nador/common/MoveableObjWrapper.h"
+#include "nador/common/FutureWaiter.h"
 
 struct ALCdevice;
 struct ALCcontext;
 
 namespace nador
 {
-    template <typename T>
-    concept FutureConcept = requires(T t) {
-        { t.valid() };
-        { t.wait() };
-    };
-
     class IFileController;
 
     class OpenAlSoundContoller : public ISoundController
@@ -127,18 +122,6 @@ namespace nador
         sound_data_list_t GetAllSoundData() const override;
 
     private:
-        struct FutureWaiter
-        {
-            template <FutureConcept T>
-            void operator()(T& future)
-            {
-                if (future.valid())
-                {
-                    future.wait();
-                }
-            }
-        };
-
         const IFileControllerPtr _fileCtrl;
 
         ALCdevice*  _pDevice { nullptr };

@@ -14,7 +14,7 @@ namespace nador
 	{
 	}
 
-	DataPtr WindowsFileController::Read(const char* fileName) const
+	FileDataPtr WindowsFileController::Read(const char* fileName) const
 	{
         NADOR_ASSERT(fileName);
         std::ifstream file(_rootPath + fileName, std::ifstream::binary);
@@ -31,7 +31,7 @@ namespace nador
                 {
                     file.close();
                     ENGINE_DEBUG("Read file %s.", fileName);
-                    return std::make_shared<Data>(data, (size_t)size);
+                    return std::make_shared<FileData>(data, (size_t)size, fileName);
                 }
                 else
                 {
@@ -45,15 +45,15 @@ namespace nador
         {
             ENGINE_WARNING("Could not open (maybe not exist) file: %s", fileName);
         }
-        return std::make_shared<Data>(nullptr, 0);
+        return std::make_shared<FileData>(nullptr, 0, "");
 	}
 
-    DataPtr WindowsFileController::Read(const std::string& fileName) const
+    FileDataPtr WindowsFileController::Read(const std::string& fileName) const
     {
         return Read(fileName.c_str());
     }
 
-	bool WindowsFileController::Write(const char* fileName, const DataPtr& data) const
+	bool WindowsFileController::Write(const char* fileName, const FileDataPtr& data) const
 	{
         NADOR_ASSERT(fileName);
         std::ofstream file(_rootPath + fileName, std::ofstream::binary);
@@ -76,7 +76,7 @@ namespace nador
         return false;
 	}
 
-    bool WindowsFileController::Write(const std::string& fileName, const DataPtr& data) const
+    bool WindowsFileController::Write(const std::string& fileName, const FileDataPtr& data) const
     {
         return Write(fileName.c_str(), data);
     }

@@ -34,15 +34,12 @@ void InitFonts()
     fontCtrl->AddFontSize(FontSize::MEDIUM);
     fontCtrl->AddFontSize(FontSize::LARGE);
 
-    fontCtrl->RegisterFont(Fonts::FREE_SANS, "res/fonts/FreeSans.ttf");
+    fontCtrl->CreateFont(Fonts::FREE_SANS, "res/fonts/FreeSans.ttf");
 
     // Sets the default font size
     fontCtrl->SetDefaultSystemFont(Fonts::FREE_SANS, FontSize::SMALL);
 
-    while (fontCtrl->IsLoading())
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    fontCtrl->Wait();
 
     NADOR_DEBUG("InitFonts duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }
