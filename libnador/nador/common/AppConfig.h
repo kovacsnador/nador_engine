@@ -41,10 +41,21 @@ namespace nador
         }
     };
 
+    struct VideoSettings
+    {
+        size_t maxVertexCount;
+
+        bool operator==(const VideoSettings& other) const
+        {
+            return (maxVertexCount == other.maxVertexCount);
+        }
+    };
+
     struct AppConfig
     {
         WindowSettings windowSettings;
         AtlasSettings atlasSettings;
+        VideoSettings videoSettings;
 
         std::string rootFilePath;
         std::string uiPath;
@@ -54,6 +65,7 @@ namespace nador
         {
             return (   windowSettings == other.windowSettings
                     && atlasSettings == other.atlasSettings
+                    && videoSettings == other.videoSettings
                     && rootFilePath == other.rootFilePath
                     && uiPath == other.uiPath);
         }
@@ -83,6 +95,13 @@ namespace nador
             {
                 appConfig.atlasSettings.atlasConfigPath = xml::GetText(atlasSettings, "AtlasConfigPath");
                 appConfig.atlasSettings.atlasImagesPath = xml::GetText(atlasSettings, "AtlasImagesPath");
+            }
+
+            // Get video settings
+            const tinyxml2::XMLElement* videoSettings = pRootElement->FirstChildElement("VideoSettings");
+            if(videoSettings)
+            {
+                appConfig.videoSettings.maxVertexCount = xml::GetUint32T(videoSettings, "MaxVertexCount");
             }
             
             appConfig.rootFilePath    = xml::GetText(pRootElement, "RootFilePath");

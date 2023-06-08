@@ -13,6 +13,10 @@
 		<AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 		<AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
 	</AtlasSettings>
+
+	<VideoSettings>
+		<MaxVertexCount> 10000 </MaxVertexCount>
+	</VideoSettings>
 	
 	<RootFilePath></RootFilePath>
 	<UiPath> res/ui/ </UiPath>

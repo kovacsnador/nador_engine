@@ -11,6 +11,8 @@
 #include <functional>
 #include <concepts>
 #include <any>
+#include <unordered_map>
+#include <optional>
 
 #include "nador/utils/NonCopyable.h"
 #include "nador/utils/Types.h"
@@ -59,6 +61,68 @@ namespace nador
 
     class ThreadPool : private NonCopyable
     {
+        template <typename KeyTy, typename ValueTy, typename Inc, typename Dec>
+        class TasksTracker
+        {
+        public:
+            void Add(KeyTy key) { _map[key] = inc(_map[key]); }
+
+            void Erase(KeyTy key)
+            {
+                auto it = _map.find(key);
+                if(it != _map.end())
+                {
+                    auto val = it->second;
+                    auto [newVal, erase] = dec(val);
+
+                    if(erase)
+                    {
+                        _map.erase(it);
+                    }
+                    else
+                    {
+                        _map.insert_or_assign(key, newVal);        
+                    }
+                }
+            }
+
+            std::optional<ValueTy> GetCount(KeyTy key) const
+            {
+                auto it = _map.find(key);
+                if (it != _map.end())
+                {
+                    return it->second;
+                }
+                return {};
+            }
+
+            auto GetTotal() const { return _map.size(); }
+
+        private:
+            std::unordered_map<KeyTy, ValueTy> _map;
+
+            Inc inc;
+            Dec dec;
+        };
+
+        struct Add
+        {
+            uint32_t operator()(uint32_t val) { return ++val; }
+        };
+
+        struct Erase
+        {
+            std::tuple<uint32_t, bool> operator()(uint32_t val)
+            {
+                if (val > 0)
+                {
+                    --val;
+                }
+
+                return std::make_tuple(val, val == 0);
+            }
+        };
+
     public:
         ThreadPool(uint32_t nrThreads);
         ~ThreadPool();
@@ -75,6 +139,7 @@ namespace nador
             {
                 std::unique_lock<std::mutex> lock(_mtx);
                 _taskQueue.emplace(ThreadPoolTask(std::move(packagedTask), priority));
+                _pendingTasks.Add(priority);
             }
 
             // notify threads
@@ -87,10 +152,15 @@ namespace nador
 
         void wait();
 
+        void wait(ETaskPriority prio);
+
     private:
         std::vector<std::thread>            _workerthreads;
         std::priority_queue<ThreadPoolTask> _taskQueue;
-        uint32_t                            _nrRunningTasks { 0 };
+        // uint32_t                            _nrRunningTasks { 0 };
+
+        TasksTracker<ETaskPriority, uint32_t, Add, Erase> _runningTasks;
+        TasksTracker<ETaskPriority, uint32_t, Add, Erase> _pendingTasks;
 
         std::mutex              _mtx;
         std::condition_variable _wakeUpWorkersCv;

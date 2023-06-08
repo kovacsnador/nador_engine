@@ -28,11 +28,9 @@ namespace nador
     {
         nador::Stopwatch<std::chrono::system_clock> sw;
 
-        static constexpr size_t MAX_VERTEX_COUNT = 10000;
-
         IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
-        IVideoPtr           video     = ModuleFactory::CreateVideo();   //m
-        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);   //m
+        IVideoPtr           video     = ModuleFactory::CreateVideo();
+        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
         IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
 
         // Attach after InputController created
@@ -44,9 +42,10 @@ namespace nador
         IShaderControllerPtr shaderCtrl = std::make_shared<ShaderController>(video);
 
         IRenderer::rendererPlugins_t rendererPlugins;
-        rendererPlugins.insert({ ERenderPlugin::EBaseRenderer, std::make_unique<BaseRenderer>(video, shaderCtrl, MAX_VERTEX_COUNT) });
-        rendererPlugins.insert( { ERenderPlugin::EBatchRenderer,
-              std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), MAX_VERTEX_COUNT, video->GetMaxTextureUnits()) });
+        rendererPlugins.insert({ ERenderPlugin::EBaseRenderer, std::make_unique<BaseRenderer>(video, shaderCtrl, config.videoSettings.maxVertexCount) });
+        rendererPlugins.insert(
+            { ERenderPlugin::EBatchRenderer,
+              std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), config.videoSettings.maxVertexCount, video->GetMaxTextureUnits()) });
 
         IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins);
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
@@ -55,18 +54,18 @@ namespace nador
         ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
 
         auto app = std::make_unique<App>(config,
-                                     std::move(window),
-                                     std::move(video),
-                                     std::move(fileCtrl),
-                                     std::move(inputCtrl),
-                                     std::move(soundCtrl),
-                                     std::move(uiApp),
-                                     std::move(renderer),
-                                     std::move(atlasCtrl),
-                                     std::move(fontCtrl),
-                                     std::move(testCtrl));
+                                         std::move(window),
+                                         std::move(video),
+                                         std::move(fileCtrl),
+                                         std::move(inputCtrl),
+                                         std::move(soundCtrl),
+                                         std::move(uiApp),
+                                         std::move(renderer),
+                                         std::move(atlasCtrl),
+                                         std::move(fontCtrl),
+                                         std::move(testCtrl));
 
-        ENGINE_DEBUG("App creation duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
+        ENGINE_DEBUG("Get total App creation time: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 
         return app;
     }

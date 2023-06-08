@@ -2,6 +2,7 @@
 
 #include "nador/utils/TinyXmlHelper.h"
 #include "nador/utils/Utils.h"
+#include "TinyXmlHelper.h"
 
 namespace nador
 {
@@ -57,5 +58,17 @@ namespace nador
 
 			return def;
 		}
-	}
+
+		uint32_t GetUint32T(const tinyxml2::XMLElement* elem, const char* name, uint32_t def)
+        {
+        	uint32_t ret;
+			std::string text = GetText(elem, name, "false");
+			if (tinyxml2::XMLUtil::ToUnsigned(text.c_str(), &ret))
+			{
+				return ret;
+			}
+			return def;
+        }
+	
+    } // namespace xml
 }

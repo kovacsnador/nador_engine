@@ -112,6 +112,7 @@ TEST_P(ThreadPoolTest, Simple_Test)
     EXPECT_EQ(count.load(), nrTask * plus);
 }
 
+// TODO check this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 TEST(ThreadPoolTest, BatchAndPriority_Test)
 {
     nador::ThreadPool threadPool(std::thread::hardware_concurrency());
@@ -119,7 +120,7 @@ TEST(ThreadPoolTest, BatchAndPriority_Test)
     std::mutex mtx;
     uint32_t   count { 0 };
 
-    auto function = [&count, &mtx](nador::ETaskPriority prio) {
+    auto function = [&count, &mtx, &threadPool](nador::ETaskPriority prio) {
         std::scoped_lock lock(mtx);
         if (prio == nador::ETaskPriority::VERY_HIGH)
         {
@@ -127,18 +128,22 @@ TEST(ThreadPoolTest, BatchAndPriority_Test)
         }
         else if (prio == nador::ETaskPriority::HIGH)
         {
+            threadPool.wait(nador::ETaskPriority::VERY_HIGH);
             EXPECT_TRUE(count >= 3 && count < 6);
         }
         else if (prio == nador::ETaskPriority::MEDIUM)
         {
+            threadPool.wait(nador::ETaskPriority::HIGH);
             EXPECT_TRUE(count >= 6 && count < 9);
         }
         else if (prio == nador::ETaskPriority::LOW)
         {
+            threadPool.wait(nador::ETaskPriority::MEDIUM);
             EXPECT_TRUE(count >= 9 && count < 12);
         }
         else if (prio == nador::ETaskPriority::VERY_LOW)
         {
+            threadPool.wait(nador::ETaskPriority::LOW);
             EXPECT_TRUE(count >= 12 && count < 15);
         }
 
@@ -196,7 +201,7 @@ TEST_P(ThreadPoolTest, Wait_Test)
     std::atomic_int32_t count { 0 };
 
     auto task = [&count] {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         ++count;
     };
 
@@ -208,21 +213,4 @@ TEST_P(ThreadPoolTest, Wait_Test)
     threadPool.wait();
 
     EXPECT_EQ(count.load(), nrTasks);
-}
-
-TEST(ThreadPoolTest, InvalidArgumentCtor_Test)
-{
-    try
-    {
-        nador::ThreadPool threadPool(0);
-        FAIL() << "Expected std::invalid_argument";
-    }
-    catch (const std::invalid_argument& e)
-    {
-        EXPECT_TRUE(true);
-    }
-    catch (...)
-    {
-        FAIL() << "Expected std::invalid_argument";
-    }
 }

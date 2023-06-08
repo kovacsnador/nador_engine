@@ -20,13 +20,24 @@ namespace nador
             return std::chrono::duration_cast<DurationTy>(ClockTy::now() - _start);
         }
 
+        template<typename DurationTy>
+        DurationTy GetPartTime()
+        {
+            auto now = ClockTy::now();
+            auto result = std::chrono::duration_cast<DurationTy>(now - _partTime);
+            _partTime = now;
+            return result;
+        }
+
         void Start()
         {
             _start = ClockTy::now();
+            _partTime = _start;
         }
 
     private:
         std::chrono::time_point<ClockTy> _start;
+        std::chrono::time_point<ClockTy> _partTime;
     };
 }
 
