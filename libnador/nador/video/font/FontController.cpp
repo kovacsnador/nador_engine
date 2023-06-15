@@ -35,7 +35,7 @@ namespace nador
 
         auto threadPool = GetThreadPool();
 
-        auto future = threadPool->enqueue(
+        auto future = threadPool->Enqueue(
             [this, fontId, threadPool, maxTextureSize](std::string filePath) {
                 // read the font file
                 auto        file = _fileCtrl->Read(filePath);
@@ -55,7 +55,7 @@ namespace nador
                     batchTasks.emplace_back(std::move(task), nador::ETaskPriority::VERY_HIGH);
                 }
 
-                threadPool->enqueue(batchTasks);
+                threadPool->Enqueue(batchTasks);
             },
             nador::ETaskPriority::VERY_HIGH,
             std::string(filePath));

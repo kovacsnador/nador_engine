@@ -129,7 +129,7 @@ namespace nador
 
         template <typename FunctionTy, typename... Args>
             requires std::invocable<FunctionTy, Args...>
-        std::future<std::result_of_t<std::decay_t<FunctionTy>(Args...)>> enqueue(FunctionTy&& function, ETaskPriority priority, Args&&... args)
+        std::future<std::result_of_t<std::decay_t<FunctionTy>(Args...)>> Enqueue(FunctionTy&& function, ETaskPriority priority, Args&&... args)
         {
             auto packagedTask = CreatePackagedTask(std::forward<FunctionTy>(function), std::forward<Args>(args)...);
 
@@ -148,16 +148,18 @@ namespace nador
             return future;
         }
 
-        void enqueue(const std::vector<ThreadPoolTask>& batchTasks);
+        void Enqueue(const std::vector<ThreadPoolTask>& batchTasks);
 
-        void wait();
+        void Wait();
 
-        void wait(ETaskPriority prio);
+        void Wait(ETaskPriority prio);
 
     private:
+        uint32_t _GetTaskCount(ETaskPriority prio) const noexcept;
+        uint32_t _Empty() const noexcept;
+
         std::vector<std::thread>            _workerthreads;
         std::priority_queue<ThreadPoolTask> _taskQueue;
-        // uint32_t                            _nrRunningTasks { 0 };
 
         TasksTracker<ETaskPriority, uint32_t, Add, Erase> _runningTasks;
         TasksTracker<ETaskPriority, uint32_t, Add, Erase> _pendingTasks;

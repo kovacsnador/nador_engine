@@ -1,5 +1,6 @@
 #include "nador/common/ThreadPool.h"
 #include "nador/common/ThreadUtils.h"
+#include "ThreadPool.h"
 
 namespace nador
 {
@@ -49,7 +50,6 @@ nador::ThreadPool::ThreadPool(uint32_t nrThreads)
 
                 auto prio = task.GetPriority();
 
-                //++_nrRunningTasks;
                 _pendingTasks.Erase(prio);
                 _runningTasks.Add(prio);
 
@@ -59,30 +59,18 @@ nador::ThreadPool::ThreadPool(uint32_t nrThreads)
                 task();
 
                 lock.lock();
-                //--_nrRunningTasks;
                 _runningTasks.Erase(prio);
 
-                if (_taskQueue.empty() && _runningTasks.GetTotal() == 0 /*_nrRunningTasks == 0*/)
+                if (_Empty() || _GetTaskCount(prio) == 0)
                 {
                     _wakeUpWaiterCv.notify_all();
-                }
-                else
-                {
-                    auto runningCount = _runningTasks.GetCount(prio);
-                    auto pendingCount = _pendingTasks.GetCount(prio);
-
-                    if(runningCount.value_or(0) == 0 && pendingCount.value_or(0) == 0)
-                    {
-                        // Notfy if that was the last task at that prio
-                        _wakeUpWaiterCv.notify_all();
-                    }
                 }
             }
         });
     }
 }
 
-void nador::ThreadPool::enqueue(const std::vector<ThreadPoolTask>& batchTasks)
+void nador::ThreadPool::Enqueue(const std::vector<ThreadPoolTask>& batchTasks)
 {
     {
         std::unique_lock<std::mutex> lock(_mtx);
@@ -97,23 +85,31 @@ void nador::ThreadPool::enqueue(const std::vector<ThreadPoolTask>& batchTasks)
     _wakeUpWorkersCv.notify_all();
 }
 
-void nador::ThreadPool::wait()
+void nador::ThreadPool::Wait()
 {
     std::unique_lock<std::mutex> lock(_mtx);
-    _wakeUpWaiterCv.wait(lock, [this] {
-        return _taskQueue.empty() && _runningTasks.GetTotal() == 0; /*_nrRunningTasks == 0;*/
-    });
+    _wakeUpWaiterCv.wait(lock, [this] { return _Empty(); });
 }
 
-void nador::ThreadPool::wait(ETaskPriority prio)
+void nador::ThreadPool::Wait(ETaskPriority prio)
 {
     std::unique_lock<std::mutex> lock(_mtx);
     _wakeUpWaiterCv.wait(lock, [this, prio] {
-        auto runningCount = _runningTasks.GetCount(prio);
-        auto pendingCount = _pendingTasks.GetCount(prio);
-
-        return runningCount.value_or(0) == 0 && pendingCount.value_or(0) == 0;
+        return _GetTaskCount(prio) == 0;
     });
+}
+
+uint32_t nador::ThreadPool::_GetTaskCount(ETaskPriority prio) const noexcept
+{
+    auto runningCount = _runningTasks.GetCount(prio);
+    auto pendingCount = _pendingTasks.GetCount(prio);
+
+    return runningCount.value_or(0) + pendingCount.value_or(0);
+}
+
+uint32_t nador::ThreadPool::_Empty() const noexcept
+{
+    return _taskQueue.empty() && _runningTasks.GetTotal() == 0;
 }
 
 nador::ThreadPool::~ThreadPool()
@@ -142,7 +138,6 @@ void nador::ThreadPoolTask::operator()() const
 bool nador::ThreadPoolTask::operator<(const ThreadPoolTask& rhs) const noexcept
 {
     return GetPriority() > rhs.GetPriority();
-    ;
 }
 
 nador::ETaskPriority nador::ThreadPoolTask::GetPriority() const noexcept

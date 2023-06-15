@@ -167,7 +167,7 @@ namespace nador
             return inserted; // on "inserted" true on "assign" false
         };
 
-        auto future = threadPool->enqueue(addSound, ETaskPriority::HIGH, filePath, soundId);
+        auto future = threadPool->Enqueue(addSound, ETaskPriority::HIGH, filePath, soundId);
         _pendingSoundLoading.emplace_back(std::move(future));
         return true;
     }

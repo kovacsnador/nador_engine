@@ -14,7 +14,7 @@ TEST(ThreadPoolTest, Init_Test)
 
     std::atomic_int32_t count { 0 };
 
-    auto future = threadPool.enqueue(
+    auto future = threadPool.Enqueue(
         [&count](auto plus) {
             count += plus;
             return count.load();
@@ -40,7 +40,7 @@ TEST_P(ThreadPoolTest, NoArgumentAndReturn_Test)
 
     for (size_t i = 0; i < GetParam(); ++i)
     {
-        auto future = threadPool.enqueue([&count] { count++; }, nador::ETaskPriority::VERY_HIGH);
+        auto future = threadPool.Enqueue([&count] { count++; }, nador::ETaskPriority::VERY_HIGH);
         futures.emplace_back(std::move(future));
     }
 
@@ -64,7 +64,7 @@ TEST_P(ThreadPoolTest, Destructor_Test)
 
         for (size_t i = 0; i < GetParam(); ++i)
         {
-            auto future = threadPool.enqueue([&count] { count++; }, nador::ETaskPriority::VERY_HIGH);
+            auto future = threadPool.Enqueue([&count] { count++; }, nador::ETaskPriority::VERY_HIGH);
             futures.emplace_back(std::move(future));
         }
     };
@@ -92,7 +92,7 @@ TEST_P(ThreadPoolTest, Simple_Test)
 
     for (size_t i = 0; i < nrTask; ++i)
     {
-        auto future = threadPool.enqueue(
+        auto future = threadPool.Enqueue(
             [&count](auto p) {
                 count += p;
                 return p;
@@ -117,33 +117,31 @@ TEST(ThreadPoolTest, BatchAndPriority_Test)
 {
     nador::ThreadPool threadPool(std::thread::hardware_concurrency());
 
-    std::mutex mtx;
-    uint32_t   count { 0 };
+    std::atomic_int32_t count { 0 };
 
-    auto function = [&count, &mtx, &threadPool](nador::ETaskPriority prio) {
-        std::scoped_lock lock(mtx);
+    auto function = [&count, &threadPool](nador::ETaskPriority prio) {
         if (prio == nador::ETaskPriority::VERY_HIGH)
         {
             EXPECT_TRUE(count < 3);
         }
         else if (prio == nador::ETaskPriority::HIGH)
         {
-            threadPool.wait(nador::ETaskPriority::VERY_HIGH);
+            threadPool.Wait(nador::ETaskPriority::VERY_HIGH);
             EXPECT_TRUE(count >= 3 && count < 6);
         }
         else if (prio == nador::ETaskPriority::MEDIUM)
         {
-            threadPool.wait(nador::ETaskPriority::HIGH);
+            threadPool.Wait(nador::ETaskPriority::HIGH);
             EXPECT_TRUE(count >= 6 && count < 9);
         }
         else if (prio == nador::ETaskPriority::LOW)
         {
-            threadPool.wait(nador::ETaskPriority::MEDIUM);
+            threadPool.Wait(nador::ETaskPriority::MEDIUM);
             EXPECT_TRUE(count >= 9 && count < 12);
         }
         else if (prio == nador::ETaskPriority::VERY_LOW)
         {
-            threadPool.wait(nador::ETaskPriority::LOW);
+            threadPool.Wait(nador::ETaskPriority::LOW);
             EXPECT_TRUE(count >= 12 && count < 15);
         }
 
@@ -166,10 +164,10 @@ TEST(ThreadPoolTest, BatchAndPriority_Test)
     packagedTaskHelper(3, nador::ETaskPriority::HIGH);
     packagedTaskHelper(3, nador::ETaskPriority::VERY_HIGH);
 
-    threadPool.wait();
+    threadPool.Wait();
 
     // run tasks
-    threadPool.enqueue(batchTasks);
+    threadPool.Enqueue(batchTasks);
 }
 
 TEST(ThreadPoolTest, TaskConsumption_Test)
@@ -178,14 +176,14 @@ TEST(ThreadPoolTest, TaskConsumption_Test)
 
     auto task = [] { std::this_thread::sleep_for(std::chrono::seconds(1)); };
 
-    threadPool.enqueue(task, nador::ETaskPriority::VERY_HIGH);
-    threadPool.enqueue(task, nador::ETaskPriority::VERY_HIGH);
-    threadPool.enqueue(task, nador::ETaskPriority::VERY_HIGH);
-    threadPool.enqueue(task, nador::ETaskPriority::VERY_HIGH);
+    threadPool.Enqueue(task, nador::ETaskPriority::VERY_HIGH);
+    threadPool.Enqueue(task, nador::ETaskPriority::VERY_HIGH);
+    threadPool.Enqueue(task, nador::ETaskPriority::VERY_HIGH);
+    threadPool.Enqueue(task, nador::ETaskPriority::VERY_HIGH);
 
     bool stuckTaskInQueue { true };
 
-    auto future = threadPool.enqueue([&stuckTaskInQueue] { stuckTaskInQueue = false; }, nador::ETaskPriority::VERY_HIGH);
+    auto future = threadPool.Enqueue([&stuckTaskInQueue] { stuckTaskInQueue = false; }, nador::ETaskPriority::VERY_HIGH);
 
     future.wait();
 
@@ -207,10 +205,10 @@ TEST_P(ThreadPoolTest, Wait_Test)
 
     for(size_t i = 0; i < nrTasks; ++i)
     {
-        threadPool.enqueue(task, nador::ETaskPriority::VERY_HIGH);
+        threadPool.Enqueue(task, nador::ETaskPriority::VERY_HIGH);
     }
 
-    threadPool.wait();
+    threadPool.Wait();
 
     EXPECT_EQ(count.load(), nrTasks);
 }
