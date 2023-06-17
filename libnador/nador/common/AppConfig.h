@@ -82,30 +82,30 @@ namespace nador
             const tinyxml2::XMLElement* windowSettings = pRootElement->FirstChildElement("WindowSettings");
             if(windowSettings)
             {
-                appConfig.windowSettings.appName         = xml::GetText(windowSettings, "AppName");
-                appConfig.windowSettings.windowDimension = xml::GetUVec2(windowSettings, "WindowDimensions");
-                appConfig.windowSettings.vSync           = xml::GetBoolean(windowSettings, "VSync", true);
-                appConfig.windowSettings.showDebugWindow = xml::GetBoolean(windowSettings, "ShowDebugWindow", false);
-                appConfig.windowSettings.showDebugInfo   = xml::GetBoolean(windowSettings, "ShowDebugInfo", false);
+                appConfig.windowSettings.appName         = xml::GetByName<std::string>(windowSettings, "AppName");
+                appConfig.windowSettings.windowDimension = xml::GetByName<glm::uvec2>(windowSettings, "WindowDimensions");
+                appConfig.windowSettings.vSync           = xml::GetByName<bool>(windowSettings, "VSync", true);
+                appConfig.windowSettings.showDebugWindow = xml::GetByName<bool>(windowSettings, "ShowDebugWindow", false);
+                appConfig.windowSettings.showDebugInfo   = xml::GetByName<bool>(windowSettings, "ShowDebugInfo", false);
             }
 
             // Get AtlasSettings
             const tinyxml2::XMLElement* atlasSettings = pRootElement->FirstChildElement("AtlasSettings");
             if(atlasSettings)
             {
-                appConfig.atlasSettings.atlasConfigPath = xml::GetText(atlasSettings, "AtlasConfigPath");
-                appConfig.atlasSettings.atlasImagesPath = xml::GetText(atlasSettings, "AtlasImagesPath");
+                appConfig.atlasSettings.atlasConfigPath = xml::GetByName<std::string>(atlasSettings, "AtlasConfigPath");
+                appConfig.atlasSettings.atlasImagesPath = xml::GetByName<std::string>(atlasSettings, "AtlasImagesPath");
             }
 
             // Get video settings
             const tinyxml2::XMLElement* videoSettings = pRootElement->FirstChildElement("VideoSettings");
             if(videoSettings)
             {
-                appConfig.videoSettings.maxVertexCount = xml::GetUint32T(videoSettings, "MaxVertexCount");
+                appConfig.videoSettings.maxVertexCount = xml::GetByName<uint32_t>(videoSettings, "MaxVertexCount");
             }
             
-            appConfig.rootFilePath    = xml::GetText(pRootElement, "RootFilePath");
-            appConfig.uiPath          = xml::GetText(pRootElement, "UiPath");
+            appConfig.rootFilePath    = xml::GetByName<std::string>(pRootElement, "RootFilePath");
+            appConfig.uiPath          = xml::GetByName<std::string>(pRootElement, "UiPath");
         }
 
         return appConfig;

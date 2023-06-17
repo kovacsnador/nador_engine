@@ -142,7 +142,6 @@ target_sources(${PROJECT_NAME}
 
     ${NADOR_SRC_DIR}/utils/ImGuiHelper.cpp
     ${NADOR_SRC_DIR}/utils/TickTracker.cpp
-    ${NADOR_SRC_DIR}/utils/TinyXmlHelper.cpp
     ${NADOR_SRC_DIR}/utils/Utils.cpp
 
     ${NADOR_SRC_DIR}/video/StbImageLoadStrategy.cpp
