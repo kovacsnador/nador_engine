@@ -41,16 +41,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        bool Delete(const char* fileName) const override;
-
-        /*!
-         * Deletes a file.
-         *
-         * \param fileName      The name of the file.
-         *
-         * \return The true on success, false otherwise.
-         */
-        bool Delete(const std::string& fileName) const override;
+        bool Delete(const std::filesystem::path& path) const override;
 
         /*!
          * Checks if the file exist.

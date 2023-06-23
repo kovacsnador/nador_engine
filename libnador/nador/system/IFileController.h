@@ -118,20 +118,11 @@ namespace nador
         /*!
          * Deletes a file.
          *
-         * \param fileName      The name of the file.
+         * \param path      The name of the file.
          *
          * \return The true on success, false otherwise.
          */
-        virtual bool Delete(const char* fileName) const = 0;
-
-        /*!
-         * Deletes a file.
-         *
-         * \param fileName      The name of the file.
-         *
-         * \return The true on success, false otherwise.
-         */
-        virtual bool Delete(const std::string& fileName) const = 0;
+        virtual bool Delete(const std::filesystem::path& path) const = 0;
 
         /*!
          * Checks if the file exist.
@@ -141,6 +132,15 @@ namespace nador
          * \return The true on exist, false otherwise.
          */
         virtual bool IsExist(std::string_view fileName) const = 0;
+
+        /*!
+         * Get the file name if it's a regular file from the path.
+         *
+         * \param filePath      The file path.
+         * 
+         * \return      The name of the file.
+         */
+        virtual std::string GetFileName(std::string_view filePath) const = 0;
 
         /*!
          * Gets the root path from the file controller.
@@ -155,15 +155,6 @@ namespace nador
          * \param root      The new root file path.
          */
         virtual void SetRootPath(const std::filesystem::path& root) { _rootPath = root; }
-
-        /*!
-         * Get the file name if it's a regular file from the path.
-         *
-         * \param filePath      The file path.
-         * 
-         * \return      The name of the file.
-         */
-        virtual std::string GetFileName(std::string_view filePath) const = 0;
 
     protected:
         std::filesystem::path _rootPath;

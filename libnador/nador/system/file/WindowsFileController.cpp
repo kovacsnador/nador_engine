@@ -72,14 +72,9 @@ namespace nador
         return false;
     }
 
-    bool WindowsFileController::Delete(const char* fileName) const
+    bool WindowsFileController::Delete(const std::filesystem::path& path) const
     {
-        return std::filesystem::remove(_rootPath / fileName) == 0;
-    }
-
-    bool WindowsFileController::Delete(const std::string& fileName) const
-    {
-        return Delete(fileName.c_str());
+        return std::filesystem::remove(_rootPath / path) == 0;
     }
 
     bool WindowsFileController::IsExist(std::string_view fileName) const
