@@ -36,8 +36,11 @@ namespace nador
 	, _fileCtrl(fileCtrl)
 	, _uiApp(uiApp)
 	{
-		_parent.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/playerBtn.png")));
-		_child.material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/test.png")));
+		auto parentTextureFile = _fileCtrl->Read("res/textures/playerBtn.png");
+		auto childTextureFile = _fileCtrl->Read("res/textures/test.png");
+
+		_parent.material.texture.reset(new Texture(_video, parentTextureFile.value()));
+		_child.material.texture.reset(new Texture(_video, childTextureFile.value()));
 
 		_parent.pos = { 100, 100 };
 		_parent.size = { 500, 500 };

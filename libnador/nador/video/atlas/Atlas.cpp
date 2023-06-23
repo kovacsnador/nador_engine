@@ -1,6 +1,7 @@
 #include <nlohmann/json.hpp>
 
 #include "nador/video/atlas/Atlas.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {
@@ -19,11 +20,11 @@ namespace nador
     {
     }
 
-    Atlas::Atlas(const IVideo*          video,
-                 const IFileController* fileCtrl,
-                 const std::string&     atlasImagePath,
-                 const std::string&     textureName,
-                 const std::string&     configName)
+    Atlas::Atlas(const IVideo*                video,
+                 const IFileController*       fileCtrl,
+                 const std::filesystem::path& atlasImagePath,
+                 const std::string&           textureName,
+                 const std::string&           configName)
     : _video(video)
     , _fileCtrl(fileCtrl)
     , _textureName(textureName)
@@ -33,7 +34,12 @@ namespace nador
         NADOR_ASSERT(_video);
         NADOR_ASSERT(_fileCtrl);
 
-        auto configData = _fileCtrl->Read((_atlasImagePath + configName));
+        auto configData = _fileCtrl->Read(_atlasImagePath / configName);
+
+        if (configData.has_value() == false)
+        {
+            throw std::runtime_error("Atlas config data could not be opened!");
+        }
 
         nlohmann::json json = nlohmann::json::parse(configData->Begin(), configData->End());
 
@@ -72,9 +78,16 @@ namespace nador
             return;
         }
 
-        auto textureData = _fileCtrl->Read((_atlasImagePath + _textureName));
+        auto textureData = _fileCtrl->Read(_atlasImagePath / _textureName);
 
-        _texture.reset(new Texture(_video, textureData));
+        if (textureData)
+        {
+            _texture.reset(new Texture(_video, textureData.value()));
+        }
+        else
+        {
+            ENGINE_ERROR("Atlas texture could not be loaded: %s", _textureName.c_str());
+        }
     }
 
     void Atlas::DeloadTexture()
@@ -100,7 +113,7 @@ namespace nador
     {
         LoadTexture();
         return { GetImage(name), _texture };
-	}
+    }
 
     const Atlas::image_ids_t& Atlas::GetImageIds() const
     {

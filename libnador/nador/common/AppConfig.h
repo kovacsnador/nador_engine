@@ -2,6 +2,7 @@
 #define __APP_CONFIG_H__
 
 #include <string>
+#include <filesystem>
 
 #include <glm/glm.hpp>
 
@@ -31,8 +32,8 @@ namespace nador
 
     struct AtlasSettings
     {
-        std::string atlasConfigPath;
-        std::string atlasImagesPath;
+        std::filesystem::path atlasConfigPath;
+        std::filesystem::path atlasImagesPath;
 
         bool operator==(const AtlasSettings& other) const
         {
@@ -57,9 +58,8 @@ namespace nador
         AtlasSettings atlasSettings;
         VideoSettings videoSettings;
 
-        std::string rootFilePath;
-        std::string uiPath;
-
+        std::filesystem::path rootFilePath;
+        std::filesystem::path uiPath;
         
         bool operator==(const AppConfig& other) const
         {
@@ -116,12 +116,17 @@ namespace nador
      *
      * \param configPath	The full path of the config file.
      */
-    inline AppConfig ReadAppConfigFromFile(const char* configPath)
+    inline AppConfig ReadAppConfigFromFile(std::filesystem::path configPath)
     {
-        ENGINE_DEBUG("Read app config file %s.", configPath);
+        ENGINE_DEBUG("Read app config file %s.", configPath.string());
+
+        if(std::filesystem::exists(configPath) == false)
+        {
+            throw std::runtime_error("AppConfig file not exist!");
+        }
 
         tinyxml2::XMLDocument doc;
-		doc.LoadFile(configPath);
+		doc.LoadFile(configPath.string().c_str());
 
         return Parse(doc);
     }

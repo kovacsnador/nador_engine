@@ -17,11 +17,11 @@ namespace nador
          *
          * \param data	The texture data.
          */
-        TextureData(const FileDataPtr& data)
+        TextureData(const FileData& data)
         {
-            NADOR_ASSERT(data->IsValid());
+            NADOR_ASSERT(data.IsValid());
 
-            localBuffer = _loadStrategy.Load(reinterpret_cast<const uint8_t*>(data->GetData()), data->GetSize(), &width, &height, &pbb, 4);
+            localBuffer = _loadStrategy.Load(reinterpret_cast<const uint8_t*>(data.GetData()), data.GetSize(), &width, &height, &pbb, 4);
         }
 
         /*!
@@ -49,7 +49,7 @@ namespace nador
          * \return		The raw texture data.
          */
         template <typename LoadStrategyTy>
-        static auto LoadFromBuffer(const FileDataPtr& data)
+        static auto LoadFromBuffer(const FileData& data)
         {
             return std::make_unique<TextureData<LoadStrategyTy>>(data);
         }

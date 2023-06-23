@@ -121,6 +121,12 @@ namespace nador
 
             auto soundFile = _fileCtrl->Read(filePath);
 
+            if(soundFile.has_value() == false)
+            {
+                ENGINE_ERROR("Sound file could not be opended: %s", filePath.c_str());
+                return false;
+            }
+
             SoundPtr soundPtr  = std::make_shared<Sound>();
             soundPtr->soundId  = soundId;
             soundPtr->fileName = filePath;

@@ -3,7 +3,7 @@
 
 namespace nador
 {
-	Texture::Texture(const IVideo* video, const FileDataPtr& data, TextureSettings textureSettings)
+	Texture::Texture(const IVideo* video, const FileData& data, TextureSettings textureSettings)
 	: _video(video)
 	, _id(0)
 	, _width(0)

@@ -5,33 +5,24 @@
 
 namespace nador
 {
-	class WindowsFileController : public IFileController
-	{
-	public:
+    class WindowsFileController : public IFileController
+    {
+    public:
         /*!
          * WindowsFileController constructor.
          *
          * \param data      The root path of the file system.
          */
-        WindowsFileController(const std::string_view& rootPath);
+        WindowsFileController(const std::filesystem::path& rootPath);
 
         /*!
          * Read a file.
          *
-         * \param fileName      The name of the file.
+         * \param path      The path of the file.
          *
          * \return The file data.
          */
-        FileDataPtr Read(const char* fileName) const override;
-
-        /*!
-         * Read a file.
-         *
-         * \param fileName      The name of the file.
-         *
-         * \return The file data.
-         */
-        FileDataPtr Read(const std::string& fileName) const override;
+        std::optional<FileData> Read(const std::filesystem::path& path) const override;
 
         /*!
          * Writes a file.
@@ -41,17 +32,7 @@ namespace nador
          *
          * \return The true on success, false otherwise.
          */
-        bool Write(const char* fileName, const FileDataPtr& data) const override;
-
-        /*!
-         * Writes a file.
-         *
-         * \param fileName      The name of the file.
-         * \param data          The new content of the file.
-         *
-         * \return The true on success, false otherwise.
-         */
-        bool Write(const std::string& fileName, const FileDataPtr& data) const override;
+        bool Write(const std::filesystem::path& path, const FileData& data) const override;
 
         /*!
          * Deletes a file.
@@ -78,20 +59,17 @@ namespace nador
          *
          * \return The true on exist, false otherwise.
          */
-        bool IsExist(const char* fileName) const override;
+        bool IsExist(std::string_view fileName) const override;
 
         /*!
-         * Checks if the file exist.
+         * Get the file name if it's a regular file from the path.
          *
-         * \param fileName      The name of the file.
+         * \param filePath      The file path.
          *
-         * \return The true on exist, false otherwise.
+         * \return      The name of the file.
          */
-        bool IsExist(const std::string& fileName) const override;
-
         std::string GetFileName(std::string_view filePath) const override;
-	};
-}
+    };
+} // namespace nador
 
 #endif // !__WINDOWS_FILE_CONTROLLER_H__
-

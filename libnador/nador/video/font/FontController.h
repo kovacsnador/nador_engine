@@ -104,17 +104,17 @@ namespace nador
         void Wait() override;
 
     private:
-        FontUPtr _CreateFont(FT_Library library, const FileDataPtr& data, uint32_t fontSize, std::string_view filePath, uint32_t maxTextureSize);
+        FontUPtr _CreateFont(FT_Library library, const FileData& data, uint32_t fontSize, std::string_view filePath, uint32_t maxTextureSize);
 
-        void _RegisterFont(uint32_t fontId, uint32_t fontSize, FileDataPtr file, std::string_view fileName, uint32_t maxTextureSize);
+        void _RegisterFont(uint32_t fontId, uint32_t fontSize, FileData file, std::string_view fileName, uint32_t maxTextureSize);
 
         const IVideoPtr          _video;
         const IFileControllerPtr _fileCtrl;
 
-        int32_t        _maxTextureSize;
-        FontsList_t    _registeredFonts;
-        FontNameToId_t _fontNamesToIds;
-        FontSizesList_t   _fontSizes;
+        int32_t         _maxTextureSize;
+        FontsList_t     _registeredFonts;
+        FontNameToId_t  _fontNamesToIds;
+        FontSizesList_t _fontSizes;
 
         PendingFutures_t _pendingFutures;
 

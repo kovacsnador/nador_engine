@@ -21,7 +21,7 @@ namespace nador
     {
         IWindowUPtr          CreateWindow(const WindowSettings& config);
         IVideoUPtr           CreateVideo();
-        IFileControllerUPtr  CreateFileController(std::string_view rootFilePath);
+        IFileControllerUPtr  CreateFileController(const std::filesystem::path& rootFilePath);
         IInputControllerUPtr CreateInputController(void* nativeWindow);
         IImguiAdapterUPtr    CreateImGuiAdapter();
         ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);

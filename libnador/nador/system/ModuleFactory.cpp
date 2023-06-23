@@ -59,7 +59,7 @@ namespace nador
 #endif
 	}
 
-	IFileControllerUPtr ModuleFactory::CreateFileController(std::string_view rootFilePath)
+	IFileControllerUPtr ModuleFactory::CreateFileController(const std::filesystem::path& rootFilePath)
 	{
 #ifdef PLATFORM_WINDOWS
         return std::make_unique<WindowsFileController>(rootFilePath);

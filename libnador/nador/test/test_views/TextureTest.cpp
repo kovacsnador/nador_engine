@@ -12,7 +12,9 @@ namespace nador
 	, _fileCtrl(fileCtrl)
 	{
 		_material.uColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		_material.texture.reset(new Texture(_video, _fileCtrl->Read("res/textures/test.png")));
+		auto textureData = _fileCtrl->Read("res/textures/test.png");
+
+		_material.texture.reset(new Texture(_video, textureData.value()));
 
 		_renderData.vertices = {
 			{0.0f,   0.0f,   0.0f, 1.0f},
