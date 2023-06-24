@@ -24,6 +24,7 @@ target_sources(${PROJECT_NAME}
     appconfig_test.cpp
     eventListener_test.cpp
     threadpool_test.cpp
+    fileController_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

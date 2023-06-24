@@ -4,17 +4,16 @@
 #include <filesystem>
 
 #include "nador/log/Log.h"
-#include "nador/system/file/WindowsFileController.h"
-#include "WindowsFileController.h"
+#include "nador/system/file/DefaultFileController.h"
 
 namespace nador
 {
-    WindowsFileController::WindowsFileController(const std::filesystem::path& rootPath)
+    DefaultFileController::DefaultFileController(const std::filesystem::path& rootPath)
     : IFileController(rootPath)
     {
     }
 
-    std::optional<FileData> WindowsFileController::Read(const std::filesystem::path& path) const
+    std::optional<FileData> DefaultFileController::Read(const std::filesystem::path& path) const
     {
         auto p = _rootPath / path;
 
@@ -33,7 +32,7 @@ namespace nador
         std::ifstream file(p, std::ifstream::binary);
         if (file.is_open())
         {
-            const auto fileSize = std::filesystem::file_size(path);
+            const auto fileSize = std::filesystem::file_size(p);
             if (fileSize > 0)
             {
                 auto data = std::make_shared<char[]>(fileSize);
@@ -41,7 +40,7 @@ namespace nador
                 if (file)
                 {
                     ENGINE_DEBUG("Read file %s.", path.string().c_str());
-                    return FileData{std::move(data), fileSize, path};
+                    return FileData { std::move(data), fileSize, path };
                 }
                 else
                 {
@@ -52,15 +51,15 @@ namespace nador
         return std::nullopt;
     }
 
-    bool WindowsFileController::Write(const std::filesystem::path& path, const FileData& data) const
+    bool DefaultFileController::Write(const std::filesystem::path& path, const char* data, size_t size) const
     {
         std::ofstream file(_rootPath / path, std::ofstream::binary);
         if (file.is_open())
         {
-            if (data.IsValid())
+            if (data)
             {
-                file.write(data.GetData(), data.GetSize());
-                ENGINE_DEBUG("Write file success! File: %s", path.string().c_str());
+                file.write(data, size);
+                ENGINE_DEBUG("Write file success with %d bytes. File: %s", size, path.string().c_str());
                 return true;
             }
             else
@@ -72,17 +71,22 @@ namespace nador
         return false;
     }
 
-    bool WindowsFileController::Delete(const std::filesystem::path& path) const
+    bool DefaultFileController::Delete(const std::filesystem::path& path) const
     {
-        return std::filesystem::remove(_rootPath / path) == 0;
+        return std::filesystem::remove_all(_rootPath / path);
     }
 
-    bool WindowsFileController::IsExist(std::string_view fileName) const
+    bool DefaultFileController::IsExist(const std::filesystem::path& path) const
     {
-        return std::filesystem::exists(_rootPath / fileName);
+        return std::filesystem::exists(_rootPath / path);
     }
 
-    std::string nador::WindowsFileController::GetFileName(std::string_view filePath) const
+    bool DefaultFileController::MakeDirs(const std::filesystem::path& path) const
+    {
+        return std::filesystem::create_directories(path);
+    }
+
+    std::string nador::DefaultFileController::GetFileName(std::string_view filePath) const
     {
         return std::filesystem::path(filePath).filename().string();
     }

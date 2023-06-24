@@ -110,10 +110,11 @@ namespace nador
          *
          * \param fileName      The name of the file.
          * \param data          The new content of the file.
+         * \param size          The size of the content data.
          *
          * \return The true on success, false otherwise.
          */
-        virtual bool Write(const std::filesystem::path& path, const FileData& data) const = 0;
+        virtual bool Write(const std::filesystem::path& path, const char* data, size_t size) const = 0;
 
         /*!
          * Deletes a file.
@@ -127,11 +128,20 @@ namespace nador
         /*!
          * Checks if the file exist.
          *
-         * \param fileName      The name of the file.
+         * \param path      The path of the file.
          *
          * \return The true on exist, false otherwise.
          */
-        virtual bool IsExist(std::string_view fileName) const = 0;
+        virtual bool IsExist(const std::filesystem::path& path) const = 0;
+
+        /*!
+         * Creates directories
+         *
+         * \param path      The path of new directories.
+         *
+         * \return      The true on success, false otherwise.
+         */
+        virtual bool MakeDirs(const std::filesystem::path& path) const = 0;
 
         /*!
          * Get the file name if it's a regular file from the path.

@@ -14,7 +14,7 @@
 #endif
 
 #ifdef PLATFORM_WINDOWS
-#include "nador/system/file/WindowsFileController.h"
+#include "nador/system/file/DefaultFileController.h"
 #endif
 
 #include "nador/sound/open_al/OpenALSoundController.h"
@@ -62,7 +62,7 @@ namespace nador
 	IFileControllerUPtr ModuleFactory::CreateFileController(const std::filesystem::path& rootFilePath)
 	{
 #ifdef PLATFORM_WINDOWS
-        return std::make_unique<WindowsFileController>(rootFilePath);
+        return std::make_unique<DefaultFileController>(rootFilePath);
 #endif
 	}
 

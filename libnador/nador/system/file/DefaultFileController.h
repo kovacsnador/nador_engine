@@ -5,15 +5,15 @@
 
 namespace nador
 {
-    class WindowsFileController : public IFileController
+    class DefaultFileController : public IFileController
     {
     public:
         /*!
-         * WindowsFileController constructor.
+         * DefaultFileController constructor.
          *
          * \param data      The root path of the file system.
          */
-        WindowsFileController(const std::filesystem::path& rootPath);
+        DefaultFileController(const std::filesystem::path& rootPath);
 
         /*!
          * Read a file.
@@ -29,10 +29,11 @@ namespace nador
          *
          * \param fileName      The name of the file.
          * \param data          The new content of the file.
+         * \param size          The size of the content data.
          *
          * \return The true on success, false otherwise.
          */
-        bool Write(const std::filesystem::path& path, const FileData& data) const override;
+        bool Write(const std::filesystem::path& path, const char* data, size_t size) const override;
 
         /*!
          * Deletes a file.
@@ -46,11 +47,20 @@ namespace nador
         /*!
          * Checks if the file exist.
          *
-         * \param fileName      The name of the file.
+         * \param path      The path of the file.
          *
          * \return The true on exist, false otherwise.
          */
-        bool IsExist(std::string_view fileName) const override;
+        bool IsExist(const std::filesystem::path& path) const override;
+
+        /*!
+         * Creates directories
+         *
+         * \param path      The path of new directories.
+         *
+         * \return      The true on success, false otherwise.
+         */
+        bool MakeDirs(const std::filesystem::path& path) const override;
 
         /*!
          * Get the file name if it's a regular file from the path.

@@ -109,8 +109,7 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/sound/open_al/OpenAlSoundController.cpp
 
     ${NADOR_SRC_DIR}/system/ModuleFactory.cpp
-
-    ${NADOR_SRC_DIR}/system/file/WindowsFileController.cpp
+    ${NADOR_SRC_DIR}/system/file/DefaultFileController.cpp
 
     ${NADOR_SRC_DIR}/test/TestCommon.cpp
     ${NADOR_SRC_DIR}/test/TestController.cpp
