@@ -6,6 +6,8 @@
 #include "nador/log/StreamLogger.h"
 #include "nador/common/Stopwatch.h"
 
+#include "nador/video/renderer/Camera.h"
+
 enum Fonts : uint32_t
 {
     FREE_SANS = 1,

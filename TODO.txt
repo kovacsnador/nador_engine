@@ -1,15 +1,15 @@
-- Rendereröt modularizálni
-- UiImage dependency-t eltüntetni
-- Logger-t megnézni, ill kicsérélni ha spdlog jobb
+- Rendereröt modularizálni (done)
+- UiImage dependency-t eltüntetni (done)
+- Logger-t megnézni, ill kicsérélni ha spdlog jobb (done)
 - test_app ot betenni a libnador-ba.
-- unit teszteket írni
+- unit teszteket írni 
 - TextureLoader async-ra csinálni
 - Többszálúsítani mindent amit lehet
-- Implement threadpool
+- Implement threadpool (done)
 
 
 
-- Audio thread-et megcsinálni
+- Audio thread-et megcsinálni (done)
 
 Initialize OpenAL in the main thread: It's recommended to initialize OpenAL and create the context in the main thread.
 OpenAL context creation usually involves interacting with the underlying windowing system, which is typically not thread-safe.
@@ -25,3 +25,6 @@ Protect the critical sections of code where OpenAL functions are called with app
 
 Communicate with the audio thread: If you have other threads that need to interact with OpenAL, establish a communication mechanism with the dedicated audio thread.
 You can use thread-safe queues or other inter-thread communication techniques to send requests or data to the audio thread, which will then execute the corresponding OpenAL operations.
+
+
+- Camera-át befejezni a rendererell
