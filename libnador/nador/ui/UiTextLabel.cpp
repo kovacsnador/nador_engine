@@ -96,8 +96,8 @@ namespace nador
 		// Bottom left corner for text orientation
 		glm::vec3 position{ vertices[3].x, vertices[3].y - yTextOffset + (EXTRA_BB_SPACE / 2), vertices[3].z };
 
-		glm::mat4 projMultiCamera = renderer->GetProjectionMatrix() * renderer->GetCameraMatrix();
-		glm::vec3 worldPosition = utils::ScreenToWorldPosition(position, renderer->GetScreenSize(), projMultiCamera);
+		auto* camera = renderer->GetCamera();
+		glm::vec3 worldPosition = utils::ScreenToWorldPosition(position, renderer->GetScreenSize(), camera->GetCameraMtx());
 
 		glm::mat4 modelMatrix = glm::translate(IDENTITY_MATRIX, worldPosition);
 

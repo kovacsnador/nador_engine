@@ -63,8 +63,8 @@ namespace nador
 			return;
 		}
 
-		glm::mat4 projMultiCamera = renderer->GetProjectionMatrix() * renderer->GetCameraMatrix();
-		glm::vec3 worldPosition = utils::ScreenToWorldPosition(_position, renderer->GetScreenSize(), projMultiCamera);
+		auto* camera = renderer->GetCamera();
+		glm::vec3 worldPosition = utils::ScreenToWorldPosition(_position, renderer->GetScreenSize(), camera->GetCameraMtx());
 
 		worldPosition.z = 0;
 

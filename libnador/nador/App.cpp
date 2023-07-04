@@ -47,7 +47,12 @@ namespace nador
             { ERenderPlugin::EBatchRenderer,
               std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), config.videoSettings.maxVertexCount, video->GetMaxTextureUnits()) });
 
-        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins);
+        // Create Camera
+        const auto& windowSizes = config.windowSettings.windowDimension;
+        auto projectionMtx = glm::ortho(0.0f, (float_t)windowSizes.x, 0.0f, (float_t)windowSizes.y, -1.0f, 1.0f);
+        auto orthoCamera = std::make_unique<Camera>(projectionMtx, OrthograpicViewMtxCalculation);
+
+        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
@@ -185,8 +190,9 @@ namespace nador
 
                 auto screenSize = _renderer->GetScreenSize();
 
-                glm::mat4 projMultiCamera = _renderer->GetProjectionMatrix() * _renderer->GetCameraMatrix();
-                glm::vec3 worldPosition   = utils::ScreenToWorldPosition({ 0, screenSize.y - fontSize }, _renderer->GetScreenSize(), projMultiCamera);
+                auto* camera = _renderer->GetCamera();
+
+                glm::vec3 worldPosition   = utils::ScreenToWorldPosition({ 0, screenSize.y - fontSize }, _renderer->GetScreenSize(), camera->GetCameraMtx());
 
                 worldPosition.z = 0;
 

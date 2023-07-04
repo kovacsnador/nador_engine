@@ -2,182 +2,140 @@
 
 #include "nador/video/renderer/Renderer.h"
 #include "nador/log/Log.h"
+#include "Renderer.h"
 
 static constexpr size_t MAX_VERTEX_COUNT = 10000;
 
 namespace nador
 {
-	Renderer::Renderer(const IVideoPtr video, rendererPlugins_t& renderers)
-	: _video(std::move(video))
-	, _attachedRenderers(std::move(renderers))
-	, _cameraMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0)))
-	, _projectionMatrix(1.0f)
-	, _modelMatrix(1.0f)
-	{
-		NADOR_ASSERT(_video);
+    Renderer::Renderer(const IVideoPtr video, rendererPlugins_t& renderers, std::unique_ptr<Camera> camera)
+    : _video(std::move(video))
+    , _attachedRenderers(std::move(renderers))
+    , _camera(std::move(camera))
+    , _modelMatrix(1.0f)
+    {
+        NADOR_ASSERT(_video);
+        
+        _video->EnableBlend();
+        _video->EnableMultiSample();
+    }
 
-		if(_video)
-		{
-			int32_t width = 0;
-			int32_t height = 0;
-			_video->GetScreenSize(width, height);
+    void Renderer::Begin()
+    {
+        _video->ClearColorRGBA(0, 0, 0, 1);
 
-			_projectionMatrix = glm::ortho(0.0f, (float_t)width, 0.0f, (float_t)height, -1.0f, 1.0f);
-			//_projectionMatrix = glm::ortho(0.0f, (float_t)width, (float_t)height, 0.0f, -1.0f, 1.0f);
+        for (auto& [_, value] : _attachedRenderers)
+        {
+            value->Begin();
+        }
+    }
 
-			_video->EnableBlend();
-			_video->EnableMultiSample();
-		}
-	}
+    void Renderer::Flush()
+    {
+        if (_currentActiveRenderer)
+        {
+            _currentActiveRenderer->Flush();
+        }
+    }
 
-	void Renderer::Begin()
-	{
-		_video->ClearColorRGBA(0, 0, 0, 1);
+    void Renderer::End()
+    {
+        for (auto& [_, value] : _attachedRenderers)
+        {
+            value->End();
+        }
+    }
 
-		for(auto& [_, value] : _attachedRenderers)
-		{
-			value->Begin();
-		}
-	}
+    void Renderer::Draw(const IMaterial*  pMaterial,
+                        const RenderData& renderData,
+                        const glm::mat4*  modelMatrix)
+    {
+        ERenderPlugin rendererPlugin = pMaterial->GetRenderPlugin();
 
-	void Renderer::Flush()
-	{
-		if (_currentActiveRenderer)
-		{
-			_currentActiveRenderer->Flush();
-		}
-	}
+        auto renderer = _attachedRenderers.find(rendererPlugin);
 
-	void Renderer::End()
-	{
-		for(auto& [_, value] : _attachedRenderers)
-		{
-			value->End();
-		}
-	}
+        if (renderer == _attachedRenderers.end())
+        {
+            ENGINE_ERROR("RenderPlugin not attached %d", rendererPlugin);
+            return;
+        }
 
-	void Renderer::Draw(const IMaterial* pMaterial,
-						const RenderData& renderData,
-						const glm::mat4* modelMatrix,
-						const glm::mat4* projectionMatrix,
-						const glm::mat4* cameraMatrix)
-	{
-		ERenderPlugin rendererPlugin = pMaterial->GetRenderPlugin();
+        _SwitchRendererIfNecessary(renderer->second.get());
 
-		auto renderer = _attachedRenderers.find(rendererPlugin);
+        if (modelMatrix)
+        {
+            _SetModelMatrix(*modelMatrix);
+        }
 
-		if(renderer == _attachedRenderers.end())
-		{
-			ENGINE_ERROR("RenderPlugin not attached %d", rendererPlugin);
-			return;
-		}
+        glm::mat4 MVPmatrix = _camera->GetCameraMtx() * _modelMatrix;
+        _currentActiveRenderer->Draw(pMaterial, renderData, MVPmatrix);
 
-		_SwitchRendererIfNecessary(renderer->second.get());
+        // count up draw count
+        CountUp();
+    }
 
-		if (modelMatrix)
-		{
-			SetModelMatrix(modelMatrix);
-		}
+    void Renderer::_SetModelMatrix(const glm::mat4& modelMatrix)
+    {
+        _modelMatrix = modelMatrix;
+    }
 
-		if (projectionMatrix)
-		{
-			SetProjectionMatrix(projectionMatrix);
-		}
+    const glm::mat4& Renderer::GetModelMatrix() const
+    {
+        return _modelMatrix;
+    }
 
-		if (cameraMatrix)
-		{
-			SetCameraMatrix(cameraMatrix);
-		}
+    const glm::ivec2& Renderer::GetScreenSize() const
+    {
+        return _video->GetScreenSize();
+    }
 
-		glm::mat4 MVPmatrix = _projectionMatrix * _cameraMatrix * _modelMatrix;
-		_currentActiveRenderer->Draw(pMaterial, renderData, MVPmatrix);
+    float_t Renderer::GetRenderPerInterval(float_t interval) const
+    {
+        return GetCountPerInterval(interval);
+    }
 
-		// count up draw count
-		CountUp();
-	}
+    uint32_t Renderer::GetDrawCount() const noexcept
+    {
+        uint32_t drawCount = 0;
+        for (auto& [key, value] : _attachedRenderers)
+        {
+            drawCount += value->GetDrawCount();
+        }
+        return drawCount;
+    }
 
-	void Renderer::SetCameraMatrix(const glm::mat4* cameraMatrix)
-	{
-		if (*cameraMatrix != _cameraMatrix)
-		{
-			_cameraMatrix = *cameraMatrix;
-		}
-	}
+    void Renderer::SetCamera(std::unique_ptr<Camera> camera)
+    {
+        _camera = std::move(camera);
+    }
 
-	void Renderer::SetProjectionMatrix(const glm::mat4* projectionMatrix)
-	{
-		if (*projectionMatrix != _projectionMatrix)
-		{
-			_projectionMatrix = *projectionMatrix;
-		}
-	}
+    Camera* Renderer::GetCamera()
+    {
+        return _camera.get();
+    }
 
-	void Renderer::SetModelMatrix(const glm::mat4* modelMatrix)
-	{
-		if (*modelMatrix != _modelMatrix)
-		{
-			_modelMatrix = *modelMatrix;
-		}
-	}
+    void Renderer::SetScissor(const glm::ivec2& position, const glm::ivec2& size) const
+    {
+        _video->SetScissor(position, size);
+    }
 
-	const glm::mat4& Renderer::GetCameraMatrix() const
-	{
-		return _cameraMatrix;
-	}
+    void Renderer::DisableScissor() const
+    {
+        _video->DisableScissor();
+    }
 
-	const glm::mat4& Renderer::GetProjectionMatrix() const
-	{
-		return _projectionMatrix;
-	}
+    void Renderer::_SwitchRendererIfNecessary(IRenderPlugin* nextRenderer)
+    {
+        NADOR_ASSERT(nextRenderer);
 
-	const glm::mat4& Renderer::GetModelMatrix() const
-	{
-		return _modelMatrix;
-	}
-
-	const glm::ivec2& Renderer::GetScreenSize() const
-	{
-		return _video->GetScreenSize();
-	}
-
-	float_t Renderer::GetRenderPerInterval(float_t interval) const
-	{
-		return GetCountPerInterval(interval);
-	}
-
-	uint32_t Renderer::GetDrawCount() const noexcept
-	{
-		uint32_t drawCount = 0;
-		for(auto& [key, value] : _attachedRenderers)
-		{
-			drawCount += value->GetDrawCount();
-		}
-		return drawCount;
-
-	}
-
-	void Renderer::SetScissor(const glm::ivec2& position, const glm::ivec2& size) const
-	{
-		_video->SetScissor(position, size);
-	}
-
-	void Renderer::DisableScissor() const
-	{
-		_video->DisableScissor();
-	}
-
-	void Renderer::_SwitchRendererIfNecessary(IRenderPlugin* nextRenderer)
-	{
-		NADOR_ASSERT(nextRenderer);
-
-		if (_currentActiveRenderer != nextRenderer)
-		{
-			// switching renderer
-			if (_currentActiveRenderer)
-			{
-				_currentActiveRenderer->Flush();
-			}
-			_currentActiveRenderer = nextRenderer;
-		}
-	}
-}
+        if (_currentActiveRenderer != nextRenderer)
+        {
+            // switching renderer
+            if (_currentActiveRenderer)
+            {
+                _currentActiveRenderer->Flush();
+            }
+            _currentActiveRenderer = nextRenderer;
+        }
+    }
+} // namespace nador

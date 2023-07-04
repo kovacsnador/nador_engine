@@ -12,114 +12,79 @@
 
 namespace nador
 {
-	//IntervalCounter for draw calls
-	class Renderer : public IRenderer, public IntervalCounter<60>
-	{
-	public:
-		/*!
-		 * Renderer constructor.
-		 */
-		Renderer(const IVideoPtr video, rendererPlugins_t& renderers);
+    // IntervalCounter for draw calls
+    class Renderer : public IRenderer, public IntervalCounter<60>
+    {
+    public:
+        /*!
+         * Renderer constructor.
+         */
+        Renderer(const IVideoPtr video, rendererPlugins_t& renderers, std::unique_ptr<Camera> camera);
 
-		/*!
-		 * The render begin function.
-		 */
-		void Begin() override;
+        /*!
+         * The render begin function.
+         */
+        void Begin() override;
 
-		/*!
-		 * The render function.
-		 */
-		void Flush() override;
+        /*!
+         * The render function.
+         */
+        void Flush() override;
 
-		/*!
-		 * The render end function.
-		 */
-		void End() override;
+        /*!
+         * The render end function.
+         */
+        void End() override;
 
-		void Draw(const IMaterial* pMaterial,
-				  const RenderData& renderData,
-				  const glm::mat4* modelMatrix = nullptr,
-				  const glm::mat4* projectionMatrix = nullptr,
-				  const glm::mat4* cameraMatrix = nullptr) override;
+        void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4* modelMatrix = nullptr) override;
 
-		/*!
-		 * Gets the camera matrix.
-		 *
-		 * \return 		The camera matrix.
-		 */
-		const glm::mat4& GetCameraMatrix() const override;
+        /*!
+         * Gets the model matrix.
+         *
+         * \return 		The model matrix.
+         */
+        const glm::mat4& GetModelMatrix() const override;
 
-		/*!
-		 * Gets the projection matrix.
-		 *
-		 * \return 		The projection matrix.
-		 */
-		const glm::mat4& GetProjectionMatrix() const override;
+        /*!
+         * Gets the screen size.
+         *
+         * \return 		The screen size.
+         */
+        const glm::ivec2& GetScreenSize() const override;
 
-		/*!
-		 * Gets the model matrix.
-		 *
-		 * \return 		The model matrix.
-		 */
-		const glm::mat4& GetModelMatrix() const override;
+        float_t GetRenderPerInterval(float_t interval = 1.f) const override;
 
-		/*!
-		 * Gets the screen size.
-		 *
-		 * \return 		The screen size.
-		 */
-		const glm::ivec2& GetScreenSize() const override;
+        // takes the left bottom corner
+        void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const override;
+        void DisableScissor() const override;
 
-		float_t GetRenderPerInterval(float_t interval = 1.f) const override;
+        uint32_t GetDrawCount() const noexcept override;
 
-		// takes the left bottom corner
-		virtual void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const override;
-		virtual void DisableScissor() const override;
+        void    SetCamera(std::unique_ptr<Camera> camera) override;
+        Camera* GetCamera() override;
 
-		uint32_t GetDrawCount() const noexcept override;
+    private:
+        /*!
+         * Sets the model matrix.
+         *
+         * \param modelMatrix		The new projection matrix.
+         */
+        void _SetModelMatrix(const glm::mat4& modelMatrix);
 
-	private:
-		/*!
-		 * Sets the camera matrix.
-		 *
-		 * \param cameraMatrix	The cameraMatrix.
-		 *	Use glm::lookAt(cameraPosition, // the position of your camera, in world space
-		 *					cameraTarget,   // where you want to look at, in world space
-		 *					upVector		// probably glm::vec3(0,1,0), but (0,-1,0) would make you looking upside-down,
-		 *									which can be great too
-		 *					)
-		 */
-		void SetCameraMatrix(const glm::mat4* cameraMatrix);
+        void _SwitchRendererIfNecessary(IRenderPlugin* nextRenderer);
 
-		/*!
-		 * Sets the projection matrix.
-		 *
-		 * \param projectionMatrix		The new projection matrix.
-		 */
-		void SetProjectionMatrix(const glm::mat4* projectionMatrix);
+        const IVideoPtr _video;
 
-		/*!
-		 * Sets the model matrix.
-		 *
-		 * \param modelMatrix		The new projection matrix.
-		 */
-		void SetModelMatrix(const glm::mat4* modelMatrix);
+        IRenderPlugin* _currentActiveRenderer { nullptr };
 
-		void _SwitchRendererIfNecessary(IRenderPlugin* nextRenderer);
+        rendererPlugins_t _attachedRenderers;
 
-		const IVideoPtr		_video;
+        std::unique_ptr<Camera> _camera;
 
-		IRenderPlugin*   _currentActiveRenderer{ nullptr };
+        glm::mat4 _modelMatrix;
+    };
 
-		rendererPlugins_t _attachedRenderers;
-
-		glm::mat4 _cameraMatrix;
-		glm::mat4 _projectionMatrix;
-		glm::mat4 _modelMatrix;
-	};
-
-	CREATE_PTR_TYPES(Renderer);
-}
+    CREATE_PTR_TYPES(Renderer);
+} // namespace nador
 
 #endif // !__RENDERER_H__
-

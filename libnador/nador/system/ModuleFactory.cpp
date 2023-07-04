@@ -85,9 +85,9 @@ namespace nador
 		return std::make_unique<OpenAlSoundContoller>(fileCtrl);
 	}
 
-    IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins)
+    IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera)
     {
-        return std::make_unique<Renderer>(video, renderPlugins);
+        return std::make_unique<Renderer>(video, renderPlugins, std::move(camera));
     }
 
     IFontControllerUPtr ModuleFactory::CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl)

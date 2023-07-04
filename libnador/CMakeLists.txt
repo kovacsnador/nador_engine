@@ -164,7 +164,6 @@ target_sources(${PROJECT_NAME}
     
     ${NADOR_SRC_DIR}/video/renderer/RenderData.cpp
     ${NADOR_SRC_DIR}/video/renderer/Renderer.cpp
-    ${NADOR_SRC_DIR}/video/renderer/Camera.cpp
 
     ${NADOR_SRC_DIR}/video/renderer/base_renderer/BaseRenderer.cpp
 
