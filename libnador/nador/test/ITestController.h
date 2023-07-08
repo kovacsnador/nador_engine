@@ -1,8 +1,11 @@
 #ifndef __I_TEST_CONTROLLER_H__
 #define __I_TEST_CONTROLLER_H__
 
+#include <variant>
+
 #include "nador/utils/Types.h"
 #include "nador/test/ITest.h"
+#include "nador/test/CameraWindow.h"
 
 namespace nador
 {
@@ -13,6 +16,9 @@ namespace nador
     public:
         using pair_t      = std::pair<std::string, std::function<void()>>;
         using test_list_t = std::vector<pair_t>;
+
+        using AdditionalWindows_t = std::variant<CameraWindow>;
+        using WindowsList_t = std::vector<AdditionalWindows_t>;
 
         using ToggleDebugTextCb_t = std::function<void()>;
 
@@ -53,6 +59,8 @@ namespace nador
         virtual void Suspend(bool suspend) = 0;
 
         virtual void SetToggleDebugTextCallback(ToggleDebugTextCb_t cb) noexcept = 0;
+
+        virtual void AddWindow(AdditionalWindows_t&& window) = 0;
 
     protected:
         test_list_t         _tests {};

@@ -315,5 +315,9 @@ namespace nador
         _testCtrl->AddTest<SoundTest>("Sound Test", GetSoundController());
         _testCtrl->AddTest<UiSquareTest>("UiSquare Test", GetVideo(), GetFileController(), GetUiApp());
         _testCtrl->AddTest<UiElementsTest>("UiElements Test", GetUiApp(), GetFontController(), GetInputController());
+
+        // adding windows
+        auto renderer = GetRenderer();
+        _testCtrl->AddWindow(CameraWindow("Camera Settings", renderer->GetCamera()));
     }
 } // namespace nador

@@ -17,6 +17,8 @@
 
 namespace nador
 {
+    class Camera;
+
     namespace ModuleFactory
     {
         IWindowUPtr          CreateWindow(const WindowSettings& config);

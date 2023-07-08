@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <variant>
 
 #include "nador/common/GlobalEvents.h"
 #include "nador/test/ITestController.h"
@@ -14,6 +15,7 @@ namespace nador
     class IFontController;
     class IUiApp;
     class IInputController;
+    class Camera;
 
     class TestController : public ITestController
     {
@@ -51,6 +53,8 @@ namespace nador
 
         void SetToggleDebugTextCallback(ToggleDebugTextCb_t cb) noexcept override;
 
+        void AddWindow(AdditionalWindows_t&& window) override;
+
     private:
         void _DebugRenderStartMenu();
 
@@ -59,6 +63,8 @@ namespace nador
         onDebugRender_listener_t _onDebugRenderListener;
 
         ToggleDebugTextCb_t _toggleDebugTxtCb { nullptr };
+
+        WindowsList_t _windows;
     };
     CREATE_PTR_TYPES(TestController);
 
