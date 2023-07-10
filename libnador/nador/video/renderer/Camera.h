@@ -39,10 +39,11 @@ namespace nador
             _Update();
         }
 
-        glm::mat4 GetCameraMtx() const { return _cameraMtxCache; }
-
-        const glm::mat4& GetProjection() const {return _projectionMtx; }
-        const glm::mat4& GetView() const {return _viewMtx; }
+        const glm::mat4& GetCameraMtx() const { return _cameraMtxCache; } // Proj x View
+        const glm::mat4& GetProjection() const { return _projectionMtx; }
+        const glm::mat4& GetView() const { return _viewMtx; }
+        const glm::vec3& GetPosition() const { return _position; }
+        const glm::vec3& GetRotation() const { return _rotation; }
 
     private:
         void _Update()
@@ -66,8 +67,8 @@ namespace nador
 
     inline glm::mat4 OrthograpicViewMtxCalculation(const glm::vec3& position, const glm::vec3& rotation)
     {
-        auto transform = glm::translate(glm::mat4 { 1.0f }, position);
-        auto rotationMtx  = glm::rotate(glm::mat4 { 1.0f }, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+        auto transform   = glm::translate(glm::mat4 { 1.0f }, position);
+        auto rotationMtx = glm::rotate(glm::mat4 { 1.0f }, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 
         // return the view matrix
         return glm::inverse(transform * rotationMtx);

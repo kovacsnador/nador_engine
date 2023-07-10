@@ -6,11 +6,10 @@
 #include "imgui.h"
 
 #include "nador/common/Finally.h"
+#include "nador/video/renderer/Camera.h"
 
 namespace nador
 {
-    class Camera;
-
     class CameraWindow
     {
     public:
@@ -35,8 +34,20 @@ namespace nador
             ImGui::Begin("Camera Settings");
             auto imguiRenderEnd = Finally([] { ImGui::End(); });
 
-            // render the window
-            ImGui::Text("This is the Camera setting window");
+            auto position = _camera->GetPosition();
+            auto rotation = _camera->GetRotation();
+
+            // Position
+            if(ImGui::SliderFloat3("Position", &position.x, -100.0f, 100.0f))
+            {
+                _camera->SetPosition(position);
+            }
+
+            // Rotation
+            if(ImGui::SliderFloat3("Rotation", &rotation.x, -180.0f, 180.0f))
+            {
+                _camera->SetRotation(rotation);
+            }
         }
 
     private:
