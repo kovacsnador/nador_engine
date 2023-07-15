@@ -197,7 +197,9 @@ namespace nador
 
                 modelMatrix *= scaleMatrix;
 
-                _renderer->Draw(&material, renderData, &modelMatrix);
+                VerticesMultiMatrix(renderData.vertices, modelMatrix);
+
+                _renderer->Draw(&material, renderData, IDENTITY_MATRIX);
             }
         }
     }

@@ -34,7 +34,7 @@ namespace nador
 	void AtlasTest::OnRender(IRenderer* renderer)
 	{
 		glm::mat4 modelMatrix(1.0f);
-		renderer->Draw(&_material, _renderData, &modelMatrix);
+		renderer->Draw(&_material, _renderData, modelMatrix);
 	}
 
 	void AtlasTest::OnDebugRender(IRenderer* /*renderer*/)

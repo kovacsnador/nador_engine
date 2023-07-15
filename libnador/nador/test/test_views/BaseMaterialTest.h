@@ -30,7 +30,7 @@ namespace nador
 		void OnRender(IRenderer* renderer) override
 		{
 			glm::mat4 modelMatrix(1.0f);
-			renderer->Draw(&_material, _renderData, &modelMatrix);
+			renderer->Draw(&_material, _renderData, modelMatrix);
 		}
 
 	private:

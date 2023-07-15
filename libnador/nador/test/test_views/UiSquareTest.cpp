@@ -55,8 +55,8 @@ namespace nador
 	{
 		glm::mat4 modelMtx(1.0f);
 
-		renderer->Draw(&_parent.material, _parent.renderData, &modelMtx);
-		renderer->Draw(&_child.material, _child.renderData, &modelMtx);
+		renderer->Draw(&_parent.material, _parent.renderData, modelMtx);
+		renderer->Draw(&_child.material, _child.renderData, modelMtx);
 	}
 
 	void UiSquareTest::OnDebugRender(IRenderer* /*renderer*/)

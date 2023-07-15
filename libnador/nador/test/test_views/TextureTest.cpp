@@ -58,9 +58,9 @@ namespace nador
 	{
 		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _translation);
 
-		renderer->Draw(&_material, _renderData, &modelMatrix);
-		renderer->Draw(&_material, _renderData2, &modelMatrix);
-		renderer->Draw(&_material, _renderData3, &modelMatrix);
+		renderer->Draw(&_material, _renderData, modelMatrix);
+		renderer->Draw(&_material, _renderData2, modelMatrix);
+		renderer->Draw(&_material, _renderData3, modelMatrix);
 	}
 
 	void TextureTest::OnDebugRender(IRenderer* renderer)

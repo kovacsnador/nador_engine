@@ -68,7 +68,7 @@ namespace nador
 
 		modelMatrix *= scaleMatrix;
 
-		renderer->Draw(&_fontMaterial, _renderData, &modelMatrix);
+		renderer->Draw(&_fontMaterial, _renderData, modelMatrix);
 	}
 
 	void FontTest::OnDebugRender(IRenderer* /*renderer*/)

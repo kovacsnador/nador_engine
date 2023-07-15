@@ -12,7 +12,6 @@ namespace nador
     : _video(std::move(video))
     , _attachedRenderers(std::move(renderers))
     , _camera(std::move(camera))
-    , _modelMatrix(1.0f)
     {
         NADOR_ASSERT(_video);
         
@@ -48,7 +47,7 @@ namespace nador
 
     void Renderer::Draw(const IMaterial*  pMaterial,
                         const RenderData& renderData,
-                        const glm::mat4*  modelMatrix)
+                        const glm::mat4&  modelMatrix)
     {
         ERenderPlugin rendererPlugin = pMaterial->GetRenderPlugin();
 
@@ -62,26 +61,11 @@ namespace nador
 
         _SwitchRendererIfNecessary(renderer->second.get());
 
-        if (modelMatrix)
-        {
-            _SetModelMatrix(*modelMatrix);
-        }
-
-        glm::mat4 MVPmatrix = _camera->GetCameraMtx() * _modelMatrix;
+        glm::mat4 MVPmatrix = _camera->GetCameraMtx() * modelMatrix;
         _currentActiveRenderer->Draw(pMaterial, renderData, MVPmatrix);
 
         // count up draw count
         CountUp();
-    }
-
-    void Renderer::_SetModelMatrix(const glm::mat4& modelMatrix)
-    {
-        _modelMatrix = modelMatrix;
-    }
-
-    const glm::mat4& Renderer::GetModelMatrix() const
-    {
-        return _modelMatrix;
     }
 
     const glm::ivec2& Renderer::GetScreenSize() const
@@ -89,7 +73,7 @@ namespace nador
         return _video->GetScreenSize();
     }
 
-    float_t Renderer::GetRenderPerInterval(float_t interval) const
+    float_t Renderer::GetRenderPerInterval(float_t interval) const noexcept
     {
         return GetCountPerInterval(interval);
     }
@@ -104,12 +88,12 @@ namespace nador
         return drawCount;
     }
 
-    void Renderer::SetCamera(std::unique_ptr<Camera> camera)
+    void Renderer::SetCamera(std::unique_ptr<Camera> camera) noexcept
     {
         _camera = std::move(camera);
     }
 
-    Camera* Renderer::GetCamera()
+    Camera* Renderer::GetCamera() const noexcept
     {
         return _camera.get();
     }

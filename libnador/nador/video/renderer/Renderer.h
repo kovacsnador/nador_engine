@@ -36,14 +36,7 @@ namespace nador
          */
         void End() override;
 
-        void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4* modelMatrix = nullptr) override;
-
-        /*!
-         * Gets the model matrix.
-         *
-         * \return 		The model matrix.
-         */
-        const glm::mat4& GetModelMatrix() const override;
+        void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4& modelMatrix = IDENTITY_MATRIX) override;
 
         /*!
          * Gets the screen size.
@@ -52,7 +45,7 @@ namespace nador
          */
         const glm::ivec2& GetScreenSize() const override;
 
-        float_t GetRenderPerInterval(float_t interval = 1.f) const override;
+        float_t GetRenderPerInterval(float_t interval = 1.f) const noexcept override;
 
         // takes the left bottom corner
         void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const override;
@@ -60,8 +53,8 @@ namespace nador
 
         uint32_t GetDrawCount() const noexcept override;
 
-        void    SetCamera(std::unique_ptr<Camera> camera) override;
-        Camera* GetCamera() override;
+        void    SetCamera(std::unique_ptr<Camera> camera) noexcept override;
+        Camera* GetCamera() const noexcept override;
 
     private:
         /*!
@@ -80,8 +73,6 @@ namespace nador
         rendererPlugins_t _attachedRenderers;
 
         std::unique_ptr<Camera> _camera;
-
-        glm::mat4 _modelMatrix;
     };
 
     CREATE_PTR_TYPES(Renderer);

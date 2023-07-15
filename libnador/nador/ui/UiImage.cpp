@@ -62,7 +62,7 @@ namespace nador
 
             glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
 
-            renderer->Draw(&_material, _renderData, &modelMtx);
+            renderer->Draw(&_material, _renderData, modelMtx);
         }
     }
 } // namespace nador

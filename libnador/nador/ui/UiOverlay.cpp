@@ -32,7 +32,7 @@ namespace nador
 
 		VerticesMultiMatrix(_renderData.vertices, modelMtx);
 
-		renderer->Draw(&_material, _renderData, &IDENTITY_MATRIX);
+		renderer->Draw(&_material, _renderData, IDENTITY_MATRIX);
 	}
 
 	void UiOverlay::OnTick(IUiLogicState* uiLogicState)
@@ -90,7 +90,7 @@ namespace nador
 
 		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
 
-		renderer->Draw(&_material, _renderData, &modelMtx);
+		renderer->Draw(&_material, _renderData, modelMtx);
 	}
 
 	void UiRoundEdgeOverlay::OnTick(IUiLogicState* uiLogicState)

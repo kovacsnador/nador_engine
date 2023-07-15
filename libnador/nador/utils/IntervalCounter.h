@@ -50,7 +50,7 @@ namespace nador
 		 * 
 		 * \return	The average count.
 		 */
-		float_t GetCountPerInterval(float_t interval = 1.f) const
+		float_t GetCountPerInterval(float_t interval = 1.f) const noexcept
 		{
 			float_t deltaTimeAverage = 0;
 			size_t deltaTimeCount = 0;
@@ -77,7 +77,7 @@ namespace nador
 		 * 
 		 * \return	The timestamp.
 		 */
-		const time_point_nanosec_t& GetLastCountUpTimestamp() const
+		const time_point_nanosec_t& GetLastCountUpTimestamp() const noexcept
 		{
 			return _lastCountUp;
 		}
@@ -87,7 +87,7 @@ namespace nador
 		 * 
 		 * \return	The last delta time.
 		 */
-		float_t GetLastDeltaTime() const
+		float_t GetLastDeltaTime() const noexcept
 		{
 			return _lastDeltaTime;
 		}

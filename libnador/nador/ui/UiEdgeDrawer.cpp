@@ -30,7 +30,7 @@ namespace nador
 
 		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, scale);
 
-		renderer->Draw(&_material, _renderData, &modelMtx);
+		renderer->Draw(&_material, _renderData, modelMtx);
 	}
 
 	void UiEdgeDrawer::Init()

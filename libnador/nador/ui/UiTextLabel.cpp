@@ -112,7 +112,7 @@ namespace nador
 			_lastModelMatrix = modelMatrix;
 		}
 
-		renderer->Draw(&_material, _renderData, &IDENTITY_MATRIX);
+		renderer->Draw(&_material, _renderData, IDENTITY_MATRIX);
 	}
 
 	void UiTextLabel::Update()

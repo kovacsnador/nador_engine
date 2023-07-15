@@ -22,18 +22,17 @@ namespace nador
         virtual void Flush() = 0;
         virtual void End()   = 0;
 
-        virtual void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4* modelMatrix = nullptr) = 0;
+        virtual void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4& modelMatrix = IDENTITY_MATRIX) = 0;
 
-        virtual const glm::mat4&  GetModelMatrix() const = 0;
-        virtual const glm::ivec2& GetScreenSize() const  = 0;
+        virtual const glm::ivec2& GetScreenSize() const = 0;
 
-        virtual void    SetCamera(std::unique_ptr<Camera> camera) = 0;
-        virtual Camera* GetCamera()                               = 0;
+        virtual void    SetCamera(std::unique_ptr<Camera> camera) noexcept = 0;
+        virtual Camera* GetCamera() const noexcept                         = 0;
 
         virtual void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const = 0;
         virtual void DisableScissor() const                                               = 0;
 
-        virtual float_t GetRenderPerInterval(float_t interval = 1.f) const = 0;
+        virtual float_t GetRenderPerInterval(float_t interval = 1.f) const noexcept = 0;
 
         virtual uint32_t GetDrawCount() const noexcept = 0;
     };

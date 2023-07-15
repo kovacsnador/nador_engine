@@ -44,7 +44,7 @@ namespace nador
 
 			glm::mat4 modelMatrix = translate * rotationMatrix;
 
-			renderer->Draw(&_material, _renderData, &modelMatrix);
+			renderer->Draw(&_material, _renderData, modelMatrix);
 		}
 
 	private:
