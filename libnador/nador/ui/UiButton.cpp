@@ -10,6 +10,17 @@ namespace nador
 		_uiImageBackground.SuspendInputEvents(true);
 	}
 
+	void UiButton::SetUiTextLabel(UiTextLabelPtr textLabel)
+	{
+		_uiTextLabelPtr = std::move(textLabel);
+
+		_uiTextLabelPtr->SetAlignment({EHorizontalAlignment::CENTER, EVerticalAlignment::CENTER});
+		_uiTextLabelPtr->SetPosition({0, 0});
+		_uiTextLabelPtr->SetParent(this);
+
+		_uiTextLabelPtr->SuspendInputEvents(true);
+	}
+
 	void UiButton::SetUiTextLabel(const FontPtr& font, std::string_view text)
 	{
 		_uiTextLabelPtr.reset(new UiTextLabel({0, 0}, font, text, {EHorizontalAlignment::CENTER, EVerticalAlignment::CENTER}, { 20, 20, 1 }, this));

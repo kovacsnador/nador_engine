@@ -63,13 +63,7 @@ namespace nador
 			return;
 		}
 
-		auto* camera = renderer->GetCamera();
-		glm::vec3 worldPosition = utils::ScreenToWorldPosition(_position, renderer->GetScreenSize(), camera->GetCameraMtx());
-
-		worldPosition.z = 0;
-
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0), worldPosition);
-
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0), { _position, 0});
 		glm::mat4 scaleMatrix = glm::scale(_scale);
 
 		modelMatrix *= scaleMatrix;

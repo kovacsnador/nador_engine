@@ -37,17 +37,6 @@ namespace nador
         }
 
         /*!
-         * Converts screen to world position.
-         *
-         * \param position          The position to convert.
-         * \param screen            The screen dimension.
-         * \param projMultiCamera   The projction and the cameramatrix.
-         *
-         * \return The world position.
-         */
-        glm::vec4 ScreenToWorldPosition(const glm::vec2& position, const glm::ivec2& screen, const glm::mat4& projMultiCamera);
-
-        /*!
          * Gets the vector size in bytes.
          *
          * \param vec          The vector.

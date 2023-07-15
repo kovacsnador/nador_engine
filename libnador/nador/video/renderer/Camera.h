@@ -71,7 +71,7 @@ namespace nador
         auto rotationMtx = glm::rotate(glm::mat4 { 1.0f }, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 
         // return the view matrix
-        return glm::inverse(transform * rotationMtx);
+        return transform * rotationMtx;
     }
 
 } // namespace nador

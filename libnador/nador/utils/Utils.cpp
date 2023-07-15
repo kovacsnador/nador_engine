@@ -6,17 +6,6 @@ namespace nador
 {
     namespace utils
     {
-        glm::vec4 ScreenToWorldPosition(const glm::vec2& position, const glm::ivec2& screen, const glm::mat4& projMultiCamera)
-        {
-            float_t x = 2.0f * position.x / screen.x - 1.0f;
-            float_t y = -2.0f * position.y / screen.y + 1.0f;
-            glm::vec4 worldPosition(x, y, 0.0f, 1.0f);
-            worldPosition = glm::inverse(projMultiCamera) * worldPosition;
-            // flipping y coord
-            worldPosition.y = screen.y - worldPosition.y;
-            return worldPosition;
-        }
-
         std::string trim(const char* s)
         {
             if (s == nullptr)

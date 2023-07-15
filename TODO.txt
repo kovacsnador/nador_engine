@@ -28,3 +28,5 @@ You can use thread-safe queues or other inter-thread communication techniques to
 
 
 - Camera-át befejezni a rendererell
+
+- VerticesMultiMatrix multi threaded!!! 

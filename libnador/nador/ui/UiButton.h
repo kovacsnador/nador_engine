@@ -27,6 +27,7 @@ namespace nador
 
 		UiButton(const glm::ivec2& position, const glm::ivec2& size, UiButtonImages images, UiAlignment aligner = {}, IUiElement* parent = nullptr, bool isShow = true);
 
+		void SetUiTextLabel(UiTextLabelPtr textLabel);
 		void SetUiTextLabel(const FontPtr& font, std::string_view text);
 		UiTextLabelPtr GetUiTextLabel() { return _uiTextLabelPtr; }
 

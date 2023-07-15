@@ -127,6 +127,7 @@ namespace nador
 
 	void VerticesMultiMatrix(vertices_list_t& vertices, const glm::mat4& matrix)
 	{
+		// could be multi threaded!!!
 		for (auto& it : vertices)
 		{
 			it = matrix * it;

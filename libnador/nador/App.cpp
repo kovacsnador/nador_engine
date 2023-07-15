@@ -190,22 +190,14 @@ namespace nador
 
                 auto screenSize = _renderer->GetScreenSize();
 
-                auto* camera = _renderer->GetCamera();
-
-                glm::vec3 worldPosition   = utils::ScreenToWorldPosition({ 0, screenSize.y - fontSize }, _renderer->GetScreenSize(), camera->GetCameraMtx());
-
-                worldPosition.z = 0;
+                glm::vec3 worldPosition{0, screenSize.y - fontSize, 0};
 
                 glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0), worldPosition);
-
                 glm::mat4 scaleMatrix = glm::scale(glm::vec3(fontSize, fontSize, 1));
 
                 modelMatrix *= scaleMatrix;
 
-                VerticesMultiMatrix(renderData.vertices, modelMatrix);
-
-                glm::mat4 identityMtx(1.0f);
-                _renderer->Draw(&material, renderData, &identityMtx);
+                _renderer->Draw(&material, renderData, &modelMatrix);
             }
         }
     }
