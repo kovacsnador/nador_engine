@@ -4,8 +4,7 @@
 #include "nador/log/Log.h"
 
 #include "nador/system/input/SDLInputController.h"
-
-#include "nador/common/GlobalEvents.h"
+#include "nador/system/input/input_events/InputEvents.h"
 
 namespace nador
 {
@@ -567,21 +566,21 @@ namespace nador
     {
         SDL_Keycode keyCode = event.key.keysym.sym;
         _keyStates.insert_or_assign(keyCode, EKeyState::PRESS);
-        g_onKeyPressedEvent(ConvertToNadorKeyCode(keyCode));
+        HandleInputEvent(OnKeyPressedEvent{ConvertToNadorKeyCode(keyCode)});
     }
 
     void SDLInputController::_OnKeyReleased(const SDL_Event& event)
     {
         SDL_Keycode keyCode = event.key.keysym.sym;
         _keyStates.insert_or_assign(keyCode, EKeyState::RELEASE);
-        g_onKeyReleasedEvent(ConvertToNadorKeyCode(keyCode));
+        HandleInputEvent(OnKeyReleasedEvent{ConvertToNadorKeyCode(keyCode)});
     }
 
     void SDLInputController::_OnKeyHolded(const SDL_Event& event)
     {
         SDL_Keycode keyCode = event.key.keysym.sym;
         _keyStates.insert_or_assign(keyCode, EKeyState::HOLD);
-        g_onKeyHoldedEvent(ConvertToNadorKeyCode(keyCode));
+        HandleInputEvent(OnKeyHoldedEvent{ConvertToNadorKeyCode(keyCode)});
     }
 
     void SDLInputController::_OnMousePressed(const SDL_Event& event)
@@ -589,7 +588,7 @@ namespace nador
         auto sdlButton = event.button;
 
         _mouseStates.insert_or_assign(sdlButton.button, SDL_GetTicks64());
-        g_onMousePressedEvent(ConvertToNadorMouseButton(sdlButton.button), GetMousePosition());
+        HandleInputEvent(OnMousePressedEvent{ConvertToNadorMouseButton(sdlButton.button), GetMousePosition()});
     }
 
     void SDLInputController::_OnMouseReleased(const SDL_Event& event)
@@ -597,7 +596,7 @@ namespace nador
         auto sdlButton = event.button;
 
         _mouseStates.erase(sdlButton.button);
-        g_onMouseReleasedEvent(ConvertToNadorMouseButton(sdlButton.button), GetMousePosition());
+        HandleInputEvent(OnMouseReleasedEvent{ConvertToNadorMouseButton(sdlButton.button), GetMousePosition()});
     }
 
     bool SDLInputController::IsKeyPressed(EKeyCode keyCode) const
@@ -617,6 +616,11 @@ namespace nador
 
     bool SDLInputController::_HasKeyState(int32_t sdlKeyCode, EKeyState keyState) const
     {
+        if(IsInputKeyHandledByOthers())
+        {
+            return false;
+        }
+
         if (auto find = _keyStates.find(sdlKeyCode); find != _keyStates.end())
         {
             return find->second == keyState;
@@ -626,6 +630,11 @@ namespace nador
 
     bool SDLInputController::IsMouseButtonPressed(EMouseButton buttonCode) const
     {
+        if(IsInputMouseHandledByOthers())
+        {
+            return false;
+        }
+
         auto sdlButtonMask = SDL_BUTTON(ConvertToNativeMouseButton(buttonCode));
 
         uint32_t state = _GetMouseState();
@@ -634,6 +643,11 @@ namespace nador
 
     bool SDLInputController::IsMouseButtonReleased(EMouseButton buttonCode) const
     {
+        if(IsInputMouseHandledByOthers())
+        {
+            return false;
+        }
+
         auto sdlButtonMask = SDL_BUTTON(ConvertToNativeMouseButton(buttonCode));
 
         if (_lastMouseState & sdlButtonMask)
@@ -647,6 +661,11 @@ namespace nador
 
     bool SDLInputController::IsMouseButtonHolded(EMouseButton buttonCode) const
     {
+        if(IsInputMouseHandledByOthers())
+        {
+            return false;
+        }
+
         if (auto find = _mouseStates.find(ConvertToNativeMouseButton(buttonCode)); find != _mouseStates.end())
         {
             return (SDL_GetTicks64() - find->second) > MOUSE_HOLD_DELAY_MS;
@@ -691,11 +710,13 @@ namespace nador
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_CLOSE)
                 {
-                    g_onWindowCloseEvent();
+                    HandleInputEvent(OnWindowClosedEvent{});
+                    //g_onWindowCloseEvent();
                 }
                 break;
             case SDL_QUIT:
-                g_onWindowCloseEvent();
+                //g_onWindowCloseEvent();
+                HandleInputEvent(OnWindowClosedEvent{});
                 break;
             case SDL_KEYDOWN: {
                 if (event.key.repeat == 0)
@@ -712,7 +733,8 @@ namespace nador
                 _OnKeyReleased(event);
                 break;
             case SDL_TEXTINPUT:
-                g_onCharEvent(event.text.text);
+                //g_onCharEvent(event.text.text);
+                HandleInputEvent(OnCharEvent{event.text.text});
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 _OnMousePressed(event);

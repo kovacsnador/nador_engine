@@ -11,40 +11,46 @@ namespace nador
     public:
         virtual ~IImguiAdapter() = default;
 
-        virtual bool InitImGuiContext(void* nativeWindow, void* context = nullptr) = 0;
-	    virtual bool NewFrameImGui() = 0;
-	    virtual bool EndFrameImGui(int32_t width, int32_t height) = 0;
-	    virtual bool ShutdownImGui() = 0;
-        virtual bool WantCaputreMouse() const = 0;
+        virtual bool Imgui_InitImGuiContext(void* nativeWindow, void* context = nullptr) = 0;
+	    virtual bool Imgui_NewFrame() = 0;
+	    virtual bool Imgui_EndFrame(int32_t width, int32_t height) = 0;
+	    virtual bool Imgui_Shutdown() = 0;
+        virtual bool Imgui_WantCaptureMouse() const = 0;
+        virtual bool Imgui_WantCaptureKeyboard() const = 0;
     };
     CREATE_PTR_TYPES(IImguiAdapter);
 
     class ImguiAdapter : public IImguiAdapter
     {
     public:
-        bool InitImGuiContext(void* nativeWindow, void* context = nullptr) override
+        bool Imgui_InitImGuiContext(void* nativeWindow, void* context = nullptr) override
         {
-            return nador::InitImGuiContext(nativeWindow, context);
+            return nador::Imgui_InitImGuiContext(nativeWindow, context);
         }
 
-	    bool NewFrameImGui() override
+	    bool Imgui_NewFrame() override
         {
-            return nador::NewFrameImGui();
+            return nador::Imgui_NewFrame();
         }
 
-	    bool EndFrameImGui(int32_t width, int32_t height) override
+	    bool Imgui_EndFrame(int32_t width, int32_t height) override
         {
-            return nador::EndFrameImGui(width, height);
+            return nador::Imgui_EndFrame(width, height);
         }
 
-	    bool ShutdownImGui() override
+	    bool Imgui_Shutdown() override
         {
-            return nador::ShutdownImGui();
+            return nador::Imgui_Shutdown();
         }
 
-        virtual bool WantCaputreMouse() const
+        bool Imgui_WantCaptureMouse() const override
         {
-            return nador::WantCaptureMouse();
+            return nador::Imgui_WantCaptureMouse();
+        }
+
+        bool Imgui_WantCaptureKeyboard() const override
+        {
+            return nador::Imgui_WantCaptureKeyboard();
         }
     };
 } // namespace nador

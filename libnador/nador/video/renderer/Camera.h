@@ -39,11 +39,11 @@ namespace nador
             _Update();
         }
 
-        const glm::mat4& GetCameraMtx() const { return _cameraMtxCache; } // Proj x View
-        const glm::mat4& GetProjection() const { return _projectionMtx; }
-        const glm::mat4& GetView() const { return _viewMtx; }
-        const glm::vec3& GetPosition() const { return _position; }
-        const glm::vec3& GetRotation() const { return _rotation; }
+        const glm::mat4& GetCameraMtx() const noexcept { return _cameraMtxCache; } // Proj x View
+        const glm::mat4& GetProjection() const noexcept { return _projectionMtx; }
+        const glm::mat4& GetView() const noexcept { return _viewMtx; }
+        const glm::vec3& GetPosition() const noexcept { return _position; }
+        const glm::vec3& GetRotation() const noexcept { return _rotation; }
 
     private:
         void _Update()
@@ -65,7 +65,7 @@ namespace nador
         ViewCalcStrategy_t _viewCalcStrategy {};
     };
 
-    inline glm::mat4 OrthograpicViewMtxCalculation(const glm::vec3& position, const glm::vec3& rotation)
+    inline glm::mat4 OrthograpicViewMtxCalculation(const glm::vec3& position, const glm::vec3& rotation) noexcept
     {
         auto transform   = glm::translate(glm::mat4 { 1.0f }, position);
         auto rotationMtx = glm::rotate(glm::mat4 { 1.0f }, glm::radians(rotation.z), glm::vec3(0, 0, 1));

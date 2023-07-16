@@ -4,8 +4,7 @@
 #include "nador/log/Log.h"
 #include "nador/system/window/WindowGLFW.h"
 #include "nador/utils/ImGuiHelper.h"
-#include "nador/common/GlobalEvents.h"
-#include "WindowGLFW.h"
+#include "nador/system/input/input_events/InputEvents.h"
 
 namespace nador
 {
@@ -18,14 +17,15 @@ namespace nador
     static void WindowCloseCallback(GLFWwindow* /*window*/)
     {
         // fire window close event
-        g_onWindowCloseEvent();
+        //g_onWindowCloseEvent();
+        HandleInputEvent(OnWindowClosedEvent{});
     }
 
     WindowGLFW::~WindowGLFW()
     {
         if(_imGuiAdapter)
         {
-            _imGuiAdapter->ShutdownImGui();
+            _imGuiAdapter->Imgui_Shutdown();
         }
 
         glfwTerminate();
@@ -119,7 +119,7 @@ namespace nador
 
         if (_showDebugWindow && _imGuiAdapter)
         {
-            _imGuiAdapter->NewFrameImGui();
+            _imGuiAdapter->Imgui_NewFrame();
         }
     }
 
@@ -131,7 +131,7 @@ namespace nador
             int32_t height;
             glfwGetWindowSize(_window, &width, &height);
 
-            _imGuiAdapter->EndFrameImGui(width, height);
+            _imGuiAdapter->Imgui_EndFrame(width, height);
         }
 
         // Swap front and back buffers
@@ -146,6 +146,6 @@ namespace nador
     void WindowGLFW::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
         _imGuiAdapter = std::move(adapter);
-        _imGuiAdapter->InitImGuiContext(_window);
+        _imGuiAdapter->Imgui_InitImGuiContext(_window);
     }
 } // namespace nador

@@ -14,12 +14,11 @@
 
 #include "nador/log/Log.h"
 #include "nador/utils/ImGuiHelper.h"
-#include "ImGuiHelper.h"
 
 namespace nador
 {
 
-    bool ImGuiStrContainerIter(void* vec, int idx, const char** out_text)
+    bool Imgui_StrContainerIter(void* vec, int idx, const char** out_text)
     {
         strings_t* vector = reinterpret_cast<strings_t*>(vec);
         if (idx < 0 || (size_t)idx >= vector->size())
@@ -30,7 +29,7 @@ namespace nador
         return true;
     }
 
-    bool InitImGuiContext(void* nativeWindow, void* context)
+    bool Imgui_InitImGuiContext(void* nativeWindow, [[maybe_unused]] void* context)
     {
 #ifdef  USE_IMGUI
         ImGui::CreateContext();
@@ -81,7 +80,7 @@ namespace nador
 #endif
     }
 
-    bool NewFrameImGui()
+    bool Imgui_NewFrame()
     {
 #ifdef  USE_IMGUI
         ImGui_ImplOpenGL3_NewFrame();
@@ -98,7 +97,7 @@ namespace nador
 #endif
     }
 
-    bool EndFrameImGui(int32_t width, int32_t height)
+    bool Imgui_EndFrame(int32_t width, int32_t height)
     {
 #ifdef  USE_IMGUI
         ImGuiIO& io = ImGui::GetIO();
@@ -132,7 +131,7 @@ namespace nador
 #endif
     }
 
-    bool ShutdownImGui()
+    bool Imgui_Shutdown()
     {
 #ifdef  USE_IMGUI
 
@@ -153,10 +152,19 @@ namespace nador
 #endif
     }
 
-    bool WantCaptureMouse()
+    bool Imgui_WantCaptureMouse()
     {
 #ifdef  USE_IMGUI
         return ImGui::GetIO().WantCaptureMouse;
+#else //  USE_IMGUI
+        return false;
+#endif
+    }
+
+    bool Imgui_WantCaptureKeyboard()
+    {
+#ifdef  USE_IMGUI
+        return ImGui::GetIO().WantCaptureKeyboard;
 #else //  USE_IMGUI
         return false;
 #endif

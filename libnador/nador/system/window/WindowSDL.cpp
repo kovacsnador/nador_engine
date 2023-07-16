@@ -4,7 +4,6 @@
 #include "nador/log/Log.h"
 #include "nador/system/window/WindowSDL.h"
 #include "nador/utils/ImGuiHelper.h"
-#include "WindowSDL.h"
 
 namespace nador
 {
@@ -14,7 +13,7 @@ namespace nador
         {
             if(_imGuiadapter)
             {
-                _imGuiadapter->ShutdownImGui();
+                _imGuiadapter->Imgui_Shutdown();
             }
 
             SDL_GL_DeleteContext(_context);
@@ -137,14 +136,14 @@ namespace nador
     void WindowSDL::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
         _imGuiadapter = std::move(adapter);
-        _imGuiadapter->InitImGuiContext(_window, _context);
+        _imGuiadapter->Imgui_InitImGuiContext(_window, _context);
     }
 
     void WindowSDL::TickBegin()
     {
         if (_showDebugWindow && _imGuiadapter)
         {
-            _imGuiadapter->NewFrameImGui();
+            _imGuiadapter->Imgui_NewFrame();
         }
     }
 
@@ -156,7 +155,7 @@ namespace nador
             int32_t height;
             SDL_GetWindowSize(_window, &width, &height);
 
-            _imGuiadapter->EndFrameImGui(width, height);
+            _imGuiadapter->Imgui_EndFrame(width, height);
         }
 
         /* Swap front and back buffers */

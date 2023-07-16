@@ -86,11 +86,11 @@ namespace nador
 		reloadNeeds |= ImGui::InputTextMultiline("Text", _inputTextBuffer.get(), INPUT_TEXT_BUFFER_SIZE);
 
 		reloadNeeds |= ImGui::ListBox("FontTypes", &selectedFontType,
-					   ImGuiStrContainerIter,
+					   Imgui_StrContainerIter,
 					   reinterpret_cast<void*>(&fontTypeNames), fontTypeNames.size(), 3);
 
 		reloadNeeds |= ImGui::ListBox("FontSize", &selectedFontSize,
-					   ImGuiStrContainerIter,
+					   Imgui_StrContainerIter,
 					   reinterpret_cast<void*>(&fontSizeNames), fontSizeNames.size(), 3);
 
 		if(reloadNeeds)

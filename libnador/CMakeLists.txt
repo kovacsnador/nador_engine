@@ -110,6 +110,7 @@ target_sources(${PROJECT_NAME}
 
     ${NADOR_SRC_DIR}/system/ModuleFactory.cpp
     ${NADOR_SRC_DIR}/system/file/DefaultFileController.cpp
+    ${NADOR_SRC_DIR}/system/input/input_events/InputEvents.cpp
 
     ${NADOR_SRC_DIR}/test/TestCommon.cpp
     ${NADOR_SRC_DIR}/test/TestController.cpp

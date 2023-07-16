@@ -49,7 +49,7 @@ namespace nador
 		IAtlasController::atlases_t atlases = _atlasCtrl->GetAtlases();
 		
 		ImGui::ListBox("Atlases", &selectedItemAtlas,
-					   ImGuiStrContainerIter,
+					   Imgui_StrContainerIter,
 					   reinterpret_cast<void*>(&atlasNames), atlasNames.size(), 5);
 
 		if((size_t)selectedItemAtlas < atlases.size())

@@ -85,6 +85,9 @@ namespace nador
 		void TickBegin() override;
 
 	private:
+		bool _HasKeyState(EKeyCode keyCode, int32_t state) const;
+		bool _HasMouseState(EMouseButton buttonCode, int32_t state) const;
+
 		GLFWwindow* _nativeApiWindow;
 	};
 }

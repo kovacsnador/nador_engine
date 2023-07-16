@@ -7,13 +7,14 @@
 
 namespace nador
 {
-	bool ImGuiStrContainerIter(void* vec, int idx, const char** out_text);
+	bool Imgui_StrContainerIter(void* vec, int idx, const char** out_text);
 
-    bool InitImGuiContext(void* nativeWindow, void* context = nullptr);
-	bool NewFrameImGui();
-	bool EndFrameImGui(int32_t width, int32_t height);
-	bool ShutdownImGui();
-    bool WantCaptureMouse();
+    bool Imgui_InitImGuiContext(void* nativeWindow, void* context = nullptr);
+	bool Imgui_NewFrame();
+	bool Imgui_EndFrame(int32_t width, int32_t height);
+	bool Imgui_Shutdown();
+    bool Imgui_WantCaptureMouse();
+    bool Imgui_WantCaptureKeyboard();
 
 	template<typename ContainerTy, typename PredTy>
 	bool ImGuiTupleContainerIter(void* pairIn, int idx, const char** out_text)
