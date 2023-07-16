@@ -199,7 +199,7 @@ namespace nador
 
                 VerticesMultiMatrix(renderData.vertices, modelMatrix);
 
-                _renderer->Draw(&material, renderData, IDENTITY_MATRIX);
+                _renderer->Draw(&material, renderData);
             }
         }
     }
