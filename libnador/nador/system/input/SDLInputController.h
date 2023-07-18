@@ -13,7 +13,7 @@ namespace nador
     class SDLInputController : public IInputController
     {
     public:
-        SDLInputController(void* window);
+        SDLInputController(void* window, InputEventHandler inputHandler);
 
         bool IsKeyPressed(EKeyCode keyCode) const override;
         bool IsKeyReleased(EKeyCode keyCode) const override;
@@ -53,6 +53,7 @@ namespace nador
         std::unordered_map<int32_t, uint64_t>  _mouseStates;
 
         SDL_Window* _window;
+        InputEventHandler _inputHandler;
     };
 } // namespace nador
 

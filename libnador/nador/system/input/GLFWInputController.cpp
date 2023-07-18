@@ -8,9 +8,12 @@
 #include "nador/log/Log.h"
 
 #include "nador/system/input/input_events/InputEvents.h"
+#include "nador/utils/event/Event.h"
 
 namespace nador
 {
+    static Event<InputEvents_t> s_glfwInputEvent;
+
     static glm::vec2 GetCursorPosition(GLFWwindow* window)
     {
         NADOR_ASSERT(window);
@@ -47,13 +50,16 @@ namespace nador
         switch (action)
         {
         case GLFW_PRESS:
-            HandleInputEvent(OnKeyPressedEvent { keycode });
+            //HandleInputEvent(OnKeyPressedEvent { keycode });
+            s_glfwInputEvent(OnKeyPressedEvent { keycode });
             break;
         case GLFW_REPEAT:
-            HandleInputEvent(OnKeyHoldedEvent { keycode });
+            //HandleInputEvent(OnKeyHoldedEvent { keycode });
+            s_glfwInputEvent(OnKeyHoldedEvent { keycode });
             break;
         case GLFW_RELEASE:
-            HandleInputEvent(OnKeyReleasedEvent { keycode });
+            //HandleInputEvent(OnKeyReleasedEvent { keycode });
+            s_glfwInputEvent(OnKeyReleasedEvent { keycode });
             break;
         default:
             ENGINE_FATAL("Not defined key action: %d", action);
@@ -71,7 +77,7 @@ namespace nador
         return static_cast<int32_t>(mouseButton);
     }
 
-    static void GLFW_MouseButtonCallback(GLFWwindow* window, int button, int action, int /*mods*/)
+    static void Glfw_MouseButtonCallback(GLFWwindow* window, int button, int action, int /*mods*/)
     {
         EMouseButton mouseButton   = ConvertToNadorMouseButton(button);
         glm::vec2    mousePosition = GetCursorPosition(window);
@@ -79,10 +85,12 @@ namespace nador
         switch (action)
         {
         case GLFW_PRESS:
-            HandleInputEvent(OnMousePressedEvent { mouseButton, mousePosition });
+            //HandleInputEvent(OnMousePressedEvent { mouseButton, mousePosition });
+            s_glfwInputEvent(OnMousePressedEvent { mouseButton, mousePosition });
             break;
         case GLFW_RELEASE:
-            HandleInputEvent(OnMouseReleasedEvent { mouseButton, mousePosition });
+            //HandleInputEvent(OnMouseReleasedEvent { mouseButton, mousePosition });
+            s_glfwInputEvent(OnMouseReleasedEvent { mouseButton, mousePosition });
             break;
         default:
             ENGINE_FATAL("Not defined mouse action action: %d", action);
@@ -90,7 +98,7 @@ namespace nador
         }
     }
 
-    static void GLFW_CharCallback(GLFWwindow* /*window*/, uint32_t codePoint)
+    static void Glfw_CharCallback(GLFWwindow* /*window*/, uint32_t codePoint)
     {
         wchar_t txt[] = { '\0', '\0', '\0', '\0' };
         memset(txt, 0, sizeof(txt));
@@ -104,63 +112,86 @@ namespace nador
         std::string text = converter.to_bytes(ws);
 
         // g_onCharEvent(text);
-        HandleInputEvent(OnCharEvent{ text });
+        //HandleInputEvent(OnCharEvent{ text });
+        s_glfwInputEvent(OnCharEvent{ text });
     }
 
-    GLFWInputController::GLFWInputController(void* nativeApiWindow)
+	static void Glfw_WindowCloseCallback(GLFWwindow* /*window*/)
+    {
+        // fire window close event
+        //HandleInputEvent(OnWindowClosedEvent{});
+        s_glfwInputEvent(OnWindowClosedEvent{});
+    }
+
+    
+    GLFWInputController::GLFWInputController(void* nativeApiWindow, InputEventHandler inputHandler)
     : _nativeApiWindow(static_cast<GLFWwindow*>(nativeApiWindow))
+	, _inputHandler(std::move(inputHandler))
+    , _glfwInputListener([this](InputEvents_t e){ _inputHandler.HandleInputEvent(e); })
     {
         NADOR_ASSERT(_nativeApiWindow);
 
+        s_glfwInputEvent += &_glfwInputListener;
+
         glfwSetKeyCallback(_nativeApiWindow, Glfw_KeyCallback);
-        glfwSetCharCallback(_nativeApiWindow, GLFW_CharCallback);
-        glfwSetMouseButtonCallback(_nativeApiWindow, GLFW_MouseButtonCallback);
+        glfwSetCharCallback(_nativeApiWindow, Glfw_CharCallback);
+        glfwSetMouseButtonCallback(_nativeApiWindow, Glfw_MouseButtonCallback);
+		glfwSetWindowCloseCallback(_nativeApiWindow, Glfw_WindowCloseCallback);
     }
 
+    
     bool GLFWInputController::IsKeyPressed(EKeyCode keyCode) const
     {
 		return _HasKeyState(keyCode, GLFW_PRESS);
     }
 
+    
     bool GLFWInputController::IsKeyReleased(EKeyCode keyCode) const
     {
 		return _HasKeyState(keyCode, GLFW_RELEASE);
     }
 
+    
     bool GLFWInputController::IsKeyHolded(EKeyCode keyCode) const
     {
 		return _HasKeyState(keyCode, GLFW_REPEAT);
     }
 
+    
     bool GLFWInputController::IsMouseButtonPressed(EMouseButton buttonCode) const
     {
 		return _HasMouseState(buttonCode, GLFW_PRESS);
     }
 
+    
     bool GLFWInputController::IsMouseButtonReleased(EMouseButton buttonCode) const
     {
 		return _HasMouseState(buttonCode, GLFW_RELEASE);
     }
 
+    
     bool GLFWInputController::IsMouseButtonHolded(EMouseButton buttonCode) const
     {
 		return _HasMouseState(buttonCode, GLFW_REPEAT);
     }
 
+    
     glm::vec2 GLFWInputController::GetMousePosition() const
     {
         return GetCursorPosition(_nativeApiWindow);
     }
 
-    void GLFWInputController::TickBegin()
+    
+    void GLFWInputController::TickBegin() const
     {
         // Poll for and process events
         glfwPollEvents();
     }
 
+    
 	bool GLFWInputController::_HasKeyState(EKeyCode keyCode, int32_t state) const
 	{
-		if (IsInputKeyHandledByOthers())
+		if (_inputHandler.IsInputKeyHandledByOthers())
         {
             return false;
         }
@@ -170,9 +201,10 @@ namespace nador
         return state == glfwGetKey(_nativeApiWindow, ConvertToApiKeyCode(keyCode));
 	}
 
+    
 	bool GLFWInputController::_HasMouseState(EMouseButton buttonCode, int32_t state) const
 	{
-		if (IsInputMouseHandledByOthers())
+		if (_inputHandler.IsInputMouseHandledByOthers())
         {
             return false;
         }

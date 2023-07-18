@@ -2,7 +2,6 @@
 #define __NADOR_MODULE_FACTORY_H__
 
 #include "nador/common/AppConfig.h"
-
 #include "nador/system/IWindow.h"
 #include "nador/video/IVideo.h"
 #include "nador/system/IFileController.h"
@@ -14,6 +13,7 @@
 #include "nador/ui/IUiApp.h"
 #include "nador/test/ITestController.h"
 #include "nador/system/window/IImGuiAdapter.h"
+#include "nador/system/input/input_events/InputEvents.h"
 
 namespace nador
 {
@@ -24,7 +24,7 @@ namespace nador
         IWindowUPtr          CreateWindow(const WindowSettings& config);
         IVideoUPtr           CreateVideo();
         IFileControllerUPtr  CreateFileController(const std::filesystem::path& rootFilePath);
-        IInputControllerUPtr CreateInputController(void* nativeWindow);
+        IInputControllerUPtr CreateInputController(void* nativeWindow, InputEventHandler handler);
         IImguiAdapterUPtr    CreateImGuiAdapter();
         ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
         IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera);

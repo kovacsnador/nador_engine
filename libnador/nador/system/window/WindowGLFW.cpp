@@ -4,21 +4,12 @@
 #include "nador/log/Log.h"
 #include "nador/system/window/WindowGLFW.h"
 #include "nador/utils/ImGuiHelper.h"
-#include "nador/system/input/input_events/InputEvents.h"
 
 namespace nador
 {
-
     static void FramebufferSizeCallback(GLFWwindow* /*window*/, int32_t width, int32_t height)
     {
         glViewport(0, 0, width, height);
-    }
-
-    static void WindowCloseCallback(GLFWwindow* /*window*/)
-    {
-        // fire window close event
-        //g_onWindowCloseEvent();
-        HandleInputEvent(OnWindowClosedEvent{});
     }
 
     WindowGLFW::~WindowGLFW()
@@ -92,9 +83,7 @@ namespace nador
 
         ENGINE_DEBUG("OpenGL version %s", glGetString(GL_VERSION));
 
-        _window = window;
-
-        glfwSetWindowCloseCallback(window, WindowCloseCallback);
+        _window = std::unique_ptr<GLFWwindow, WindowDeleter_t>(window, [](GLFWwindow* w){ glfwDestroyWindow(w); });
     }
 
     void WindowGLFW::CreateFullScreenWindow(const char* title, bool vSync)
@@ -104,7 +93,7 @@ namespace nador
 
     void* WindowGLFW::GetNativeApiWindow() const
     {
-        return _window;
+        return _window.get();
     }
 
     void* WindowGLFW::GetNativeContext()
@@ -129,13 +118,13 @@ namespace nador
         {
             int32_t width;
             int32_t height;
-            glfwGetWindowSize(_window, &width, &height);
+            glfwGetWindowSize(_window.get(), &width, &height);
 
             _imGuiAdapter->Imgui_EndFrame(width, height);
         }
 
         // Swap front and back buffers
-        glfwSwapBuffers(_window);
+        glfwSwapBuffers(_window.get());
     }
 
     void WindowGLFW::ShowDebugWindow(bool show)
@@ -146,6 +135,6 @@ namespace nador
     void WindowGLFW::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
         _imGuiAdapter = std::move(adapter);
-        _imGuiAdapter->Imgui_InitImGuiContext(_window);
+        _imGuiAdapter->Imgui_InitImGuiContext(_window.get());
     }
 } // namespace nador

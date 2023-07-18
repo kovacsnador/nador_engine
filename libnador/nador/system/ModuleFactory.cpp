@@ -66,10 +66,10 @@ namespace nador
 #endif
 	}
 
-	IInputControllerUPtr ModuleFactory::CreateInputController(void* nativeWindow)
+	IInputControllerUPtr ModuleFactory::CreateInputController(void* nativeWindow, InputEventHandler handler)
 	{
 #ifdef USE_GLFW_WINDOW
-    	return std::make_unique<GLFWInputController>(nativeWindow);
+    	return std::make_unique<GLFWInputController>(nativeWindow, std::move(handler));
 #elif USE_SDL_WINDOW
     	return std::make_unique<SDLInputController>(nativeWindow);
 #endif

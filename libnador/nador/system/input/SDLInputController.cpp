@@ -557,8 +557,9 @@ namespace nador
         }
     }
 
-    SDLInputController::SDLInputController(void* window)
+    SDLInputController::SDLInputController(void* window, InputEventHandler inputHandler)
     : _window(static_cast<SDL_Window*>(window))
+    , _inputHandler(std::move(inputHandler))
     {
     }
 

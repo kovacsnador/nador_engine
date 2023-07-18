@@ -63,9 +63,11 @@ namespace nador
         void AttachImGuiAdapter(IImguiAdapterUPtr adapter) override;
 
     private:
-        GLFWwindow*       _window { nullptr };
-        bool              _showDebugWindow { false };
-        IImguiAdapterUPtr _imGuiAdapter { nullptr };
+        using WindowDeleter_t = std::function<void(GLFWwindow*)>;
+
+        std::unique_ptr<GLFWwindow, WindowDeleter_t> _window { nullptr };
+        bool                        _showDebugWindow { false };
+        IImguiAdapterUPtr           _imGuiAdapter { nullptr };
     };
 } // namespace nador
 

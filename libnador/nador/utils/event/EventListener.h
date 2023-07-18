@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <algorithm>
+#include <list>
 
 #include "nador/log/Log.h"
 

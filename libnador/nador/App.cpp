@@ -19,8 +19,8 @@
 #include "nador/video/renderer/base_renderer/BaseRenderer.h"
 #include "nador/video/renderer/batch_renderer/BatchRenderer.h"
 #include "nador/common/Stopwatch.h"
-
 #include "nador/test/Tests.h"
+#include "nador/system/input/input_events/InputEvents.h"
 
 namespace nador
 {
@@ -31,7 +31,10 @@ namespace nador
         IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
         IVideoPtr           video     = ModuleFactory::CreateVideo();
         IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
-        IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow());
+
+        // Create input handling and input controller
+        InputEventHandler InputEventHandler{nador::IsInputKeyHandledByOthers, nador::IsInputMouseHandledByOthers};
+        IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow(), std::move(InputEventHandler));
 
         // Attach after InputController created
         window->AttachImGuiAdapter(ModuleFactory::CreateImGuiAdapter());

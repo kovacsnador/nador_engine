@@ -81,7 +81,7 @@ namespace nador
 		/*!
 		 * On tick begin fundtion to pull all input events.
 		 */
-		virtual void TickBegin() = 0;
+		virtual void TickBegin() const = 0;
 	};
 	CREATE_PTR_TYPES(IInputController);
 }

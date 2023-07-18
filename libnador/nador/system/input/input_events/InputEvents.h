@@ -2,6 +2,7 @@
 #define __NADOR_INPUT_EVENTS_H__
 
 #include <variant>
+#include <functional>
 
 #include "nador/common/KeyCodes.h"
 #include "nador/common/Mouse.h"
@@ -52,7 +53,28 @@ namespace nador
                                        OnMousePressedEvent,
                                        OnMouseReleasedEvent>;
 
-    bool HandleInputEvent(InputEvents_t event);
+    class InputEventHandler
+    {
+    public:
+        using callback_t = std::function<bool()>;
+
+        InputEventHandler(callback_t handleKey, callback_t handleMouse)
+        : _handledKey(handleKey)
+        , _handledMouse(handleMouse)
+        {
+        }
+
+        bool HandleInputEvent(InputEvents_t event) const;
+
+        bool IsInputKeyHandledByOthers() const;
+        bool IsInputMouseHandledByOthers() const;
+
+    private:
+        callback_t _handledKey{};
+        callback_t _handledMouse{};
+    };
+
+    //bool HandleInputEvent(InputEvents_t event);
 
     bool IsInputKeyHandledByOthers();
     bool IsInputMouseHandledByOthers();
