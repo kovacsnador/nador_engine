@@ -1,7 +1,7 @@
 #ifndef __NADOR_WINDOW_SDL_H__
 #define __NADOR_WINDOW_SDL_H__
 
-#include <SDL.h>
+#include <functional>
 
 #include "nador/system/IWindow.h"
 
@@ -11,6 +11,8 @@ namespace nador
 {
     class WindowSDL : public IWindow
     {
+        using GLContext_t = void;
+
     public:
         ~WindowSDL();
 
@@ -20,19 +22,22 @@ namespace nador
         void TickBegin() override;
         void TickEnd() override;
 
-        void* GetNativeApiWindow() const override;
-        void* GetNativeContext() override;
-        void  ShowDebugWindow(bool show) override;
+        void* GetNativeApiWindow() const noexcept override;
+        void* GetNativeContext() const noexcept override;
+        void  ShowDebugWindow(bool show) noexcept override;
 
         void AttachImGuiAdapter(IImguiAdapterUPtr adapter) override;
 
     private:
-        SDL_Window*     _window {nullptr};
-        SDL_GLContext   _context {nullptr};
+        using WindowDeleter_t  = std::function<void(SDL_Window*)>;
+        using ContextDeleter_t = std::function<void(GLContext_t*)>;
+
+        std::unique_ptr<SDL_Window, WindowDeleter_t>   _window { nullptr };
+        std::unique_ptr<GLContext_t, ContextDeleter_t> _context { nullptr };
 
         bool _showDebugWindow;
 
-        IImguiAdapterUPtr _imGuiadapter {nullptr};
+        IImguiAdapterUPtr _imGuiadapter { nullptr };
     };
 } // namespace nador
 

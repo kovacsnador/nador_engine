@@ -16,8 +16,8 @@ namespace nador
                 _imGuiadapter->Imgui_Shutdown();
             }
 
-            SDL_GL_DeleteContext(_context);
-            SDL_DestroyWindow(_window);
+            _context.reset();
+            _window.reset();
             SDL_Quit();
         }
     }
@@ -41,15 +41,18 @@ namespace nador
 
             uint32_t sdlWindowFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
+            auto windowDeleter = [](SDL_Window* w){ SDL_DestroyWindow(w); };
+
             if (width != 0 && height != 0)
             {
                 // Simple window
-                _window = SDL_CreateWindow(title,
+                _window = {SDL_CreateWindow(title,
                                            SDL_WINDOWPOS_CENTERED,
                                            SDL_WINDOWPOS_CENTERED,
                                            width,
                                            height,
-                                           sdlWindowFlags);
+                                           sdlWindowFlags), windowDeleter};
+                
                 if (_window == nullptr)
                 {
                     ENGINE_FATAL("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -63,29 +66,30 @@ namespace nador
                 height = DM.h;
 
                 // Full screen window
-                _window = SDL_CreateWindow(title,
+                _window = {SDL_CreateWindow(title,
                                            SDL_WINDOWPOS_CENTERED,
                                            SDL_WINDOWPOS_CENTERED,
                                            width,
                                            height,
-                                           sdlWindowFlags);
+                                           sdlWindowFlags), windowDeleter};
                 if (_window == nullptr)
                 {
                     ENGINE_FATAL("Window could not be created! SDL_Error: %s\n", SDL_GetError());
                 }
 
-                if (SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN) != 0)
+                if (SDL_SetWindowFullscreen(_window.get(), SDL_WINDOW_FULLSCREEN) != 0)
                 {
                     ENGINE_FATAL("Window on fullscreen error! SDL_Error: %s\n", SDL_GetError());
                 }
 
-                if (SDL_SetWindowDisplayMode(_window, nullptr) != 0)
+                if (SDL_SetWindowDisplayMode(_window.get(), nullptr) != 0)
                 {
                     ENGINE_FATAL("Window display mode not set! SDL_Error: %s\n", SDL_GetError());
                 }
             }
 
-            _context = SDL_GL_CreateContext(_window);
+            _context = {SDL_GL_CreateContext(_window.get()), [](GLContext_t* c) { SDL_GL_DeleteContext(c); }};
+
             if (_context == nullptr)
             {
                 ENGINE_FATAL("SDL_GL_CreateContext failed! Error: %s", SDL_GetError());
@@ -118,17 +122,17 @@ namespace nador
         CreateWindow(0, 0, title, vSync);
     }
 
-    void* WindowSDL::GetNativeApiWindow() const
+    void* WindowSDL::GetNativeApiWindow() const noexcept
     {
-        return _window;
+        return _window.get();
     }
 
-    void* WindowSDL::GetNativeContext()
+    void* WindowSDL::GetNativeContext() const noexcept
     {
-        return _context;
+        return _context.get();
     }
 
-    void WindowSDL::ShowDebugWindow(bool show)
+    void WindowSDL::ShowDebugWindow(bool show) noexcept
     {
         _showDebugWindow = show;
     }
@@ -136,7 +140,7 @@ namespace nador
     void WindowSDL::AttachImGuiAdapter(IImguiAdapterUPtr adapter)
     {
         _imGuiadapter = std::move(adapter);
-        _imGuiadapter->Imgui_InitImGuiContext(_window, _context);
+        _imGuiadapter->Imgui_InitImGuiContext(_window.get(), _context.get());
     }
 
     void WindowSDL::TickBegin()
@@ -153,12 +157,12 @@ namespace nador
         {
             int32_t width;
             int32_t height;
-            SDL_GetWindowSize(_window, &width, &height);
+            SDL_GetWindowSize(_window.get(), &width, &height);
 
             _imGuiadapter->Imgui_EndFrame(width, height);
         }
 
         /* Swap front and back buffers */
-        SDL_GL_SwapWindow(_window);
+        SDL_GL_SwapWindow(_window.get());
     }
 } // namespace nador

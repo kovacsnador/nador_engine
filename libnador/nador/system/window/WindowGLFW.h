@@ -49,16 +49,16 @@ namespace nador
          *
          * \return	The api specific window.
          */
-        void* GetNativeApiWindow() const override;
+        void* GetNativeApiWindow() const noexcept override;
 
-        void* GetNativeContext() override;
+        void* GetNativeContext() const noexcept override;
 
         /*!
          * Shows and hides the debug window.
          *
          * \param show	The flag.
          */
-        void ShowDebugWindow(bool show) override;
+        void ShowDebugWindow(bool show) noexcept override;
 
         void AttachImGuiAdapter(IImguiAdapterUPtr adapter) override;
 
@@ -66,8 +66,9 @@ namespace nador
         using WindowDeleter_t = std::function<void(GLFWwindow*)>;
 
         std::unique_ptr<GLFWwindow, WindowDeleter_t> _window { nullptr };
-        bool                        _showDebugWindow { false };
-        IImguiAdapterUPtr           _imGuiAdapter { nullptr };
+
+        bool              _showDebugWindow { false };
+        IImguiAdapterUPtr _imGuiAdapter { nullptr };
     };
 } // namespace nador
 

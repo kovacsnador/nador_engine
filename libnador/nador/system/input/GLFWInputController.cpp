@@ -50,15 +50,12 @@ namespace nador
         switch (action)
         {
         case GLFW_PRESS:
-            //HandleInputEvent(OnKeyPressedEvent { keycode });
             s_glfwInputEvent(OnKeyPressedEvent { keycode });
             break;
         case GLFW_REPEAT:
-            //HandleInputEvent(OnKeyHoldedEvent { keycode });
             s_glfwInputEvent(OnKeyHoldedEvent { keycode });
             break;
         case GLFW_RELEASE:
-            //HandleInputEvent(OnKeyReleasedEvent { keycode });
             s_glfwInputEvent(OnKeyReleasedEvent { keycode });
             break;
         default:
@@ -85,11 +82,9 @@ namespace nador
         switch (action)
         {
         case GLFW_PRESS:
-            //HandleInputEvent(OnMousePressedEvent { mouseButton, mousePosition });
             s_glfwInputEvent(OnMousePressedEvent { mouseButton, mousePosition });
             break;
         case GLFW_RELEASE:
-            //HandleInputEvent(OnMouseReleasedEvent { mouseButton, mousePosition });
             s_glfwInputEvent(OnMouseReleasedEvent { mouseButton, mousePosition });
             break;
         default:
@@ -111,15 +106,12 @@ namespace nador
 
         std::string text = converter.to_bytes(ws);
 
-        // g_onCharEvent(text);
-        //HandleInputEvent(OnCharEvent{ text });
         s_glfwInputEvent(OnCharEvent{ text });
     }
 
 	static void Glfw_WindowCloseCallback(GLFWwindow* /*window*/)
     {
         // fire window close event
-        //HandleInputEvent(OnWindowClosedEvent{});
         s_glfwInputEvent(OnWindowClosedEvent{});
     }
 
@@ -182,7 +174,7 @@ namespace nador
     }
 
     
-    void GLFWInputController::TickBegin() const
+    void GLFWInputController::TickBegin()
     {
         // Poll for and process events
         glfwPollEvents();

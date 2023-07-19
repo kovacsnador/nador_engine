@@ -45,16 +45,16 @@ namespace nador
 		 *
 		 * \return	The api specific window.
 		 */
-		virtual void* GetNativeApiWindow() const = 0;
+		virtual void* GetNativeApiWindow() const noexcept = 0;
 
-		virtual void* GetNativeContext() = 0;
+		virtual void* GetNativeContext() const noexcept = 0;
 
 		/*!
 		 * Shows and hides the debug window.
 		 *
 		 * \param show	The flag.
 		 */
-		virtual void ShowDebugWindow(bool show) = 0;
+		virtual void ShowDebugWindow(bool show) noexcept = 0;
 
 		virtual void AttachImGuiAdapter(IImguiAdapterUPtr adapter) = 0;
 	};

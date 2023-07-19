@@ -82,7 +82,7 @@ namespace nador
          */
         glm::vec2 GetMousePosition() const override;
 
-        void TickBegin() const override;
+        void TickBegin() override;
 
     private:
         bool _HasKeyState(EKeyCode keyCode, int32_t state) const;

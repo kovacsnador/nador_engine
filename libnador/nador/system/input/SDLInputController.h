@@ -4,9 +4,11 @@
 #include <unordered_map>
 #include <set>
 
-#include <SDL.h>
-
 #include "nador/system/IInputController.h"
+#include "nador/system/input/input_events/InputEvents.h"
+
+struct SDL_Window;
+union SDL_Event;
 
 namespace nador
 {
@@ -52,7 +54,7 @@ namespace nador
         std::unordered_map<int32_t, EKeyState> _keyStates;
         std::unordered_map<int32_t, uint64_t>  _mouseStates;
 
-        SDL_Window* _window;
+        SDL_Window*       _window;
         InputEventHandler _inputHandler;
     };
 } // namespace nador

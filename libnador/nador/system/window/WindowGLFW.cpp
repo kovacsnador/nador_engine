@@ -32,12 +32,10 @@ namespace nador
             return;
         }
 
-        GLFWwindow* window;
-
         /* Initialize the library */
         if (!glfwInit())
         {
-            ENGINE_FATAL("GLFW window init failed!");
+            ENGINE_FATAL("GLFW init failed!");
         }
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -46,10 +44,12 @@ namespace nador
 
         glfwWindowHint(GLFW_SAMPLES, 4);
 
+        auto windowDeleter = [](GLFWwindow* w){ glfwDestroyWindow(w); };
+
         if (width > 0 && height > 0)
         {
             // Window mode
-            window = glfwCreateWindow(width, height, title, NULL, NULL);
+            _window = {glfwCreateWindow(width, height, title, NULL, NULL), windowDeleter};
         }
         else
         {
@@ -57,17 +57,17 @@ namespace nador
             GLFWmonitor*       monitor = glfwGetPrimaryMonitor();
             const GLFWvidmode* mode    = glfwGetVideoMode(monitor);
             /* Create a windowed mode window and its OpenGL context */
-            window = glfwCreateWindow(mode->width, mode->height, title, monitor, NULL);
+            _window = {glfwCreateWindow(mode->width, mode->height, title, monitor, NULL), windowDeleter};
         }
 
-        if (!window)
+        if (_window == nullptr)
         {
             glfwTerminate();
             ENGINE_FATAL("GLFW window create failed!");
         }
 
         /* Make the window's context current */
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(_window.get());
 
         glfwSwapInterval(vSync);
 
@@ -77,13 +77,11 @@ namespace nador
             ENGINE_FATAL("GLEW init failed! Code %d, Error: %s", glewErr, glewGetErrorString(glewErr));
         }
 
-        glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+        glfwSetFramebufferSizeCallback(_window.get(), FramebufferSizeCallback);
 
         ENGINE_DEBUG("WindowGLFW is created");
 
         ENGINE_DEBUG("OpenGL version %s", glGetString(GL_VERSION));
-
-        _window = std::unique_ptr<GLFWwindow, WindowDeleter_t>(window, [](GLFWwindow* w){ glfwDestroyWindow(w); });
     }
 
     void WindowGLFW::CreateFullScreenWindow(const char* title, bool vSync)
@@ -91,12 +89,12 @@ namespace nador
         CreateWindow(0, 0, title, vSync);
     }
 
-    void* WindowGLFW::GetNativeApiWindow() const
+    void* WindowGLFW::GetNativeApiWindow() const noexcept
     {
         return _window.get();
     }
 
-    void* WindowGLFW::GetNativeContext()
+    void* WindowGLFW::GetNativeContext() const noexcept
     {
         return nullptr;
     }
@@ -127,7 +125,7 @@ namespace nador
         glfwSwapBuffers(_window.get());
     }
 
-    void WindowGLFW::ShowDebugWindow(bool show)
+    void WindowGLFW::ShowDebugWindow(bool show) noexcept
     {
         _showDebugWindow = show;
     }

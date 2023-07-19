@@ -71,7 +71,7 @@ namespace nador
 #ifdef USE_GLFW_WINDOW
     	return std::make_unique<GLFWInputController>(nativeWindow, std::move(handler));
 #elif USE_SDL_WINDOW
-    	return std::make_unique<SDLInputController>(nativeWindow);
+    	return std::make_unique<SDLInputController>(nativeWindow, handler);
 #endif
 	}
 
