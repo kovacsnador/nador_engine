@@ -9,17 +9,19 @@ namespace nador
 {
     template <typename T>
         requires std::invocable<T>
-    class FinalAction : OnlyMoveable
+    class FinalAction : private OnlyMoveable
     {
     public:
-        explicit FinalAction(T&& func) noexcept
-        : _func(std::forward<T>(func))
+        using value_type = T;
+
+        explicit FinalAction(value_type&& func) noexcept
+        : _func(std::forward<value_type>(func))
         {
         }
 
-        FinalAction(FinalAction&& move) noexcept
-        : _func(std::move(move._func))
-        , _invoke(std::exchange(move._invoke, false))
+        FinalAction(FinalAction&& other) noexcept
+        : _func(std::move(other._func))
+        , _invoke(std::exchange(other._invoke, false))
         {
         }
 
@@ -32,8 +34,8 @@ namespace nador
         }
 
     private:
-        T    _func {};
-        bool _invoke { true };
+        value_type _func {};
+        bool       _invoke { true };
     };
 
     template <typename T>
