@@ -107,7 +107,7 @@ namespace nador
 		{
 			_renderData.vertices = _renderDataBackup.vertices;
 
-			VerticesMultiMatrix(_renderData.vertices, modelMatrix);
+			_renderData.vertices *= modelMatrix;
 
 			_lastModelMatrix = modelMatrix;
 		}

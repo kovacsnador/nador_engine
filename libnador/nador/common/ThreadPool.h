@@ -154,6 +154,8 @@ namespace nador
 
         void Wait(ETaskPriority prio);
 
+        size_t WorkerThreadCount() const noexcept;
+
     private:
         uint32_t _GetTaskCount(ETaskPriority prio) const noexcept;
         uint32_t _Empty() const noexcept;

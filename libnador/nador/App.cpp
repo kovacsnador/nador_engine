@@ -200,7 +200,7 @@ namespace nador
 
                 modelMatrix *= scaleMatrix;
 
-                VerticesMultiMatrix(renderData.vertices, modelMatrix);
+                renderData.vertices *= modelMatrix;
 
                 _renderer->Draw(&material, renderData);
             }

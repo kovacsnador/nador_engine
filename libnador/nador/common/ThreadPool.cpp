@@ -99,6 +99,11 @@ void nador::ThreadPool::Wait(ETaskPriority prio)
     });
 }
 
+size_t nador::ThreadPool::WorkerThreadCount() const noexcept
+{
+    return _workerthreads.size();
+}
+
 uint32_t nador::ThreadPool::_GetTaskCount(ETaskPriority prio) const noexcept
 {
     auto runningCount = _runningTasks.GetCount(prio);

@@ -151,11 +151,8 @@ namespace nador
     CREATE_PTR_TYPES(RenderData);
 
     glm::vec2 GetBoundingBox(const vertices_list_t& vertices);
-
-    void VerticesMultiMatrix(vertices_list_t& vertices, const glm::mat4& matrix);
     void ConcatIndices(indices_list_t& indicesBase, const indices_list_t& toAdd);
-
-    vertices_list_t operator*(const vertices_list_t& vertices, const glm::mat4& matrix);
+    void operator*=(vertices_list_t& v, const glm::mat4& m);
 
     std::string ToString(const glm::vec4& vec);
     std::string ToString(const glm::vec3& vec);

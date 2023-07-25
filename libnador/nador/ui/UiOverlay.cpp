@@ -30,7 +30,7 @@ namespace nador
 
 		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
 
-		VerticesMultiMatrix(_renderData.vertices, modelMtx);
+		_renderData.vertices *= modelMtx;
 
 		renderer->Draw(&_material, _renderData, IDENTITY_MATRIX);
 	}
