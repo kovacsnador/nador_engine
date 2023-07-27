@@ -118,7 +118,7 @@ namespace nador
      */
     inline AppConfig ReadAppConfigFromFile(std::filesystem::path configPath)
     {
-        ENGINE_DEBUG("Read app config file %s.", configPath.string());
+        ENGINE_DEBUG("Read app config file %s.", configPath.string().c_str());
 
         if(std::filesystem::exists(configPath) == false)
         {

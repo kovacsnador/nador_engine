@@ -53,6 +53,6 @@ namespace nador
         {
             return _inputCtrl->GetMousePosition();
         }
-        return { 0, 0 };
+        return { -1, -1 };
     }
 } // namespace nador

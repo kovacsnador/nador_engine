@@ -170,6 +170,11 @@ namespace nador
     
     glm::vec2 GLFWInputController::GetMousePosition() const
     {
+        if (_inputHandler.IsInputMouseHandledByOthers())
+        {
+            return {-1, -1};
+        }
+
         return GetCursorPosition(_nativeApiWindow);
     }
 

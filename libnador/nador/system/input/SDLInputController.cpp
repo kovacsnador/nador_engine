@@ -678,6 +678,11 @@ namespace nador
 
     glm::vec2 SDLInputController::GetMousePosition() const
     {
+        if (_inputHandler.IsInputMouseHandledByOthers())
+        {
+            return {-1, -1};
+        }
+
         NADOR_ASSERT(_window);
 
         int32_t x;
