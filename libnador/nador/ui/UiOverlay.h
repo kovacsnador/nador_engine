@@ -20,7 +20,6 @@ namespace nador
 
 	protected:
 		void OnRender(IRenderer* renderer, const quadVertices_t& vertices) override;
-		void OnTick(IUiLogicState* uiLogicState) override;
 
 	private:
 		BatchMaterial	_material;
@@ -45,7 +44,6 @@ namespace nador
 
 	protected:
 		void OnRender(IRenderer* renderer, const quadVertices_t& vertices) override;
-		void OnTick(IUiLogicState* uiLogicState) override;
 
 	private:
 		RoundEdgeMaterial	_material;

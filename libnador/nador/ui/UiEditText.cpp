@@ -104,14 +104,12 @@ namespace nador
 		return false;
 	}
 
-	void UiEditText::OnTick(IUiLogicState* uiLogicState)
+	void UiEditText::OnTick(IUiLogicState* uiLogicState, bool mouseOver)
 	{
 		IUiApp* uiApp = uiLogicState->GetUiApp();
 
-		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
+		if (mouseOver)
 		{
-			uiLogicState->SetMouseOverHandled(true);
-
 			if (_state == EState::IDLE)
 			{
 				_state = EState::OVER;

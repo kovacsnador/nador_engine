@@ -35,15 +35,6 @@ namespace nador
 		renderer->Draw(&_material, _renderData, IDENTITY_MATRIX);
 	}
 
-	void UiOverlay::OnTick(IUiLogicState* uiLogicState)
-	{
-		// handle mouse over event
-		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
-		{
-			uiLogicState->SetMouseOverHandled(true);
-		}
-	}
-
 	//--------------------------------------------------------------------------------------------------------------
 
 	UiRoundEdgeOverlay::UiRoundEdgeOverlay(const glm::ivec2& position, const glm::ivec2& size, const glm::vec4& color, UiAlignment aligner, IUiElement* parent)
@@ -91,14 +82,5 @@ namespace nador
 		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
 
 		renderer->Draw(&_material, _renderData, modelMtx);
-	}
-
-	void UiRoundEdgeOverlay::OnTick(IUiLogicState* uiLogicState)
-	{
-		// handle mouse over event
-		if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false)
-		{
-			uiLogicState->SetMouseOverHandled(true);
-		}
 	}
 }

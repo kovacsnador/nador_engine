@@ -37,7 +37,7 @@ namespace nador
 		void OnMousePressed(EMouseButton mouseButton, const glm::vec2& position) override;
 		void OnMouseReleased(EMouseButton mouseButton, const glm::vec2& position) override;
 
-		void OnTick(IUiLogicState* uiLogicState) override;
+		void OnTick(IUiLogicState* uiLogicState, bool mouseOver) override;
 
 	private:
 		EState			_state{ EState::IDLE };

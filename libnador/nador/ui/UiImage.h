@@ -31,7 +31,7 @@ namespace nador
 		void MakeEmptyImage() noexcept;
 
 	protected:
-		void OnTick(IUiLogicState* uiLogicState) override;
+		void OnTick(IUiLogicState* uiLogicState, bool mouseOver) override;
 		void OnRender(IRenderer* renderer, const quadVertices_t& vertices) override;
 
 	private:

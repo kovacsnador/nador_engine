@@ -225,7 +225,16 @@ namespace nador
 
     void IUiElement::OnTickImpl(IUiLogicState* uiLogicState)
     {
-        OnTick(uiLogicState);
+        // Check and handle mouse over event
+        bool mouseOver { false };
+
+        if (IsOver(uiLogicState->GetMousePosition()) && uiLogicState->IsMouseOverHandled() == false && _inputEventSuspended == false)
+        {
+            uiLogicState->SetMouseOverHandled(true);
+            mouseOver = true;
+        }
+
+        OnTick(uiLogicState, mouseOver);
 
         // tick in reverse order
         for (auto it = _childrens.rbegin(); it != _childrens.rend(); ++it)

@@ -55,16 +55,15 @@ namespace nador
 		renderer->DisableScissor();
 	}
 
-	void UiScrollList::OnTick(IUiLogicState* uiLogicState)
+	void UiScrollList::OnTick(IUiLogicState* uiLogicState, bool mouseOver)
 	{
 		glm::ivec2 currentMousePos = uiLogicState->GetMousePosition();
-		if (IsOver(currentMousePos) && _state == EState::SCROLLING)
+		if (mouseOver && _state == EState::SCROLLING)
 		{
 			glm::vec2 offset = _lastMousePos - currentMousePos;
 
 			if (glm::abs(offset.x) > 1 || glm::abs(offset.y) > 1)
 			{
-				uiLogicState->SetMouseOverHandled(true);
 				SuspendInputEventsForChildrens(true);
 
 				glm::ivec2 maxOffset = _aligner.CalculateMaxOffset();
@@ -77,6 +76,11 @@ namespace nador
 				_spinner.lastOffset = offset;
 				_spinner.lastDeltaTime = uiLogicState->GetDeltaTime();
 			}
+			else
+			{
+				// pass it forward to the childrens
+				uiLogicState->SetMouseOverHandled(false);
+			}
 
 			_aligner.SetOffset(_aligner.GetOffset() + offset);
 
@@ -84,6 +88,12 @@ namespace nador
 		}
 		else
 		{
+			if(mouseOver)
+			{	
+				// pass it forward to the childrens
+				uiLogicState->SetMouseOverHandled(false);
+			}
+			
 			SuspendInputEventsForChildrens(false);
 			_state = EState::IDLE;
 			_slider.Hide();

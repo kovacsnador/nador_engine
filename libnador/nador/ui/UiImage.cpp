@@ -41,7 +41,7 @@ namespace nador
         _imageName = video::EImageName::IMAGE_NAME_COUNT;
     }
 
-    void UiImage::OnTick(IUiLogicState* uiLogicState)
+    void UiImage::OnTick(IUiLogicState* uiLogicState, NADOR_MAYBE_UNUSED bool mouseOver)
 	{
 		if(IsRealImage() && _renderData.Empty())
 		{

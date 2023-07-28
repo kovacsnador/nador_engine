@@ -199,7 +199,7 @@ namespace nador
 		void SetUiAppHandler(IUiApp* uiApp) noexcept;
 
 	protected:
-		virtual void OnTick(IUiLogicState* /*uiLogicState*/) {};
+		virtual void OnTick(IUiLogicState* /*uiLogicState*/, bool /*mouseOver*/) {};
 		virtual void OnRender(IRenderer* /*renderer*/, const quadVertices_t& /*vertices*/) {};
 		virtual void OnRenderEnd(IRenderer* /*renderer*/) {};
 

@@ -47,7 +47,7 @@ namespace nador
 		bool OnKeyPressed(EKeyCode keyCode) override;
 		bool OnKeyHolded(EKeyCode keyCode) override;
 
-		void OnTick(IUiLogicState* uiLogicState) override;
+		void OnTick(IUiLogicState* uiLogicState, bool mouseOver) override;
 
 	private:
 		static constexpr int32_t DEFAULT_LINE_WIDTH = 2;
