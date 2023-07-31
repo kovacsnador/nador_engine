@@ -13,7 +13,7 @@ TEST(EventTest, SimpleEventTest)
     nador::Event simpleEvent;
     nador::EventListener<> eventListener([&fired](){ fired = true;});
 
-    simpleEvent += &eventListener;
+    simpleEvent += eventListener;
 
     EXPECT_FALSE(fired);
 
@@ -41,7 +41,7 @@ TEST_P(EventTest, MultiListenersEventTest)
     for(size_t i = 0; i < GetParam(); ++i)
     {
         auto listener = std::make_unique<nador::EventListener<>>([&count](){ ++count; });
-        simpleEvent += listener.get();
+        simpleEvent += *listener.get();
 
         vec.push_back(std::move(listener));
     }

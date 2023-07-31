@@ -44,7 +44,7 @@ namespace nador
 
         struct SoundSourceImpl : public ISoundSource, public onStopAllSound_listener_t
         {
-            SoundSourceImpl(uint32_t sourceId, uint32_t soundId, onStopAllSound_event_t* event);
+            SoundSourceImpl(uint32_t sourceId, uint32_t soundId, onStopAllSound_event_t& event);
             ~SoundSourceImpl();
 
             void Play() const override;

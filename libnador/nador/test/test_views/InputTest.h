@@ -19,11 +19,6 @@ namespace nador
 		InputTest(const IInputController* inputCtrl);
 
 		/*!
-		 * InputTest destructor.
-		 */
-		~InputTest();
-
-		/*!
 		 * Render the imgui content.
 		 */
 		void OnDebugRender(IRenderer* /*renderer*/) override;

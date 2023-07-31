@@ -3,7 +3,7 @@
 namespace nador
 {
     TickTracker::TickTracker()
-	: onTickBegin_listener_t(&g_onTickBeginEvent, std::bind(&TickTracker::_onTickBegin, this))
+	: onTickBegin_listener_t(g_onTickBeginEvent, std::bind(&TickTracker::_onTickBegin, this))
 	{
 	}
     

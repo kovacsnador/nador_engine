@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <algorithm>
-#include <list>
+#include <set>
 
 #include "nador/log/Log.h"
 
@@ -19,7 +19,7 @@ namespace nador
 	{
 		using callback_t = std::function<void(Args...)>;
 		using event_t = Event<Args...>;
-		using event_list_t = std::list<event_t*>;
+		using event_list_t = std::set<event_t*>;
 
 	public:
 		/*!
@@ -51,26 +51,30 @@ namespace nador
 		 * EventListener constructor.
 		 * Attachs listener to the event directly.
 		 *
-		 * \param pEvent		The event to attach.
+		 * \param event		The event to attach.
 		 * \param callback  The callback on event fire.
 		 */
-		EventListener(event_t* pEvent, const callback_t& callback)
+		EventListener(event_t& event, const callback_t& callback)
 		: _callback(callback)
 		{
-			pEvent->operator+=(this);
+			//pEvent.operator+=(*this);
+
+			event += *this;
 		}
 
 		/*!
 		 * EventListener constructor.
 		 * Attachs listener to the event directly.
 		 *
-		 * \param pEvent		The event to attach.
+		 * \param event		The event to attach.
 		 * \param callback  The callback on event fire.
 		 */
-		EventListener(event_t* pEvent, callback_t&& callback)
+		EventListener(event_t& event, callback_t&& callback)
 		: _callback(std::move(callback))
 		{
-			pEvent->operator+=(this);
+			//pEvent->operator+=(*this);
+
+			event += *this;
 		}
 
 		/*!
@@ -83,7 +87,7 @@ namespace nador
 			event_list_t tempList = _attachedEvents;
 			for (auto& it : tempList)
 			{
-				it->operator-=(this);
+				it->operator-=(*this);
 			}
 		}
 
@@ -124,41 +128,23 @@ namespace nador
 		/*!
 		 * Attach to an event.
 		 *
-		 * \param pEvent  The attached event.
+		 * \param event  The attached event.
 		 */
-		void AttachEvent(event_t* pEvent)
+		bool AttachEvent(event_t& event)
 		{
-			NADOR_ASSERT(pEvent);
-
-			auto findIter = std::find(_attachedEvents.begin(), _attachedEvents.end(), pEvent);
-
-			if (findIter != _attachedEvents.end())
-			{
-				ENGINE_WARNING("Event listener already added to event!");
-				return;
-			}
-
-			_attachedEvents.push_back(pEvent);
+			auto[_, inserted] = _attachedEvents.insert(&event);
+			return inserted;
 		}
 
 		/*!
 		 * Detach from an event.
 		 *
-		 * \param pEvent  The detached event.
+		 * \param event  The detached event.
 		 */
-		void DetachEvent(const event_t* pEvent)
-		{
-			NADOR_ASSERT(pEvent);
-			
-			auto findIter = std::find(_attachedEvents.begin(), _attachedEvents.end(), pEvent);
-
-			if (findIter == _attachedEvents.end())
-			{
-				ENGINE_WARNING("Event listener already detached from event!");
-				return;
-			}
-
-			_attachedEvents.erase(findIter);
+		bool DetachEvent(event_t& event)
+		{	
+			_attachedEvents.erase(&event);
+			return true;
 		}
 
 		void Suspend(bool suspend)

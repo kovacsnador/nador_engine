@@ -124,7 +124,7 @@ namespace nador
         };
 
     public:
-        ThreadPool(uint32_t nrThreads);
+        ThreadPool(uint32_t nrThreads, std::string_view nameOfPool = "nador_worker_thread_");
         ~ThreadPool();
 
         template <typename FunctionTy, typename... Args>

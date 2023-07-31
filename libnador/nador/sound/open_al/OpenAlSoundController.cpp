@@ -199,7 +199,7 @@ namespace nador
         alec(alSourcei(sourceId, AL_LOOPING, AL_FALSE));
         alec(alSourcei(sourceId, AL_BUFFER, iter->second->bufferId));
 
-        return std::make_unique<SoundSourceImpl>(soundId, sourceId, &_onStopAllSoundEvent);
+        return std::make_unique<SoundSourceImpl>(soundId, sourceId, _onStopAllSoundEvent);
     }
 
     void OpenAlSoundContoller::PlaySound(uint32_t soundId)
@@ -241,7 +241,7 @@ namespace nador
         alec(alDeleteBuffers(1, &bufferId));
     }
 
-    OpenAlSoundContoller::SoundSourceImpl::SoundSourceImpl(uint32_t soundId, uint32_t sourceId, onStopAllSound_event_t* event)
+    OpenAlSoundContoller::SoundSourceImpl::SoundSourceImpl(uint32_t soundId, uint32_t sourceId, onStopAllSound_event_t& event)
     : onStopAllSound_listener_t(event, std::bind(&OpenAlSoundContoller::SoundSourceImpl::Stop, this))
     , soundId(soundId)
     , sourceId(sourceId)

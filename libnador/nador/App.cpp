@@ -89,7 +89,7 @@ namespace nador
              IAtlasControllerPtr atlasCtrl,
              IFontControllerPtr  fontCtrl,
              ITestControllerPtr  testCtrl)
-    : onWindowClose_listener_t(&g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
+    : onWindowClose_listener_t(g_onWindowCloseEvent, std::bind(&App::_onWindowClose, this))
     , _config(config)
     , _window(std::move(window))
     , _video(std::move(video))
@@ -114,7 +114,7 @@ namespace nador
     {
         ENGINE_DEBUG("App deinitializing....");
 
-        // need to be delete before other modules (not holding refcounted Ptr to others)
+        // need to delete before other modules (not holding refcounted Ptr to others)
         _testCtrl.reset();
 
         ENGINE_DEBUG("App deinitialized.");

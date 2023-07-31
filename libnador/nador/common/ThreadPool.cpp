@@ -18,7 +18,7 @@ namespace nador
 
 } // namespace nador
 
-nador::ThreadPool::ThreadPool(uint32_t nrThreads)
+nador::ThreadPool::ThreadPool(uint32_t nrThreads, std::string_view nameOfPool)
 {
     if (nrThreads == 0)
     {
@@ -27,12 +27,11 @@ nador::ThreadPool::ThreadPool(uint32_t nrThreads)
 
     for (uint32_t i = 0; i < nrThreads; ++i)
     {
-        _workerthreads.emplace_back([this, i] {
-            char threadName[50];
-            if (snprintf(threadName, sizeof(threadName), "nador_worker_thread_%d", i))
-            {
-                SetThreadName(threadName);
-            }
+        std::string nameOfThread{nameOfPool};
+        nameOfThread += std::to_string(i);
+
+        _workerthreads.emplace_back([this, i, nameOfThread] {
+            SetThreadName(nameOfThread.c_str());
 
             for (;;)
             {

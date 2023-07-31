@@ -15,26 +15,19 @@ namespace nador
 		memset(_additionalMsg, 0, bufferSize * sizeof(*_additionalMsg));
 		memset(_additionalMsgMouse, 0, bufferSize * sizeof(*_additionalMsgMouse));
 
-		g_onKeyPressedEvent += &_keyPressedListener;
-		g_onKeyHoldedEvent += &_keyHoldedListener;
-		g_onKeyReleasedEvent += &_keyReleasedListener;
+		g_onKeyPressedEvent += _keyPressedListener;
+		g_onKeyHoldedEvent += _keyHoldedListener;
+		g_onKeyReleasedEvent += _keyReleasedListener;
 
 		_keyPressedListener.SetCallback(std::bind(&InputTest::_KeyPressedCallback, this, arg::_1));
 		_keyHoldedListener.SetCallback(std::bind(&InputTest::_KeyHoldedCallback, this, arg::_1));
 		_keyReleasedListener.SetCallback(std::bind(&InputTest::_KeyReleasedCallback, this, arg::_1));
 
-		g_onMousePressedEvent += &_mousePressedListener;
-		g_onMouseReleasedEvent += &_mouseReleasedListener;
+		g_onMousePressedEvent += _mousePressedListener;
+		g_onMouseReleasedEvent += _mouseReleasedListener;
 
 		_mousePressedListener.SetCallback(std::bind(&InputTest::_MousePressedCallback, this, arg::_1, arg::_2));
 		_mouseReleasedListener.SetCallback(std::bind(&InputTest::_MouseReleasedCallback, this, arg::_1, arg::_2));
-	}
-
-	InputTest::~InputTest()
-	{
-		g_onKeyPressedEvent -= &_keyPressedListener;
-		g_onKeyHoldedEvent -= &_keyHoldedListener;
-		g_onKeyReleasedEvent -= &_keyReleasedListener;
 	}
 
 	void InputTest::OnDebugRender(IRenderer* /*renderer*/)

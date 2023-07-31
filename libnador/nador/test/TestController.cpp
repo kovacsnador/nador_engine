@@ -6,9 +6,9 @@
 namespace nador
 {
     TestController::TestController()
-    : _onTickListener(&g_onTickEvent, std::bind(&TestController::OnTick, this, arg::_1))
-    , _onRenderListener(&g_onRenderEvent, std::bind(&TestController::OnRender, this, arg::_1))
-    , _onDebugRenderListener(&g_onDebugRenderEvent, std::bind(&TestController::OnDebugRender, this, arg::_1))
+    : _onTickListener(g_onTickEvent, std::bind(&TestController::OnTick, this, arg::_1))
+    , _onRenderListener(g_onRenderEvent, std::bind(&TestController::OnRender, this, arg::_1))
+    , _onDebugRenderListener(g_onDebugRenderEvent, std::bind(&TestController::OnDebugRender, this, arg::_1))
     {
     }
 
