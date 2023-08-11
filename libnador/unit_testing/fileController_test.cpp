@@ -16,18 +16,12 @@ struct FileControllerTest : public ::testing::TestWithParam<PathPair_t>
         fileCtrl = nador::ModuleFactory::CreateFileController("");
         const auto& [path, _] = GetParam();
 
-        std::cout << "Create path: " << path << '\n';
         EXPECT_TRUE(std::filesystem::create_directories(path));
     }
 
     void TearDown() override
     {
         const auto& [path, _] = GetParam();
-
-        std::cout << "Delete path: " << path << '\n';
-        std::cout << "Delete parent path: " << path.parent_path() << '\n';
-        std::cout << "Delete root path: " << path.root_directory() << '\n';
-        std::cout << "Root name path: " << path.root_name() << '\n';
 
         // getting parent folder if exist
         auto p = path;
@@ -45,7 +39,7 @@ struct FileControllerTest : public ::testing::TestWithParam<PathPair_t>
 
 INSTANTIATE_TEST_CASE_P(FileControllerTest, FileControllerTest, ::testing::Values(
     PathPair_t{"unit_test" , "unit_test_file.txt"},
-    //PathPair_t{"unit_test/root" , "unit_test_file2.txt"},
+    PathPair_t{"unit_test/root" , "unit_test_file2.txt"},
     PathPair_t{"unit_test/root/sub" , "unit_test_file3.txt"}));
 
 TEST_P(FileControllerTest, WriteAndRead_test)

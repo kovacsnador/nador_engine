@@ -196,6 +196,14 @@ namespace nador
 
         bool _suspended { false };
     };
+
+    // Deduction guide
+    template<typename... Args>
+    EventListener(std::function<void(Args...)>) -> EventListener<Args...>;
+
+    template<typename... Args, typename T>
+    EventListener(Event<Args...>, T) -> EventListener<Args...>;
+
 } // namespace nador
 
 #endif // !__EVENT_LISTENER_H__
