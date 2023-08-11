@@ -47,7 +47,7 @@ namespace nador
          *
          * \return True if the window should be closed otherwise False.
          */
-        bool ShouldClose() const override;
+        bool ShouldClose() const noexcept override;
 
         /*!
          * The Tick function.

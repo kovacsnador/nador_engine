@@ -120,7 +120,7 @@ namespace nador
         ENGINE_DEBUG("App deinitialized.");
     }
 
-    bool App::ShouldClose() const
+    bool App::ShouldClose() const noexcept
     {
         return _state == EAppState::CLOSED;
     }
@@ -142,6 +142,7 @@ namespace nador
 
         // Game Tick event
         float_t deltaTime = _tickTracker.GetLastDeltaTimeInSec();
+        g_onAnimationTickEvent(deltaTime);
         g_onTickEvent(deltaTime);
 
         // Render event

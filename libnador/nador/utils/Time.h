@@ -13,7 +13,7 @@ namespace nador
     using microsec_t = std::chrono::microseconds;
     using millisec_t = std::chrono::milliseconds;
     using seconds_t = std::chrono::seconds;
-    using seconds_f_t = std::chrono::duration<float_t>;
+    using seconds_f_t = std::chrono::duration<float>;
     using minutes_t = std::chrono::minutes;
     using hours_t = std::chrono::hours;
 

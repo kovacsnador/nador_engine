@@ -25,6 +25,7 @@ target_sources(${PROJECT_NAME}
     eventListener_test.cpp
     threadpool_test.cpp
     fileController_test.cpp
+    sequence_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

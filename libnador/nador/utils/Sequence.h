@@ -4,60 +4,101 @@
 #include <functional>
 #include <vector>
 #include <chrono>
+#include <cmath>
+
+#include "nador/utils/event/Event.h"
+#include "nador/utils/Time.h"
+
+using namespace std::chrono_literals;
 
 namespace nador
 {
-    template <typename ActionTy, typename DurationTy = std::chrono::milliseconds>
+    template <typename DurationTy = float_t, typename... Args>
     struct ElementSequence
     {
-        template<typename... Args>
         void operator()(Args&&... args) const
         {
-            if(action)
+            if (action)
             {
                 action(std::forward<Args>(args)...);
             }
         }
 
-        DurationTy duration{};
-        ActionTy   action{};
+        DurationTy                   duration {};
+        std::function<void(Args...)> action {};
     };
 
-    template<typename ActionTy, typename DurationTy = std::chrono::milliseconds>
+    template <typename ClockTy = std::chrono::system_clock, typename DurationTy = float_t, typename... Args>
     class Sequence
     {
     public:
-        Sequence(std::vector<ElementSequence<ActionTy, DurationTy>> seq)
-        : _sequence(std::move(seq))
+        enum class EPlayPolicy
         {
+            NORMAL,
+            FORCED,
+        };
+
+        using sequence_list_t = std::vector<ElementSequence<DurationTy, Args...>>;
+
+        Sequence(sequence_list_t seq, Event<DurationTy>& event)
+        : _sequence(std::move(seq))
+        , _listener([this](DurationTy delta, Args... args) { _Tick(delta, args...); })
+        {
+            _currentIter = _sequence.end();
+            _listener.Suspend(true);
+            event += _listener;
         }
 
-        void Start()
+        void Play(EPlayPolicy policy = EPlayPolicy::NORMAL)
         {
-            
+            _listener.Suspend(false);
+            if (_currentIter == _sequence.end() || policy == EPlayPolicy::FORCED)
+            {
+                _deltaBuffer = 0;
+                _currentIter = _sequence.begin();
+            }
+        }
+
+        void Pause()
+        {
+            _listener.Suspend(true);
         }
 
         void Stop()
         {
-
-        }
-
-        template<typenaem... Args>
-        void Pull(Args&&... args)
-        {
-            for(const auto& it : _pendingActions)
-            {
-                it(args...);
-            }
-
-            _pendingActions.clear();
+            _listener.Suspend(true);
+            _currentIter = _sequence.end();
         }
 
     private:
-        std::vector<ElementSequence<ActionTy, DurationTy>> _sequence;
-        std::vector<ActionTy> _pendingActions;
-    };
+        void _Tick(DurationTy deltaTime, Args... args)
+        {
+            _deltaBuffer += deltaTime;
 
+            for (; _currentIter != _sequence.end(); ++_currentIter)
+            {
+                if (_deltaBuffer < _currentIter->duration)
+                {
+                    break;
+                }
+
+                // trigger sequence callback
+                (*_currentIter)(args...);
+                _deltaBuffer -= _currentIter->duration;
+            }
+
+            if(_currentIter == _sequence.end())
+            {
+                _listener.Suspend(true);
+            }
+        }
+
+        sequence_list_t           _sequence;
+        sequence_list_t::iterator _currentIter;
+
+        EventListener<DurationTy> _listener;
+        DurationTy                _deltaBuffer { 0 };
+    };
 } // namespace nador
 
 #endif //!__NADOR_SEQUENCE_H__

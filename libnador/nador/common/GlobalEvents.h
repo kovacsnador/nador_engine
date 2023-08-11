@@ -37,6 +37,10 @@ namespace nador
 	extern onTick_event_t g_onTickEvent;
 
 	//=====================================================================
+	CREATE_EVENT_TYPE_ARG_1(onAnimationTick, float_t);
+	extern onTick_event_t g_onAnimationTickEvent;
+
+	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_0(onTickEnd);
 	extern onTickEnd_event_t g_onTickEndEvent;
 

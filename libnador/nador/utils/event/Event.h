@@ -9,23 +9,47 @@
 namespace nador
 {
     template <typename... Args>
-    class Event
+    class Event : private OnlyMoveable
     {
     public:
         using listener_t      = EventListener<Args...>;
         using listener_list_t = std::list<listener_t*>;
 
         /*!
+         * Event default constructor.
+         */
+        Event() = default;
+
+        /*!
+         * Event default move constructor.
+         */
+        Event(Event&& other) noexcept
+        : _listeners(other._listeners)
+        {
+            other._Detach();
+            _Attach();
+        }
+
+        /*!
+         * Event default move assign operator.
+         */
+        Event& operator=(Event&& other) noexcept
+        {
+            if (&other != this)
+            {
+                _listeners = other._listeners;
+
+                other._Detach();
+                _Attach();
+            }
+            return *this;
+        }
+
+        /*!
          * Event destructor.
          * Detach all event listeners if some is left.
          */
-        ~Event()
-        {
-            for (auto it : _listeners)
-            {
-                it->DetachEvent(*this);
-            }
-        }
+        ~Event() { _Detach(); }
 
         /*!
          * Add listener to the event.
@@ -35,7 +59,7 @@ namespace nador
         void operator+=(listener_t& listener)
         {
             auto ok = _HandleListener(
-                listener, [this](listener_t& l) { return _Attach(l); }, [](auto it, auto end) { return it == end; });
+                listener, [this](auto& l) { return _Attach(l); }, [](auto it, auto end) { return it == end; });
 
             if (ok == false)
             {
@@ -52,7 +76,7 @@ namespace nador
         {
             auto ok = _HandleListener(
                 listener,
-                [this](listener_t& l) {
+                [this](auto& l) {
                     _listeners.push_front(&l);
                     l.AttachEvent(*this);
                     return true;
@@ -73,7 +97,7 @@ namespace nador
         void operator-=(listener_t& listener)
         {
             auto ok = _HandleListener(
-                listener, [this](listener_t& l) { return _Detach(l); }, [](auto it, auto end) { return it != end; });
+                listener, [this](auto& l) { return _Detach(l); }, [](auto it, auto end) { return it != end; });
 
             if (ok == false)
             {
@@ -126,6 +150,17 @@ namespace nador
             _listeners.remove(&eventListener);
             eventListener.DetachEvent(*this);
             return true;
+        }
+
+        void _Detach()
+        {
+            std::for_each(_listeners.begin(), _listeners.end(), [this](auto& it) { it->DetachEvent(*this); });
+            _listeners.clear();
+        }
+
+        void _Attach()
+        {
+            std::for_each(_listeners.begin(), _listeners.end(), [this](auto it) { it->AttachEvent(*this); });
         }
 
         listener_list_t _listeners;
