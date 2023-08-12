@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 namespace nador
 {
-    template <typename DurationTy = float, typename... Args>
+    template <typename DurationTy = std::chrono::milliseconds, typename... Args>
     struct ElementSequence
     {
         void operator()(Args&&... args) const
@@ -27,7 +27,7 @@ namespace nador
         std::function<void(Args...)> action {};
     };
 
-    template <typename ClockTy = std::chrono::system_clock, typename DurationTy = float, typename... Args>
+    template <typename DurationTy = std::chrono::milliseconds, typename... Args>
     class Sequence
     {
     public:
@@ -53,7 +53,7 @@ namespace nador
             _listener.Suspend(false);
             if (_currentIter == _sequence.end() || policy == EPlayPolicy::FORCED)
             {
-                _deltaBuffer = 0;
+                _deltaBuffer = DurationTy{0};
                 _currentIter = _sequence.begin();
             }
         }

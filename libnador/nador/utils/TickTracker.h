@@ -35,6 +35,13 @@ namespace nador
 		 */
 		float_t GetLastDeltaTimeInSec() const;
 
+		template<typename DurationTy>
+		auto DeltaTime() const noexcept
+		{
+			std::chrono::duration<float_t> deltaInSec(GetLastDeltaTime());
+			return std::chrono::duration_cast<DurationTy>(deltaInSec);
+		}
+
 		/*!
 		 * Gets the tick per seconds (TPS).
 		 *

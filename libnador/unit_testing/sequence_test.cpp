@@ -4,7 +4,7 @@
 
 TEST(SequneceTest, Sequence_test)
 {
-    nador::Event<float> event;
+    nador::Event<std::chrono::milliseconds> event;
 
     size_t count{0};
 
@@ -19,7 +19,7 @@ TEST(SequneceTest, Sequence_test)
         EXPECT_TRUE(true);
     }
 
-    std::vector<nador::ElementSequence<>> list{{0.001f, action}, {0.0015f, action}, {0.002f, action}, {0.0005f, action}};
+    std::vector<nador::ElementSequence<>> list{{10ms, action}, {15ms, action}, {20ms, action}, {5ms, action}};
 
     nador::Sequence sequence(list, event);
 
@@ -29,7 +29,7 @@ TEST(SequneceTest, Sequence_test)
     {
         std::this_thread::sleep_for(10ms);
 
-        event(0.001f);
+        event(10ms);
     }
 
     EXPECT_EQ(count, list.size());

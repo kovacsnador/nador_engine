@@ -141,9 +141,8 @@ namespace nador
         _TickBegin();
 
         // Game Tick event
-        float_t deltaTime = _tickTracker.GetLastDeltaTimeInSec();
-        g_onAnimationTickEvent(deltaTime);
-        g_onTickEvent(deltaTime);
+        g_onAnimationTickEvent(_tickTracker.DeltaTime<std::chrono::milliseconds>());
+        g_onTickEvent(_tickTracker.GetLastDeltaTimeInSec());
 
         // Render event
         g_onRenderEvent(GetRenderer());

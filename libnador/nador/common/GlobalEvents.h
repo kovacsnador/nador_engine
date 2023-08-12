@@ -1,6 +1,8 @@
 #ifndef __GLOBAL_EVENTS_H__
 #define __GLOBAL_EVENTS_H__
 
+#include <chrono>
+
 #include "nador/utils/event/Event.h"
 #include "nador/common/KeyCodes.h"
 #include "nador/common/Mouse.h"
@@ -37,8 +39,8 @@ namespace nador
 	extern onTick_event_t g_onTickEvent;
 
 	//=====================================================================
-	CREATE_EVENT_TYPE_ARG_1(onAnimationTick, float_t);
-	extern onTick_event_t g_onAnimationTickEvent;
+	CREATE_EVENT_TYPE_ARG_1(onAnimationTick, std::chrono::milliseconds);
+	extern onAnimationTick_event_t g_onAnimationTickEvent;
 
 	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_0(onTickEnd);
