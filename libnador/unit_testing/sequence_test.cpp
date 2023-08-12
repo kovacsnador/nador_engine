@@ -4,7 +4,7 @@
 
 TEST(SequneceTest, Sequence_test)
 {
-    nador::Event<float_t> event;
+    nador::Event<float> event;
 
     size_t count{0};
 

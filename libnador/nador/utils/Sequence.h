@@ -4,7 +4,6 @@
 #include <functional>
 #include <vector>
 #include <chrono>
-#include <cmath>
 
 #include "nador/utils/event/Event.h"
 #include "nador/utils/Time.h"
@@ -13,7 +12,7 @@ using namespace std::chrono_literals;
 
 namespace nador
 {
-    template <typename DurationTy = float_t, typename... Args>
+    template <typename DurationTy = float, typename... Args>
     struct ElementSequence
     {
         void operator()(Args&&... args) const
@@ -28,7 +27,7 @@ namespace nador
         std::function<void(Args...)> action {};
     };
 
-    template <typename ClockTy = std::chrono::system_clock, typename DurationTy = float_t, typename... Args>
+    template <typename ClockTy = std::chrono::system_clock, typename DurationTy = float, typename... Args>
     class Sequence
     {
     public:
