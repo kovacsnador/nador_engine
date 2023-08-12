@@ -3,10 +3,10 @@
 
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <mutex>
 #include <vector>
 #include <future>
+#include <list>
 
 #include "nador/sound/ISoundController.h"
 #include "nador/utils/event/Event.h"

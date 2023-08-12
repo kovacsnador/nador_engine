@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/utils/TinyXmlHelper.h"
 
 namespace nador

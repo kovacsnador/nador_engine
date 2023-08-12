@@ -5,7 +5,7 @@
 
 #include "nador/utils/Types.h"
 #include "nador/system/IFileController.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

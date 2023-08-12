@@ -1,6 +1,8 @@
 #include "nador/ui/UiImage.h"
 #include "nador/ui/UiCommon.h"
 #include "nador/video/atlas/IAtlasController.h"
+#include "nador/video/renderer/IRenderer.h"
+#include "nador/ui/IUiLogicState.h"
 
 namespace nador
 {

@@ -1,16 +1,15 @@
 #ifndef __UI_APP_H__
 #define __UI_APP_H__
 
-#include <map>
-
 #include "nador/ui/IUiApp.h"
 #include "nador/common/GlobalListener.h"
 #include "nador/system/IInputController.h"
 #include "nador/video/atlas/IAtlasController.h"
+#include "nador/utils/NonCopyable.h"
 
 namespace nador
 {
-    class UiApp : public IUiApp, protected GlobalListener
+    class UiApp : public IUiApp, protected GlobalListener, private NonCopyable
     {
     public:
         /*!

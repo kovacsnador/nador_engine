@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/system/window/WindowGLFW.h"
 #include "nador/utils/ImGuiHelper.h"
 

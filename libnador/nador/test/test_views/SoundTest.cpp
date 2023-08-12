@@ -3,7 +3,7 @@
 #include "nador/utils/ImGuiHelper.h"
 #include "nador/test/test_views/SoundTest.h"
 #include "nador/sound/ISoundController.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

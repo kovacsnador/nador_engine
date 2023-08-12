@@ -9,6 +9,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	struct TestImage
 	{
 		TestImage();

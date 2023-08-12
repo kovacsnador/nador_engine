@@ -1,20 +1,21 @@
 #ifndef __I_UI_ELEMENT_H__
 #define __I_UI_ELEMENT_H__
 
-#include <vector>
 #include <functional>
 #include <list>
 
-#include "nador/utils/Types.h"
 #include "nador/ui/UiCommon.h"
 #include "nador/common/Mouse.h"
 #include "nador/common/KeyCodes.h"
 #include "nador/utils/NonCopyable.h"
-#include "nador/ui/IUiLogicState.h"
 #include "nador/ui/UiEdgeDrawer.h"
 
 namespace nador
 {
+	class IRenderer;
+	class IUiLogicState;
+	class IUiApp;
+
 	class IUiElement;
 	CREATE_PTR_TYPES(IUiElement);
 

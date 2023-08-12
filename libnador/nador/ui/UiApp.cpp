@@ -1,5 +1,6 @@
 #include "nador/ui/UiApp.h"
 #include "nador/ui/UiLogicState.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {
@@ -144,7 +145,7 @@ namespace nador
 
 	void UiApp::OnTick(float_t deltaTime)
 	{
-		UiLogicState uiLogicState(deltaTime, _inputCtrl.get(), _atlasCtrl.get(), this);
+		UiLogicState uiLogicState{deltaTime, _inputCtrl.get(), _atlasCtrl.get(), this};
 		auto screenVertices = GetScreenVertices();
 
 		// reverse iteration 

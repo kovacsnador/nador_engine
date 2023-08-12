@@ -4,7 +4,7 @@
 #include "nador/video/opengl3/shaders/ShaderOpenGL3.h"
 #endif // USE_OPENGL_3
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

@@ -8,6 +8,8 @@
 
 namespace nador
 {
+	class IRenderer;
+	
 	class UiImage : public IUiElement
 	{
 	public:

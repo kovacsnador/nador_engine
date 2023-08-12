@@ -15,6 +15,7 @@ namespace nador
     class IUiApp;
     class IFontController;
     class IInputController;
+    class IRenderer;
 
     class UiElementsTest : public ITest
     {

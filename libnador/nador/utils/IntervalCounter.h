@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/utils/Types.h"
 #include "nador/utils/Time.h"
 

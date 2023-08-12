@@ -5,6 +5,7 @@
 #include "nador/video/font/IFontController.h"
 #include "nador/system/IInputController.h"
 #include "nador/ui/IUiApp.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {

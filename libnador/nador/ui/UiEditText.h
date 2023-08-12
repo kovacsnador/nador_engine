@@ -9,6 +9,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	class UiEditText : public IUiElement
 	{
 		enum class EState

@@ -6,6 +6,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	class UiOverlay : public IUiElement
 	{
 	public:

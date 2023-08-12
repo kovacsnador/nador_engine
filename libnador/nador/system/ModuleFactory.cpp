@@ -1,5 +1,5 @@
 #include "nador/system/ModuleFactory.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 #ifdef USE_GLFW_WINDOW
 #include "nador/system/window/WindowGLFW.h"

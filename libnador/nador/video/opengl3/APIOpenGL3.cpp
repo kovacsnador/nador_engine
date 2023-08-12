@@ -1,5 +1,5 @@
 ﻿#include "APIOpenGL3.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 #ifdef NADOR_VIDEO_DEBUG
 #define GL_CLEAR_ERRORS GLClearErrors(__FUNCTION__);

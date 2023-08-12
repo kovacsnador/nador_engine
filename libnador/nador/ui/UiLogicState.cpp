@@ -1,7 +1,7 @@
 #include "nador/ui/UiLogicState.h"
 #include "nador/system/IInputController.h"
 #include "nador/video/atlas/IAtlasController.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

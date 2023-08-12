@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "nador/system/input/GLFWInputController.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 #include "nador/system/input/input_events/InputEvents.h"
 #include "nador/utils/event/Event.h"

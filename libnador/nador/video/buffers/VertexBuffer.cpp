@@ -1,5 +1,5 @@
 #include "nador/video/buffers/VertexBuffer.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

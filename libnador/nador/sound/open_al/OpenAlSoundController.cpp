@@ -7,7 +7,7 @@
 #include "dr_libs/dr_mp3.h"
 
 #include "nador/system/IFileController.h"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/sound/open_al/OpenALSoundController.h"
 #include "nador/common/ThreadPool.h"
 #include "nador/utils/Utils.h"

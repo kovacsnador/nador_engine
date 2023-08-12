@@ -4,6 +4,7 @@
 #include "nador/test/TestCommon.h"
 #include "nador/video/IVideo.h"
 #include "nador/system/IFileController.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {

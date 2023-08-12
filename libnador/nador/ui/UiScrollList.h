@@ -7,6 +7,8 @@
 
 namespace nador
 {
+    class IRenderer;
+
     class UiScrollList : public IUiElement
     {
         enum class EState

@@ -1,6 +1,6 @@
 ﻿#include <malloc.h>
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/video/opengl3/VideoOpenGL3.h"
 
 namespace nador

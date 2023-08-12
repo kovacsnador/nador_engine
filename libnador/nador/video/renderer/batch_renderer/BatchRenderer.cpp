@@ -1,4 +1,4 @@
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/video/renderer/batch_renderer/BatchRenderer.h"
 #include "nador/video/renderer/batch_renderer/BatchRenderData.h"
 #include "nador/video/buffers/IndexBuffer.h"

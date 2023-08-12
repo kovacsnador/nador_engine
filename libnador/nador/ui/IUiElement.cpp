@@ -1,6 +1,7 @@
 #include "nador/ui/IUiApp.h"
-
 #include "nador/ui/IUiElement.h"
+#include "nador/video/renderer/IRenderer.h"
+#include "nador/ui/IUiLogicState.h"
 
 namespace nador
 {

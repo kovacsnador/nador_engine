@@ -1,4 +1,5 @@
 #include "nador/ui/UiOverlay.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {

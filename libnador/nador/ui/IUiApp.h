@@ -1,6 +1,8 @@
 #ifndef __NADOR_I_UI_APP_H__
 #define __NADOR_I_UI_APP_H__
 
+#include <map>
+
 #include "nador/utils/Types.h"
 #include "nador/ui/UiCommon.h"
 #include "nador/ui/IUiElement.h"

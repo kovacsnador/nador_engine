@@ -3,6 +3,7 @@
 #include "nador/ui/UiTextLabel.h"
 #include "nador/utils/Utils.h"
 #include "nador/log/ILog.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {

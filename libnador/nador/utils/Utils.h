@@ -9,7 +9,7 @@
 #include <type_traits>
 
 #include "glm/glm.hpp"
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

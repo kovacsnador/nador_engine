@@ -12,7 +12,7 @@
 
 #include "backends/imgui_impl_opengl3.h"
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/utils/ImGuiHelper.h"
 
 namespace nador

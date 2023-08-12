@@ -1,4 +1,5 @@
 #include "nador/ui/UiCommon.h"
+#include "nador/log/ILog.h"
 
 namespace nador
 {

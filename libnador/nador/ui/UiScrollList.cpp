@@ -1,5 +1,7 @@
 #include "nador/ui/UiScrollList.h"
 #include "nador/system/IInputController.h"
+#include "nador/video/renderer/IRenderer.h"
+#include "nador/ui/IUiLogicState.h"
 
 namespace nador
 {

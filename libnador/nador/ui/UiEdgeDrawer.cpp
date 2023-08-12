@@ -1,5 +1,6 @@
 #include "nador/ui/UiEdgeDrawer.h"
 #include "nador/utils/Utils.h"
+#include "nador/video/renderer/IRenderer.h"
 
 namespace nador
 {

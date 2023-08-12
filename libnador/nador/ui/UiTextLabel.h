@@ -6,6 +6,8 @@
 
 namespace nador
 {
+	class IRenderer;
+
 	class UiTextLabel : public IUiElement
 	{
 	public:

@@ -1,8 +1,7 @@
-#ifndef __EVENT_LISTENER_H__
-#define __EVENT_LISTENER_H__
+#ifndef __NADOR_EVENT_LISTENER_H__
+#define __NADOR_EVENT_LISTENER_H__
 
 #include <functional>
-#include <algorithm>
 #include <set>
 
 #include "nador/log/ILog.h"
@@ -206,4 +205,4 @@ namespace nador
 
 } // namespace nador
 
-#endif // !__EVENT_LISTENER_H__
+#endif // !__NADOR_EVENT_LISTENER_H__

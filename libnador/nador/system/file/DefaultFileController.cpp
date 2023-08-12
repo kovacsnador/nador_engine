@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <filesystem>
 
-#include "nador/log/Log.h"
+#include "nador/log/ILog.h"
 #include "nador/system/file/DefaultFileController.h"
 
 namespace nador

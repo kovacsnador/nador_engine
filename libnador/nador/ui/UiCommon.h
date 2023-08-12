@@ -1,9 +1,7 @@
 #ifndef __UI_COMMON_H__
 #define __UI_COMMON_H__
 
-#include <array>
-
-#include "nador/video/renderer/Renderer.h"
+#include "nador/utils/Types.h"
 
 #include "EImageName.h"
 
