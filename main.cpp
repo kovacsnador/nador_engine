@@ -1,5 +1,4 @@
 #include <iostream>
-#include <thread>
 
 #include "nador/App.h"
 #include "nador/log/StandardLogger.h"
@@ -28,7 +27,7 @@ enum Sound : uint32_t
 
 void InitFonts()
 {
-    nador::Stopwatch<std::chrono::system_clock> sw;
+    nador::Stopwatch sw;
 
     nador::IFontController* fontCtrl = nador::IApp::Get()->GetFontController();
 
@@ -48,7 +47,7 @@ void InitFonts()
 
 void InitSounds()
 {
-    nador::Stopwatch<std::chrono::system_clock> sw;
+    nador::Stopwatch sw;
 
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
 

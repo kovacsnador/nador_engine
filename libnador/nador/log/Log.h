@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <thread>
 #include <variant>
+#include <functional>
 
 #include "nador/log/ILog.h"
 #include "nador/log/StandardLogger.h"

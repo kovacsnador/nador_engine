@@ -3,11 +3,8 @@
 
 #include <memory>
 #include <cstdint>
-#include <functional>
 #include <string_view>
-#include <chrono>
-#include <ctime>
-#include <cstring>
+#include <array>
 
 #define NADOR_LOG nador::GetLogInterface()
 
@@ -181,37 +178,13 @@ namespace nador
 
     ILog* GetLoggingInterface();
     void  SetLoggingInterface(std::unique_ptr<ILog> log);
+
+    static constexpr size_t s_timeStringLenght = 100;
+    static constexpr size_t s_millisecondsStringLenght = 4;
+
+    using TimestampArray = std::array<char, (s_timeStringLenght + s_millisecondsStringLenght)>;
     
-    inline auto GetCurrentTimestamp(std::string_view format)
-    {
-        static constexpr size_t timeStringLenght = 100;
-        static constexpr size_t millisecondsStringLenght = 4;
-
-        auto currentTime = std::chrono::system_clock::now();
-
-        // Convert the time to milliseconds since epoch
-        auto duration     = currentTime.time_since_epoch();
-        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-
-        // Convert the milliseconds to a time_point representing the local time
-        std::time_t currentTimeMillis = std::chrono::system_clock::to_time_t(currentTime);
-        std::tm*    localTime         = std::localtime(&currentTimeMillis);
-
-        // Format the time string including milliseconds
-        char timeString[timeStringLenght];
-        std::strftime(timeString, sizeof(timeString), format.data(), localTime);
-
-        char millisecondsString[millisecondsStringLenght];
-        std::snprintf(millisecondsString, sizeof(millisecondsString), "%.3d", static_cast<int>(milliseconds % 1000));
-
-        std::array<char, timeStringLenght + millisecondsStringLenght + 1> result;
-
-        std::strcpy(result.data(), timeString);
-        strcat(result.data(), ".");
-        strcat(result.data(), millisecondsString);
-
-        return result;
-    }
+    TimestampArray GetCurrentTimestamp(std::string_view format);
 
 } // namespace nador
 

@@ -5,7 +5,7 @@
 
 namespace nador
 {
-    template<typename ClockTy>
+    template<typename ClockTy = std::chrono::system_clock>
     class Stopwatch
     {
     public:

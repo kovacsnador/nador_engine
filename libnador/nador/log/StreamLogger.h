@@ -4,12 +4,10 @@
 #include <memory>
 #include <fstream>
 #include <filesystem>
-#include <chrono>
-#include <future>
 
 namespace nador
 {
-    template <typename StreamTy>
+    template <typename StreamTy = std::ofstream>
     std::unique_ptr<StreamTy> GetStream(const std::filesystem::path& path)
     {
         auto parentPath = path.parent_path();
@@ -26,15 +24,15 @@ namespace nador
     public:
         using value_type = std::shared_ptr<std::ofstream>;
 
-        explicit StreamLogger(value_type&& stream)
-        : _streamPtr(std::forward<value_type>(stream))
+        explicit StreamLogger(value_type stream)
+        : _stream(std::move(stream))
         {
-            if (_streamPtr == nullptr)
+            if (_stream == nullptr)
             {
                 throw std::runtime_error("Stream is not created");
             }
 
-            if (_streamPtr->fail())
+            if (_stream->fail())
             {
                 throw std::runtime_error("Stream could not open");
             }
@@ -42,15 +40,15 @@ namespace nador
 
         void Write(std::string_view logMsg)
         {
-            if (_streamPtr && _streamPtr->is_open())
+            if (_stream && _stream->is_open())
             {
-                (*_streamPtr) << logMsg;
-                _streamPtr->flush();
+                (*_stream) << logMsg;
+                _stream->flush();
             }
         }
 
     private:
-        value_type _streamPtr;
+        value_type _stream;
     };
 } // namespace nador
 

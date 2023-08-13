@@ -4,6 +4,8 @@
 
 #include "nador/log/StandardLogger.h"
 
+static constexpr size_t s_standardLoggerBuffer = 2500;
+
 static constexpr const char* stdGreenBegin   = "\033[1;32m";
 static constexpr const char* stdYellowBegin  = "\033[1;33m";
 static constexpr const char* stdRedBegin     = "\033[1;31m";
@@ -24,25 +26,25 @@ static auto Concat(const char* color, std::string_view logMsg)
 
 void nador::StandardLogger::Debug(std::string_view logMsg) const noexcept
 {
-    auto msgWithColor = Concat<2500>(stdGreenBegin, logMsg);
+    auto msgWithColor = Concat<s_standardLoggerBuffer>(stdGreenBegin, logMsg);
     std::cout << msgWithColor.data();
 }
 
 void nador::StandardLogger::Warning(std::string_view logMsg) const noexcept
 {
-    auto msgWithColor = Concat<2500>(stdYellowBegin, logMsg);
+    auto msgWithColor = Concat<s_standardLoggerBuffer>(stdYellowBegin, logMsg);
     std::cout << msgWithColor.data();
 }
 
 void nador::StandardLogger::Error(std::string_view logMsg) const noexcept
 {
-    auto msgWithColor = Concat<2500>(stdRedBegin, logMsg);
+    auto msgWithColor = Concat<s_standardLoggerBuffer>(stdRedBegin, logMsg);
     std::cerr << msgWithColor.data();
 }
 
 void nador::StandardLogger::Fatal(std::string_view logMsg) const noexcept
 {
-    auto msgWithColor = Concat<2500>(stdMagentaBegin, logMsg);
+    auto msgWithColor = Concat<s_standardLoggerBuffer>(stdMagentaBegin, logMsg);
     std::cerr << msgWithColor.data();
 }
 
