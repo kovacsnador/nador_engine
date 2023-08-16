@@ -108,7 +108,12 @@ void SetupLogging()
 int main(void)
 {
     // Logger setup
-    SetupLogging();
+    //SetupLogging();
+
+    std::chrono::milliseconds ms{};
+    nador::utils::MeasureTime(ms, SetupLogging);
+
+    NADOR_DEBUG("SetupLogging duration: %dms", ms.count());
 
     {
         // Initialize the app with the config settings.

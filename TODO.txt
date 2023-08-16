@@ -27,7 +27,7 @@ Communicate with the audio thread: If you have other threads that need to intera
 You can use thread-safe queues or other inter-thread communication techniques to send requests or data to the audio thread, which will then execute the corresponding OpenAL operations.
 
 
-- Camera-át befejezni a rendererell
+- Camera-át befejezni a rendererell (done)
 
-- VerticesMultiMatrix multi threaded!!!
-- Make precompiled headers
+- VerticesMultiMatrix multi threaded!!! (nem jó)
+- Make precompiled headers (nem jó)

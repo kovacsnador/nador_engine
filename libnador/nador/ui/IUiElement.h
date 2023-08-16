@@ -57,12 +57,12 @@ namespace nador
         /*!
          * Shows the ui element.
          */
-        void Show();
+        void Show() noexcept;
 
         /*!
          * Hides the ui element.
          */
-        void Hide();
+        void Hide() noexcept;
 
         /*!
          * Gets if the ui element is showing.
@@ -85,13 +85,13 @@ namespace nador
          *
          * \param size	The new size.
          */
-        void SetSize(const glm::ivec2& size);
+        void SetSize(const glm::ivec2& size) noexcept;
 
-        void SetSize(int32_t width, int32_t height);
+        void SetSize(int32_t width, int32_t height) noexcept;
 
-        void SetWidth(int32_t width);
+        void SetWidth(int32_t width) noexcept;
 
-        void SetHeight(int32_t height);
+        void SetHeight(int32_t height) noexcept;
 
         /*!
          * Gets the ui element position.
@@ -105,7 +105,7 @@ namespace nador
          *
          * \param position	The new position.
          */
-        void SetPosition(const glm::ivec2& position);
+        void SetPosition(const glm::ivec2& position) noexcept;
 
         /*!
          * Gets the ui element alignment.
@@ -119,7 +119,7 @@ namespace nador
          *
          * \param alignment	The new alignment.
          */
-        void SetAlignment(const UiAlignment& aligner);
+        void SetAlignment(const UiAlignment& aligner) noexcept;
 
         /*!
          * Gets the parent ui element.
@@ -154,13 +154,13 @@ namespace nador
          */
         void RemoveChild(IUiElement* elem);
 
-        void SuspendInputEvents(bool suspend);
-        void SuspendInputEventsForChildrens(bool suspend);
+        void SuspendInputEvents(bool suspend) noexcept;
+        void SuspendInputEventsForChildrens(bool suspend) noexcept;
 
-        void HandleInputEventBeforeChildren(bool beforeChildren);
-        void SetDefaultMouseHandling(bool handled);
+        void HandleInputEventBeforeChildren(bool beforeChildren) noexcept;
+        void SetDefaultMouseHandling(bool handled) noexcept;
 
-        void             SetScale(const glm::vec3& scale);
+        void             SetScale(const glm::vec3& scale) noexcept; 
         const glm::vec3& GetScale() const noexcept;
 
         void OnTickImpl(IUiLogicState* uiLogicState);
@@ -180,7 +180,7 @@ namespace nador
 
         const quadVertices_t& GetVertices() const noexcept;
 
-        void              SetOffset(const glm::ivec2& offset);
+        void              SetOffset(const glm::ivec2& offset) noexcept;
         const glm::ivec2& GetOffset() const noexcept;
 
         void UpdateVertices(const quadVertices_t& parentVertices);

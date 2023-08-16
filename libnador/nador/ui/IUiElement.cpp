@@ -39,12 +39,12 @@ namespace nador
         }
     }
 
-    void IUiElement::Show()
+    void IUiElement::Show() noexcept
     {
         _isShow = true;
     };
 
-    void IUiElement::Hide()
+    void IUiElement::Hide() noexcept
     {
         _isShow = false;
     };
@@ -64,7 +64,7 @@ namespace nador
         return _size;
     };
 
-    void IUiElement::SetSize(const glm::ivec2& size)
+    void IUiElement::SetSize(const glm::ivec2& size) noexcept
     {
         if (size != _size)
         {
@@ -72,12 +72,12 @@ namespace nador
         }
     };
 
-    void IUiElement::SetSize(int32_t width, int32_t height)
+    void IUiElement::SetSize(int32_t width, int32_t height) noexcept
     {
         SetSize({ width, height });
     };
 
-    void IUiElement::SetWidth(int32_t width)
+    void IUiElement::SetWidth(int32_t width) noexcept
     {
         if (_size.x != width)
         {
@@ -85,7 +85,7 @@ namespace nador
         }
     };
 
-    void IUiElement::SetHeight(int32_t height)
+    void IUiElement::SetHeight(int32_t height) noexcept
     {
         if (_size.y != height)
         {
@@ -98,7 +98,7 @@ namespace nador
         return _position;
     };
 
-    void IUiElement::SetPosition(const glm::ivec2& position)
+    void IUiElement::SetPosition(const glm::ivec2& position) noexcept
     {
         if (position != _position)
         {
@@ -111,7 +111,7 @@ namespace nador
         return _alignment;
     };
 
-    void IUiElement::SetAlignment(const UiAlignment& aligner)
+    void IUiElement::SetAlignment(const UiAlignment& aligner) noexcept
     {
         _alignment = aligner;
     };
@@ -186,12 +186,12 @@ namespace nador
         }
     }
 
-    void IUiElement::SuspendInputEvents(bool suspend)
+    void IUiElement::SuspendInputEvents(bool suspend) noexcept
     {
         _inputEventSuspended = suspend;
     }
 
-    void IUiElement::SuspendInputEventsForChildrens(bool suspend)
+    void IUiElement::SuspendInputEventsForChildrens(bool suspend) noexcept
     {
         for (auto& it : _childrens)
         {
@@ -199,12 +199,12 @@ namespace nador
         }
     }
 
-    void IUiElement::HandleInputEventBeforeChildren(bool beforeChildren)
+    void IUiElement::HandleInputEventBeforeChildren(bool beforeChildren) noexcept
     {
         _handleInputEventBeforeChildren = beforeChildren;
     }
 
-    void IUiElement::SetDefaultMouseHandling(bool handled)
+    void IUiElement::SetDefaultMouseHandling(bool handled) noexcept
     {
         _defaultMouseHandling = handled;
     }
@@ -214,7 +214,7 @@ namespace nador
         return _scale;
     }
 
-    void IUiElement::SetScale(const glm::vec3& scale)
+    void IUiElement::SetScale(const glm::vec3& scale) noexcept
     {
         _scale = scale;
 
@@ -303,7 +303,7 @@ namespace nador
         return _vertices;
     }
 
-    void IUiElement::SetOffset(const glm::ivec2& offset)
+    void IUiElement::SetOffset(const glm::ivec2& offset) noexcept
     {
         _offset = offset;
     }

@@ -4,12 +4,16 @@
 #include <chrono>
 #include <future>
 #include <string>
+#include <string_view>
 #include <regex>
 #include <random>
 #include <type_traits>
+#include <functional>
 
 #include "glm/glm.hpp"
 #include "nador/log/ILog.h"
+#include "nador/common/Finally.h"
+#include "nador/common/Stopwatch.h"
 
 namespace nador
 {
@@ -122,7 +126,7 @@ namespace nador
             return static_cast<typename std::underlying_type<E>::type>(e);
         }
 
-        template < typename ResultT, typename ContainerT, typename Pred>
+        template <typename ResultT, typename ContainerT, typename Pred>
         constexpr auto Extraxt(const ContainerT& c, Pred pred)
         {
             ResultT retval;
@@ -133,6 +137,31 @@ namespace nador
             return retval;
         }
 
+        template <typename BeforeCallable, typename AfterCallable, typename CallableTy, typename... Args>
+        decltype(auto) WrappCallable(BeforeCallable b, AfterCallable a, CallableTy&& c, Args&&... args)
+        {
+            // calling before callback
+            b();
+
+            // setup exit callback
+            auto onExit = Finally(std::move(a));
+
+            // invoke function
+            return std::invoke(std::forward<CallableTy>(c), std::forward<Args>(args)...);
+        }
+
+        template<typename DurationTy, typename CallableTy, typename... Args>
+        decltype(auto) MeasureTime(DurationTy& dur_out, CallableTy&& c, Args&&... args)
+        {
+            Stopwatch sw;
+
+            auto before = [&sw] { sw.Start(); };
+            auto after  = [&sw, &dur_out] () mutable { 
+                dur_out = sw.Stop<DurationTy>();
+            };
+
+            return WrappCallable(before, after, std::forward<CallableTy>(c), std::forward<Args>(args)...);
+        }
     } // namespace utils
 } // namespace nador
 

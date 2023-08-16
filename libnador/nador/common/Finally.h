@@ -14,20 +14,20 @@ namespace nador
     public:
         using value_type = T;
 
-        explicit FinalAction(value_type&& func) noexcept
-        : _func(std::forward<value_type>(func))
+        explicit FinalAction(value_type&& func)
+        : _func{std::move(func)}
         {
         }
 
         FinalAction(FinalAction&& other) noexcept
-        : _func(std::move(other._func))
-        , _invoke(std::exchange(other._invoke, false))
+        : _func{std::move(other._func)}
+        , _own{std::exchange(other._own, false)}
         {
         }
 
         ~FinalAction()
         {
-            if (_invoke && _func)
+            if (_own)
             {
                 _func();
             }
@@ -35,7 +35,7 @@ namespace nador
 
     private:
         value_type _func {};
-        bool       _invoke { true };
+        bool       _own { true };
     };
 
     template <typename T>
