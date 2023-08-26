@@ -15,7 +15,7 @@ namespace nador
     class Event;
 
     template <typename... Args>
-    class EventListener : private OnlyMoveable
+    class EventListener
     {
         using callback_t   = std::function<void(Args...)>;
         using event_t      = Event<Args...>;

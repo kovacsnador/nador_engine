@@ -8,7 +8,7 @@
 namespace nador
 {
     template <typename... Args>
-    class Event : private OnlyMoveable
+    class Event
     {
     public:
         using listener_t      = EventListener<Args...>;

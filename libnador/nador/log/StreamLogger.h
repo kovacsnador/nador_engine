@@ -4,6 +4,7 @@
 #include <memory>
 #include <fstream>
 #include <filesystem>
+#include <string_view>
 
 namespace nador
 {
@@ -45,6 +46,12 @@ namespace nador
                 (*_stream) << logMsg;
                 _stream->flush();
             }
+        }
+
+        StreamLogger& operator<<(std::string_view logMsg)
+        {
+            Write(logMsg);
+            return *this;
         }
 
     private:

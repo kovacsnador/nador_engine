@@ -68,37 +68,37 @@ void SetupLogging()
     // setup default standard logging
     log->RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Debug(msg);
-        engineStreamLogger.Write(msg);
+        engineStreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Warning(msg);
-        engineStreamLogger.Write(msg);
+        engineStreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Error(msg);
-        engineStreamLogger.Write(msg);
+        engineStreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
         standardLogger.Fatal(msg);
-        engineStreamLogger.Write(msg);
+        engineStreamLogger << msg;
         throw std::runtime_error(msg.data());
     });
 
     log->RegisterCallback(nador::ELogType::DEBUG, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Debug(msg);
-        userstreamLogger.Write(msg);
+        userstreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::WARNING, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Warning(msg);
-        userstreamLogger.Write(msg);
+        userstreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::ERROR, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Error(msg);
-        userstreamLogger.Write(msg);
+        userstreamLogger << msg;
     });
     log->RegisterCallback(nador::ELogType::FATAL, [standardLogger, userstreamLogger](std::string_view msg) mutable {
         standardLogger.Fatal(msg);
-        userstreamLogger.Write(msg);
+        userstreamLogger << msg;
         throw std::runtime_error(msg.data());
     });
 
