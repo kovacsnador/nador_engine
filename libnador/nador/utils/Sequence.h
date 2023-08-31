@@ -27,7 +27,10 @@ namespace nador
         std::function<void(Args...)> action {};
     };
 
-    template <typename DurationTy = std::chrono::milliseconds, typename... Args>
+    template<typename T>
+    using ElementSequenceVec_t = std::vector<ElementSequence<std::chrono::milliseconds, T&>>;
+
+    template <typename UserDataTy, typename DurationTy = std::chrono::milliseconds>
     class Sequence
     {
     public:
@@ -37,11 +40,11 @@ namespace nador
             FORCED,
         };
 
-        using sequence_list_t = std::vector<ElementSequence<DurationTy, Args...>>;
+        using sequence_list_t = std::vector<ElementSequence<DurationTy, UserDataTy&>>;
 
-        Sequence(sequence_list_t seq, Event<DurationTy>& event)
+        Sequence(UserDataTy& userData, sequence_list_t seq, Event<DurationTy>& event)
         : _sequence(std::move(seq))
-        , _listener([this](DurationTy delta, Args... args) { _Tick(delta, args...); })
+        , _listener([this, &userData](DurationTy delta) { _Tick(delta, std::ref(userData)); })
         {
             _currentIter = _sequence.end();
             _listener.Suspend(true);
@@ -53,15 +56,12 @@ namespace nador
             _listener.Suspend(false);
             if (_currentIter == _sequence.end() || policy == EPlayPolicy::FORCED)
             {
-                _deltaBuffer = DurationTy{0};
+                _deltaBuffer = DurationTy { 0 };
                 _currentIter = _sequence.begin();
             }
         }
 
-        void Pause()
-        {
-            _listener.Suspend(true);
-        }
+        void Pause() { _listener.Suspend(true); }
 
         void Stop()
         {
@@ -70,6 +70,7 @@ namespace nador
         }
 
     private:
+        template <typename... Args>
         void _Tick(DurationTy deltaTime, Args... args)
         {
             _deltaBuffer += deltaTime;
@@ -86,12 +87,13 @@ namespace nador
                 _deltaBuffer -= _currentIter->duration;
             }
 
-            if(_currentIter == _sequence.end())
+            if (_currentIter == _sequence.end())
             {
                 _listener.Suspend(true);
             }
         }
 
+        //UserDataTy&               _userData;
         sequence_list_t           _sequence;
         sequence_list_t::iterator _currentIter;
 
