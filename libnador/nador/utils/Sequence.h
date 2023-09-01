@@ -6,7 +6,6 @@
 #include <chrono>
 
 #include "nador/utils/event/Event.h"
-#include "nador/utils/Time.h"
 
 using namespace std::chrono_literals;
 
@@ -43,12 +42,40 @@ namespace nador
         using sequence_list_t = std::vector<ElementSequence<DurationTy, UserDataTy&>>;
 
         Sequence(UserDataTy& userData, sequence_list_t seq, Event<DurationTy>& event)
-        : _sequence(std::move(seq))
-        , _listener([this, &userData](DurationTy delta) { _Tick(delta, std::ref(userData)); })
+        : _userData(userData)
+        , _sequence(std::move(seq))
+        , _listener([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); })
         {
             _currentIter = _sequence.end();
             _listener.Suspend(true);
             event += _listener;
+        }
+
+        Sequence(Sequence&& other) noexcept
+        : _userData(other._userData)
+        , _listener(std::move(other._listener))
+        , _deltaBuffer(std::move(other._deltaBuffer))
+        {
+            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); });
+
+            auto idx = other._currentIter - other._sequence.begin();
+            
+            _sequence = std::move(other._sequence);
+            _currentIter = _sequence.begin() + idx;
+        }
+
+        Sequence& operator=(Sequence&& other) noexcept
+        {
+            _userData = other._userData;
+            _listener = std::move(other._listener);
+            _deltaBuffer = std::move(other._deltaBuffer);
+
+            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); });
+
+            auto idx = other._currentIter - other._sequence.begin();
+            
+            _sequence = std::move(other._sequence);
+            _currentIter = _sequence.begin() + idx;
         }
 
         void Play(EPlayPolicy policy = EPlayPolicy::NORMAL)
@@ -93,7 +120,7 @@ namespace nador
             }
         }
 
-        //UserDataTy&               _userData;
+        UserDataTy&               _userData;
         sequence_list_t           _sequence;
         sequence_list_t::iterator _currentIter;
 

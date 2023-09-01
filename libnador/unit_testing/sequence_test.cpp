@@ -18,17 +18,34 @@ TEST(SequneceTest, Sequence_test)
 
     nador::ElementSequenceVec_t<Elem> list { { 10ms, action }, { 15ms, action }, { 20ms, action }, { 5ms, action } };
 
-    nador::Sequence<Elem> sequence(elem, list, event);
+    nador::Sequence<Elem> seq1(elem, list, event);
 
-    sequence.Play();
+    seq1.Play();
 
-    for (size_t i = 0; i < 10; ++i)
-    {
-        std::this_thread::sleep_for(10ms);
+    event(1ms);
+    EXPECT_EQ(elem.i, 0);
+    EXPECT_EQ(count, 0);
 
-        event(10ms);
-    }
+    event(9ms);
+    EXPECT_EQ(elem.i, 1);
+    EXPECT_EQ(count, 1);
 
+    // move test
+    nador::Sequence<Elem> seq2 = std::move(seq1);
+
+    event(10ms);
+    EXPECT_EQ(elem.i, 1);
+    EXPECT_EQ(count, 1);
+
+    event(10ms);
+    EXPECT_EQ(elem.i, 2);
+    EXPECT_EQ(count, 2);
+
+    event(10ms);
+    EXPECT_EQ(elem.i, 2);
+    EXPECT_EQ(count, 2);
+
+    event(10ms);
     EXPECT_EQ(elem.i, list.size());
     EXPECT_EQ(count, list.size());
 }
