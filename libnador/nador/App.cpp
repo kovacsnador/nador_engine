@@ -312,6 +312,7 @@ namespace nador
         _testCtrl->AddTest<SoundTest>("Sound Test", GetSoundController());
         _testCtrl->AddTest<UiSquareTest>("UiSquare Test", GetVideo(), GetFileController(), GetUiApp());
         _testCtrl->AddTest<UiElementsTest>("UiElements Test", GetUiApp(), GetFontController(), GetInputController());
+        _testCtrl->AddTest<AnimationTest>("Animation Test", GetUiApp());
 
         // adding windows
         auto renderer = GetRenderer();

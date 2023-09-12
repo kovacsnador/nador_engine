@@ -1,5 +1,5 @@
-#ifndef __TESTS_H__
-#define __TESTS_H__
+#ifndef __NADOR_TESTS_H__
+#define __NADOR_TESTS_H__
 
 #include "nador/test/test_views/ClearColorTest.h"
 #include "nador/test/test_views/BaseMaterialTest.h"
@@ -12,6 +12,7 @@
 #include "nador/test/test_views/UiElementsTest.h"
 #include "nador/test/test_views/SimpleLineTest.h"
 #include "nador/test/test_views/RoundEdgeMaterialTest.h"
+#include "nador/test/test_views/AnimationTest.h"
 
-#endif // !__TESTS_H__
+#endif // !__NADOR_TESTS_H__
 

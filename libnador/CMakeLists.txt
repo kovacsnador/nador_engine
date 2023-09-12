@@ -123,6 +123,7 @@ target_sources(${PROJECT_NAME}
     ${NADOR_SRC_DIR}/test/test_views/TextureTest.cpp
     ${NADOR_SRC_DIR}/test/test_views/UiElementsTest.cpp
     ${NADOR_SRC_DIR}/test/test_views/UiSquareTest.cpp
+    ${NADOR_SRC_DIR}/test/test_views/AnimationTest.cpp
 
     ${NADOR_SRC_DIR}/ui/IUiElement.cpp
     ${NADOR_SRC_DIR}/ui/UiAligner.cpp
