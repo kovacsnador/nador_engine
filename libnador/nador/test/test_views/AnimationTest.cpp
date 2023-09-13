@@ -3,6 +3,7 @@
 #include "nador/test/test_views/AnimationTest.h"
 #include "nador/common/GlobalEvents.h"
 #include "nador/ui/IUiApp.h"
+#include "AnimationTest.h"
 
 namespace nv = nador::video;
 
@@ -15,13 +16,19 @@ static nador::ElementSequenceVec_t<nador::UiImage> s_simpleAnim {
 };
 
 static nador::ElementSequenceVec_t<nador::UiImage> s_imageAnim {
-    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0001); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0002); } },
+    { 0ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0001); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0002); } },
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0003); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0004); } },
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0005); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0006); } },
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0007); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0008); } },
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0009); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0010); } },
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0011); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0012); } },
-    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0013); } }
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0013); } },
+    { 100ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0012); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0011); } },
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0010); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0009); } },
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0008); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0007); } },
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0006); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0005); } },
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0004); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0003); } },
+    { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0012); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0001); } },
 };
 
 nador::AnimationTest::AnimationTest(IUiApp* uiApp)
@@ -33,42 +40,40 @@ nador::AnimationTest::AnimationTest(IUiApp* uiApp)
     _uiApp->AddElementToLayer(EUiLayer::OVERLAY, &_image2);
 }
 
-void nador::AnimationTest::OnDebugRender(NADOR_MAYBE_UNUSED IRenderer* renderer)
+void PlayRender(std::string_view name, nador::Sequence<nador::UiImage>& anim, int imguiId)
 {
     ImGui::BeginGroup();
+    ImGui::Text(name.data());
+    ImGui::SameLine();
 
-    if (ImGui::Button("Play Simple Animation"))
+    ImGui::PushID(imguiId);
+
+    if (ImGui::Button("Play"))
     {
-        _simpleAnim.Play();
+        anim.Play();
     }
 
-    if (ImGui::Button("Pause Simple Animation"))
+    ImGui::SameLine();
+
+    if (ImGui::Button("Pause"))
     {
-        _simpleAnim.Pause();
+        anim.Pause();
     }
 
-    if (ImGui::Button("Stop Simple Animation"))
+    ImGui::SameLine();
+
+    if (ImGui::Button("Stop"))
     {
-        _simpleAnim.Stop();
+        anim.Stop();
     }
+
+    ImGui::PopID();
 
     ImGui::EndGroup();
+}
 
-    ImGui::BeginGroup();
-
-    if (ImGui::Button("Play Image Animation"))
-    {
-        _imageAnim.Play();
-    }
-
-    if (ImGui::Button("Pause Image Animation"))
-    {
-        _imageAnim.Pause();
-    }
-
-    if (ImGui::Button("Stop Image Animation"))
-    {
-        _imageAnim.Stop();
-    }
-    ImGui::EndGroup();
+void nador::AnimationTest::OnDebugRender(NADOR_MAYBE_UNUSED IRenderer* renderer)
+{
+    PlayRender("Move animation:", _simpleAnim, 1);
+    PlayRender("Image animation:", _imageAnim, 2);
 }
