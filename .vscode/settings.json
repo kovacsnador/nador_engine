@@ -75,7 +75,8 @@
         "zlib.h": "c",
         "any": "cpp",
         "charconv": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "ranges": "cpp"
     },
 
     "cmake.configureOnEdit": false,

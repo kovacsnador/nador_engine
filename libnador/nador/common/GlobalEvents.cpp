@@ -13,10 +13,10 @@ namespace nador
     onMouse_event_t g_onMousePressedEvent;
     onMouse_event_t g_onMouseReleasedEvent;
 
-    onTickBegin_event_t    g_onTickBeginEvent;
+    onTickBegin_event_t     g_onTickBeginEvent;
     onAnimationTick_event_t g_onAnimationTickEvent;
-    onTick_event_t         g_onTickEvent;
-    onTickEnd_event_t      g_onTickEndEvent;
+    onTick_event_t          g_onTickEvent;
+    onTickEnd_event_t       g_onTickEndEvent;
 
     onRender_event_t      g_onRenderEvent;
     onDebugRender_event_t g_onDebugRenderEvent;

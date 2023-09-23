@@ -7,6 +7,12 @@ if(NOT CMAKE_BUILD_TYPE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 endif(NOT CMAKE_BUILD_TYPE)
 
+set(CMAKE_CXX_FLAGS                     "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -fexceptions")
+set(CMAKE_CXX_FLAGS_DEBUG               "${CMAKE_CXX_FLAGS} -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE             "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO      "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS_MINSIZEREL          "${CMAKE_CXX_FLAGS} -O2") 
+
 add_subdirectory(dep/googletest-main) # add googletest subdirectory
 
 add_executable(${PROJECT_NAME})
@@ -21,11 +27,12 @@ target_include_directories(${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
     PRIVATE
     main.cpp
-    appconfig_test.cpp
-    eventListener_test.cpp
-    threadpool_test.cpp
-    fileController_test.cpp
-    sequence_test.cpp
+    src/appconfig_test.cpp
+    src/eventListener_test.cpp
+    src/threadpool_test.cpp
+    src/fileController_test.cpp
+    src/sequence_test.cpp
+    src/LRUCache_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

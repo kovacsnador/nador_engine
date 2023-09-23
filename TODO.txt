@@ -31,3 +31,4 @@ You can use thread-safe queues or other inter-thread communication techniques to
 
 - VerticesMultiMatrix multi threaded!!! (nem jó)
 - Make precompiled headers (nem jó)
+- LRUCache

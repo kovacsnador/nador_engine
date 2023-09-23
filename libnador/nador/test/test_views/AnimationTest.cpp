@@ -3,7 +3,7 @@
 #include "nador/test/test_views/AnimationTest.h"
 #include "nador/common/GlobalEvents.h"
 #include "nador/ui/IUiApp.h"
-#include "AnimationTest.h"
+#include "nador/common/PackedSequenceUtils.h"
 
 namespace nv = nador::video;
 
@@ -31,16 +31,44 @@ static nador::ElementSequenceVec_t<nador::UiImage> s_imageAnim {
     { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0012); } },  { 16ms, [](auto& img) { img.SetImage(nv::EImageName::FEHERFEKETE0001); } },
 };
 
+static auto s_test = nador::CreateElemSequence<nador::UiImage>(std::vector {nv::EImageName::FEHERFEKETE0001,
+                                                                            nv::EImageName::FEHERFEKETE0002,
+                                                                            nv::EImageName::FEHERFEKETE0003,
+                                                                            nv::EImageName::FEHERFEKETE0004,
+                                                                            nv::EImageName::FEHERFEKETE0005,
+                                                                            nv::EImageName::FEHERFEKETE0006,
+                                                                            nv::EImageName::FEHERFEKETE0007,
+                                                                            nv::EImageName::FEHERFEKETE0008,
+                                                                            nv::EImageName::FEHERFEKETE0009,
+                                                                            nv::EImageName::FEHERFEKETE0010,
+                                                                            nv::EImageName::FEHERFEKETE0011,
+                                                                            nv::EImageName::FEHERFEKETE0012,
+                                                                            nv::EImageName::FEHERFEKETE0013,
+                                                                            nv::EImageName::FEHERFEKETE0012,
+                                                                            nv::EImageName::FEHERFEKETE0011,
+                                                                            nv::EImageName::FEHERFEKETE0010,
+                                                                            nv::EImageName::FEHERFEKETE0009,
+                                                                            nv::EImageName::FEHERFEKETE0008,
+                                                                            nv::EImageName::FEHERFEKETE0007,
+                                                                            nv::EImageName::FEHERFEKETE0006,
+                                                                            nv::EImageName::FEHERFEKETE0005,
+                                                                            nv::EImageName::FEHERFEKETE0004,
+                                                                            nv::EImageName::FEHERFEKETE0003,
+                                                                            nv::EImageName::FEHERFEKETE0002,
+                                                                            nv::EImageName::FEHERFEKETE0001},
+                                                                &nador::UiImage::SetImage);
+
 nador::AnimationTest::AnimationTest(IUiApp* uiApp)
 : _uiApp(uiApp)
-, _simpleAnim{_image, s_simpleAnim, g_onAnimationTickEvent}
-, _imageAnim(_image2, s_imageAnim, g_onAnimationTickEvent)
 {
     _uiApp->AddElementToLayer(EUiLayer::OVERLAY, &_image);
     _uiApp->AddElementToLayer(EUiLayer::OVERLAY, &_image2);
+
+    _simpleAnim = CreatePackedSequence(_image, s_simpleAnim);
+    _imageAnim = CreatePackedSequence(_image2, s_test);
 }
 
-void PlayRender(std::string_view name, nador::Sequence<nador::UiImage>& anim, int imguiId)
+void PlayRender(std::string_view name, nador::PackedSequence<nador::UiImage>& anim, int imguiId)
 {
     ImGui::BeginGroup();
     ImGui::Text(name.data());

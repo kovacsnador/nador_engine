@@ -26,11 +26,11 @@ namespace nador
         std::function<void(Args...)> action {};
     };
 
-    template<typename T>
+    template <typename T>
     using ElementSequenceVec_t = std::vector<ElementSequence<std::chrono::milliseconds, T&>>;
 
     template <typename UserDataTy, typename DurationTy = std::chrono::milliseconds>
-    class Sequence
+    class PackedSequence
     {
     public:
         enum class EPlayPolicy
@@ -41,41 +41,45 @@ namespace nador
 
         using sequence_list_t = std::vector<ElementSequence<DurationTy, UserDataTy&>>;
 
-        Sequence(UserDataTy& userData, sequence_list_t seq, Event<DurationTy>& event)
-        : _userData(userData)
+        PackedSequence() = default;
+
+        PackedSequence(UserDataTy& userData, sequence_list_t seq, Event<DurationTy>& event)
+        : _userData(std::addressof(userData))
         , _sequence(std::move(seq))
-        , _listener([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); })
+        , _listener([this](DurationTy delta) { _Tick(delta, std::ref(*_userData)); })
         {
             _currentIter = _sequence.end();
             _listener.Suspend(true);
             event += _listener;
         }
 
-        Sequence(Sequence&& other) noexcept
-        : _userData(other._userData)
+        PackedSequence(PackedSequence&& other) noexcept
+        : _userData(std::move(other._userData))
         , _listener(std::move(other._listener))
         , _deltaBuffer(std::move(other._deltaBuffer))
         {
-            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); });
+            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(*_userData)); });
 
             auto idx = other._currentIter - other._sequence.begin();
-            
-            _sequence = std::move(other._sequence);
+
+            _sequence    = std::move(other._sequence);
             _currentIter = _sequence.begin() + idx;
         }
 
-        Sequence& operator=(Sequence&& other) noexcept
+        PackedSequence& operator=(PackedSequence&& other) noexcept
         {
-            _userData = other._userData;
-            _listener = std::move(other._listener);
+            _userData    = other._userData;
+            _listener    = std::move(other._listener);
             _deltaBuffer = std::move(other._deltaBuffer);
 
-            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(_userData)); });
+            _listener.SetCallback([this](DurationTy delta) { _Tick(delta, std::ref(*_userData)); });
 
             auto idx = other._currentIter - other._sequence.begin();
-            
-            _sequence = std::move(other._sequence);
+
+            _sequence    = std::move(other._sequence);
             _currentIter = _sequence.begin() + idx;
+            
+            return *this;
         }
 
         void Play(EPlayPolicy policy = EPlayPolicy::NORMAL)
@@ -120,13 +124,37 @@ namespace nador
             }
         }
 
-        UserDataTy&               _userData;
+        UserDataTy*               _userData { nullptr };
         sequence_list_t           _sequence;
         sequence_list_t::iterator _currentIter;
 
         EventListener<DurationTy> _listener;
         DurationTy                _deltaBuffer { 0 };
     };
+
+    template <typename ObjTy, typename ContainterTy, typename FuncTy, typename DurationTy = std::chrono::milliseconds>
+    constexpr auto CreateElemSequence(const ContainterTy& items, FuncTy func, DurationTy duration = 16ms)
+    {
+        std::vector<ElementSequence<DurationTy, ObjTy&>> result;
+
+        DurationTy zero {};
+
+        for (auto it = std::begin(items); it != std::end(items); ++it)
+        {
+            auto callback = [arg = *it, func](auto& obj) { std::invoke(func, obj, arg); };
+
+            if (it != std::begin(items))
+            {
+                result.emplace_back(duration, callback);
+            }
+            else
+            {
+                result.emplace_back(zero, callback);
+            }
+        }
+        return result;
+    }
+
 } // namespace nador
 
 #endif //!__NADOR_SEQUENCE_H__

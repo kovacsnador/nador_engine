@@ -22,8 +22,8 @@ namespace nador
         UiImage _image {{150, 50}, {200, 200}, video::EImageName::FEHERMOSOLYOG};
         UiImage _image2 {{350, 50}, {150, 150}, video::EImageName::FEHERFEKETE0001};
 
-        Sequence<UiImage> _simpleAnim;
-        Sequence<UiImage> _imageAnim;
+        PackedSequence<UiImage> _simpleAnim{};
+        PackedSequence<UiImage> _imageAnim{};
     };
 
 } // namespace nador
