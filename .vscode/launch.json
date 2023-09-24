@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "nador_app (Debug)",
+            "name": "nador_win_example (Debug)",
             "type": "cppdbg",
             "request": "launch",
             "args": [],
             "environment": [],
-            "program": "${workspaceFolder}/out/Debug/bin/nador_test_app.exe",
+            "program": "${workspaceFolder}/out/Debug/bin/nador_win_example.exe",
             "cwd": "${workspaceFolder}",
             "MIMode": "gdb",
             "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe",
@@ -28,10 +28,10 @@
             ]
         },
         {
-            "name": "nador_app (Release)",
+            "name": "nador_win_example (Release)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/Release/bin/nador_test_app.exe",
+            "program": "${workspaceFolder}/out/Release/bin/nador_win_example.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-project("nador_test_app" VERSION 0.1 DESCRIPTION "The nador engine test program.")
+project("nador_win_example" VERSION 0.1 DESCRIPTION "The nador engine example application (win).")
 
 if(NOT CMAKE_BUILD_TYPE)   
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type options: Debug; Release; RelWithDebInfo; MinSizeRel" FORCE)
@@ -38,7 +38,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME}
     PRIVATE
-    main.cpp
+    win_example.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nador)
