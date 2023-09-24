@@ -12,6 +12,7 @@
 	<AtlasSettings>
 		<AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 		<AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
+		<AtlasCacheSize> 2 </AtlasCacheSize>
 	</AtlasSettings>
 
 	<VideoSettings>

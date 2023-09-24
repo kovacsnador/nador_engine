@@ -7,6 +7,7 @@ namespace nador
 	AtlasController::AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings)
 	: _video(std::move(video))
 	, _fileCtrl(std::move(fileCtrl))
+	, _cache(atlasSettings.atlasCacheSize, [](NADOR_MAYBE_UNUSED const auto& key, const auto& val) { val->DeloadTexture(); })
 	{
 		NADOR_ASSERT(_video);
 		NADOR_ASSERT(_fileCtrl);
@@ -43,7 +44,20 @@ namespace nador
 		{
 			ENGINE_FATAL("Image id %d not found!", name);
 		}
-		return _atlases.at(it->second)->GetImageData(name);
+
+		const auto& key = it->second;
+
+		if(_cache.Exist(key))
+		{
+			auto& atlas = _cache.Get(key);
+			return atlas->GetImageData(name);
+		}
+		else
+		{
+			const auto& atlas = _atlases.at(key);
+			_cache.Insert(key, atlas);
+			return atlas->GetImageData(name);
+		}
 	}
 
 	const AtlasController::atlases_t& AtlasController::GetAtlases() const

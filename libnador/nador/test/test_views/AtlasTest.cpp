@@ -72,7 +72,7 @@ namespace nador
 			if(ids.size())
 			{
 				video::EImageName id = ids.at(selectedItemImage);
-				ImageData imageData = selectedAtlas->GetImageData(id);
+				ImageData imageData = _atlasCtrl->GetImage(id);
 
 				_material.texture = imageData.texture;
 				_renderData.SetTextureCoords(imageData.image->uvs);

@@ -31,6 +31,7 @@ INSTANTIATE_TEST_CASE_P(
 	                    <AtlasSettings>
 		                    <AtlasConfigPath> res/atlas/__atlases/atlas_config.json </AtlasConfigPath>
 		                    <AtlasImagesPath> res/atlas/__atlases/ </AtlasImagesPath>
+                            <AtlasCacheSize> 10 </AtlasCacheSize>
 	                    </AtlasSettings>
 
                         <VideoSettings>
@@ -50,7 +51,8 @@ INSTANTIATE_TEST_CASE_P(
                         },
                         {   /*AtlasSettings*/
                             "res/atlas/__atlases/atlas_config.json",    /*AtlasConfigPath*/
-                            "res/atlas/__atlases/"                      /*AtlasImagesPath*/
+                            "res/atlas/__atlases/",                     /*AtlasImagesPath*/
+                            10
                         },
                         {   /*VideoSettings*/
                             10000,      /*MaxVertexCount*/

@@ -124,7 +124,7 @@ namespace nador
             return false;
         }
 
-        bool Exist(const KeyTy& key) const 
+        bool Exist(const KeyTy& key) const noexcept
         {
             return _map.find(key) != _map.end();
         }

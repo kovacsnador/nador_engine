@@ -34,11 +34,13 @@ namespace nador
     {
         std::filesystem::path atlasConfigPath;
         std::filesystem::path atlasImagesPath;
+        size_t atlasCacheSize;
 
         bool operator==(const AtlasSettings& other) const
         {
             return (   atlasConfigPath == other.atlasConfigPath
-                    && atlasImagesPath == other.atlasImagesPath);
+                    && atlasImagesPath == other.atlasImagesPath
+                    && atlasCacheSize == other.atlasCacheSize);
         }
     };
 
@@ -95,6 +97,7 @@ namespace nador
             {
                 appConfig.atlasSettings.atlasConfigPath = xml::GetByName<std::string>(atlasSettings, "AtlasConfigPath");
                 appConfig.atlasSettings.atlasImagesPath = xml::GetByName<std::string>(atlasSettings, "AtlasImagesPath");
+                appConfig.atlasSettings.atlasCacheSize = xml::GetByName<size_t>(atlasSettings, "AtlasCacheSize");
             }
 
             // Get video settings

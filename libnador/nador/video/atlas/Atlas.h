@@ -61,15 +61,16 @@ namespace nador
          * Atlas constructor.
          *
          * \param video				The video api interface.
+         * \param fileCtrl	        The file controller.
          * \param atlasImagePath	The path of the atlas images folder.
          * \param textureName		The name of the texture.
          * \param configName		The name of the config file.
          */
-        Atlas(const IVideo*          video,
-              const IFileController* fileCtrl,
-              const std::filesystem::path&     atlasImagePath,
-              const std::string&     textureName,
-              const std::string&     configName);
+        Atlas(const IVideo*                video,
+              const IFileController*       fileCtrl,
+              const std::filesystem::path& atlasImagePath,
+              const std::string&           textureName,
+              const std::string&           configName);
 
         /*!
          * Loads the texture.

@@ -3,15 +3,17 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include "nador/video/atlas/IAtlasController.h"
 #include "nador/common/AppConfig.h"
+#include "nador/utils/LRUCache.hpp"
 
 namespace nador
 {
 	class AtlasController : public IAtlasController
 	{
-		using image_lookup_t = std::map<video::EImageName, size_t>;
+		using image_lookup_t = std::unordered_map<video::EImageName, size_t>;
 	
 	public:
 		/*!
@@ -48,6 +50,8 @@ namespace nador
 
 		image_lookup_t	_imageLookup;
 		atlases_t		_atlases;
+
+		mutable LRUCache<size_t, AtlasPtr> _cache;
 	};
 
 	CREATE_PTR_TYPES(AtlasController);
