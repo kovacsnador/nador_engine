@@ -9,6 +9,14 @@
 
 namespace nador
 {
+    struct AppConfigException : public std::runtime_error
+    {
+        AppConfigException(const std::string& msg)
+        : std::runtime_error(msg)
+        {
+        }
+    };
+
     struct AppConfig
     {
         WindowSettings windowSettings;
@@ -39,27 +47,21 @@ namespace nador
             const tinyxml2::XMLElement* windowSettings = pRootElement->FirstChildElement("WindowSettings");
             if(windowSettings)
             {
-                appConfig.windowSettings.appName         = xml::GetByName<std::string>(windowSettings, "AppName");
-                appConfig.windowSettings.windowDimension = xml::GetByName<glm::uvec2>(windowSettings, "WindowDimensions");
-                appConfig.windowSettings.vSync           = xml::GetByName<bool>(windowSettings, "VSync", true);
-                appConfig.windowSettings.showDebugWindow = xml::GetByName<bool>(windowSettings, "ShowDebugWindow", false);
-                appConfig.windowSettings.showDebugInfo   = xml::GetByName<bool>(windowSettings, "ShowDebugInfo", false);
+                Parse(windowSettings, appConfig.windowSettings);
             }
 
             // Get AtlasSettings
             const tinyxml2::XMLElement* atlasSettings = pRootElement->FirstChildElement("AtlasSettings");
             if(atlasSettings)
             {
-                appConfig.atlasSettings.atlasConfigPath = xml::GetByName<std::string>(atlasSettings, "AtlasConfigPath");
-                appConfig.atlasSettings.atlasImagesPath = xml::GetByName<std::string>(atlasSettings, "AtlasImagesPath");
-                appConfig.atlasSettings.atlasCacheSize = xml::GetByName<size_t>(atlasSettings, "AtlasCacheSize");
+                Parse(atlasSettings, appConfig.atlasSettings);
             }
 
             // Get video settings
             const tinyxml2::XMLElement* videoSettings = pRootElement->FirstChildElement("VideoSettings");
             if(videoSettings)
             {
-                appConfig.videoSettings.maxVertexCount = xml::GetByName<uint32_t>(videoSettings, "MaxVertexCount");
+                Parse(videoSettings, appConfig.videoSettings);
             }
             
             appConfig.rootFilePath    = xml::GetByName<std::string>(pRootElement, "RootFilePath");
@@ -80,7 +82,7 @@ namespace nador
 
         if(std::filesystem::exists(configPath) == false)
         {
-            throw std::runtime_error("AppConfig file not exist!");
+            throw AppConfigException("AppConfig file not exist!");
         }
 
         tinyxml2::XMLDocument doc;

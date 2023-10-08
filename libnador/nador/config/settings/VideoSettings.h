@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "nador/utils/TinyXmlHelper.h"
+
 namespace nador
 {
     struct VideoSettings
@@ -11,6 +13,12 @@ namespace nador
 
         bool operator==(const VideoSettings& other) const = default;
     };
+
+    inline void Parse(const tinyxml2::XMLElement* elem, VideoSettings& settings)
+    {
+        settings.maxVertexCount = xml::GetByName<uint32_t>(elem, "MaxVertexCount");
+    }
+
 } // namespace nador
 
 

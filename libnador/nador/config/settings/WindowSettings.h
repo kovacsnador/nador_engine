@@ -5,6 +5,8 @@
 
 #include <glm/glm.hpp>
 
+#include "nador/utils/TinyXmlHelper.h"
+
 namespace nador
 {
     struct WindowSettings
@@ -18,7 +20,16 @@ namespace nador
 
         bool operator==(const WindowSettings& other) const = default;
     };
-} // namespace nador
 
+    inline void Parse(const tinyxml2::XMLElement* elem, WindowSettings& settings)
+    {
+        settings.appName         = xml::GetByName<std::string>(elem, "AppName");
+        settings.windowDimension = xml::GetByName<glm::uvec2>(elem, "WindowDimensions");
+        settings.vSync           = xml::GetByName<bool>(elem, "VSync", true);
+        settings.showDebugWindow = xml::GetByName<bool>(elem, "ShowDebugWindow", false);
+        settings.showDebugInfo   = xml::GetByName<bool>(elem, "ShowDebugInfo", false);
+    }
+
+} // namespace nador
 
 #endif //!__NADOR_WINDOW_SETTINGS_H__
