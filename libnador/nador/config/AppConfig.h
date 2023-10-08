@@ -1,59 +1,14 @@
 #ifndef __APP_CONFIG_H__
 #define __APP_CONFIG_H__
 
-#include <string>
-#include <filesystem>
-
-#include <glm/glm.hpp>
-
 #include "nador/log/ILog.h"
 #include "nador/utils/TinyXmlHelper.h"
+#include "nador/config/settings/AtlasSettings.h"
+#include "nador/config/settings/WindowSettings.h"
+#include "nador/config/settings/VideoSettings.h"
 
 namespace nador
 {
-    struct WindowSettings
-    {
-        std::string appName;
-        glm::uvec2  windowDimension = { 0, 0 };
-        bool        vSync { true };
-
-        bool showDebugWindow { false };
-        bool showDebugInfo { false };
-
-        bool operator==(const WindowSettings& other) const
-        {
-            return (appName == other.appName 
-                    && windowDimension == other.windowDimension
-                    && vSync == other.vSync
-                    && showDebugInfo == other.showDebugInfo
-                    && showDebugWindow == other.showDebugWindow);
-        }
-    };
-
-    struct AtlasSettings
-    {
-        std::filesystem::path atlasConfigPath;
-        std::filesystem::path atlasImagesPath;
-        size_t atlasCacheSize;
-
-        bool operator==(const AtlasSettings& other) const
-        {
-            return (   atlasConfigPath == other.atlasConfigPath
-                    && atlasImagesPath == other.atlasImagesPath
-                    && atlasCacheSize == other.atlasCacheSize);
-        }
-    };
-
-    struct VideoSettings
-    {
-        size_t maxVertexCount;
-
-        bool operator==(const VideoSettings& other) const
-        {
-            return (maxVertexCount == other.maxVertexCount);
-        }
-    };
-
     struct AppConfig
     {
         WindowSettings windowSettings;

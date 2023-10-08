@@ -14,7 +14,7 @@
 #include "utils/TickTracker.h"
 #include "sound/ISoundController.h"
 #include "ui/IUiApp.h"
-#include "common/AppConfig.h"
+#include "config/AppConfig.h"
 #include "IApp.h"
 #include "system/ModuleFactory.h"
 

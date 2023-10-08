@@ -6,8 +6,9 @@
 #include <unordered_map>
 
 #include "nador/video/atlas/IAtlasController.h"
-#include "nador/common/AppConfig.h"
+#include "nador/config/AppConfig.h"
 #include "nador/utils/LRUCache.hpp"
+#include "nador/video/atlas/AtlasConfigParser.h"
 
 namespace nador
 {
@@ -19,7 +20,7 @@ namespace nador
 		/*!
 		 * AtlasController construcor.
 		 */
-		AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings);
+		AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings, const atlas::AtlasConfigList_t& list);
 
 		/*!
 		 * Gets the image data.

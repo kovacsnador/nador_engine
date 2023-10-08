@@ -8,6 +8,7 @@
 
 #include "EImageName.h"
 #include "nador/video/buffers/Texture.h"
+#include "nador/video/atlas/AtlasConfigParser.h"
 
 namespace nador
 {
@@ -63,14 +64,12 @@ namespace nador
          * \param video				The video api interface.
          * \param fileCtrl	        The file controller.
          * \param atlasImagePath	The path of the atlas images folder.
-         * \param textureName		The name of the texture.
-         * \param configName		The name of the config file.
+         * \param baseConfig		The atlas base config data.
          */
-        Atlas(const IVideo*                video,
-              const IFileController*       fileCtrl,
-              const std::filesystem::path& atlasImagePath,
-              const std::string&           textureName,
-              const std::string&           configName);
+        Atlas(const IVideo*                 video,
+              const IFileController*        fileCtrl,
+              const std::filesystem::path&  atlasImagePath,
+              const atlas::AtlasConfig&     baseConfig);
 
         /*!
          * Loads the texture.

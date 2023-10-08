@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "nador/common/AppConfig.h"
+#include "nador/config/AppConfig.h"
 
 struct NadorConfigTestValue
 {

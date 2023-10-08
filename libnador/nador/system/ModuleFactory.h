@@ -1,7 +1,7 @@
 #ifndef __NADOR_MODULE_FACTORY_H__
 #define __NADOR_MODULE_FACTORY_H__
 
-#include "nador/common/AppConfig.h"
+#include "nador/config/AppConfig.h"
 #include "nador/system/IWindow.h"
 #include "nador/video/IVideo.h"
 #include "nador/system/IFileController.h"
@@ -14,6 +14,7 @@
 #include "nador/test/ITestController.h"
 #include "nador/system/window/IImGuiAdapter.h"
 #include "nador/system/input/input_events/InputEvents.h"
+#include "nador/video/atlas/AtlasConfigParser.h"
 
 namespace nador
 {
@@ -29,7 +30,7 @@ namespace nador
         ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
         IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera);
         IFontControllerUPtr  CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl);
-        IAtlasControllerUPtr CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings);
+        IAtlasControllerUPtr CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings, const atlas::AtlasConfigList_t& list);
         IUiAppUPtr           CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl);
         ITestControllerUPtr  CreateTestController();
     } // namespace ModuleFactory

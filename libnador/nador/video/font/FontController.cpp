@@ -72,11 +72,15 @@ namespace nador
     {
         std::lock_guard<std::mutex> lock(_mutex);
 
-        if (_registeredFonts.find(fontSize) != _registeredFonts.end())
+        auto fontSizeIter = _registeredFonts.find(fontSize);
+
+        if (fontSizeIter != _registeredFonts.end())
         {
-            if (_registeredFonts.at(fontSize).find(fontId) != _registeredFonts.at(fontSize).end())
+            auto fontIter = fontSizeIter->second.find(fontId);
+
+            if (fontIter != _registeredFonts.at(fontSize).end())
             {
-                return _registeredFonts.at(fontSize).at(fontId);
+                return fontIter->second;
             }
         }
         ENGINE_WARNING("Font %d not found with size: %d!", fontId, fontSize);

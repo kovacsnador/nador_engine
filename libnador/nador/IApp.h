@@ -2,7 +2,7 @@
 #define __NADOR_I_APP_H__
 
 #include "nador/utils/Types.h"
-#include "nador/common/AppConfig.h"
+#include "nador/config/AppConfig.h"
 
 namespace nador
 {

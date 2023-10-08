@@ -23,51 +23,30 @@ namespace nador
     Atlas::Atlas(const IVideo*                video,
                  const IFileController*       fileCtrl,
                  const std::filesystem::path& atlasImagePath,
-                 const std::string&           textureName,
-                 const std::string&           configName)
+                 const atlas::AtlasConfig&    baseConfig)
     : _video(video)
     , _fileCtrl(fileCtrl)
-    , _textureName(textureName)
-    , _configName(configName)
+    , _textureName(baseConfig.image)
+    , _configName(baseConfig.config)
     , _atlasImagePath(atlasImagePath)
     {
         NADOR_ASSERT(_video);
         NADOR_ASSERT(_fileCtrl);
 
-        auto configData = _fileCtrl->Read(_atlasImagePath / configName);
+        auto configData = _fileCtrl->Read(_atlasImagePath / _configName);
 
         if (configData.has_value() == false)
         {
             throw std::runtime_error("Atlas config data could not be opened!");
         }
 
-        nlohmann::json json = nlohmann::json::parse(configData->Begin(), configData->End());
+        auto imageConfigs = atlas::AtlasConfigParser::ParseAtlasImageConfigs<video::EImageName>(configData);
 
-        for (const auto& image : json["images"])
+        for (const auto& it : imageConfigs)
         {
-            video::EImageName id        = image["id"].get<video::EImageName>();
-            uint32_t          width     = image["width"].get<uint32_t>();
-            uint32_t          height    = image["height"].get<uint32_t>();
-            std::string       name      = image["Name"].get<std::string>();
-            std::string       atlasName = image["atlas_name"].get<std::string>();
-
-            glm::mat4x2 uvs;
-
-            uvs[0][0] = image["UV_X_1"].get<float_t>();
-            uvs[0][1] = image["UV_Y_1"].get<float_t>();
-
-            uvs[1][0] = image["UV_X_2"].get<float_t>();
-            uvs[1][1] = image["UV_Y_2"].get<float_t>();
-
-            uvs[2][0] = image["UV_X_3"].get<float_t>();
-            uvs[2][1] = image["UV_Y_3"].get<float_t>();
-
-            uvs[3][0] = image["UV_X_4"].get<float_t>();
-            uvs[3][1] = image["UV_Y_4"].get<float_t>();
-
-            _images[id] = std::make_unique<Image>(width, height, name, atlasName, id, uvs);
-            _imageIds.push_back(id);
-            _imageNames.push_back(name);
+            _images[it.id] = std::make_unique<Image>(it.width, it.height, it.name, it.atlasName, it.id, it.uvs);
+            _imageIds.push_back(it.id);
+            _imageNames.push_back(it.name);
         }
     }
 

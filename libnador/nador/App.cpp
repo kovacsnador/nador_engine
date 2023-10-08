@@ -57,7 +57,12 @@ namespace nador
 
         IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
-        IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings);
+
+        // Atlas controller
+        auto atlasConfigData = fileCtrl->Read(config.atlasSettings.atlasConfigPath);
+        auto atlasConfigList = atlas::AtlasConfigParser::ParseAtlasConfigs(atlasConfigData);
+        IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings, atlasConfigList);
+
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
         ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
 

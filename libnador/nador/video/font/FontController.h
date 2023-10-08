@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 #include <future>
+#include <unordered_map>
 
 #include "nador/video/font/IFontController.h"
 #include "nador/common/MoveableObjWrapper.h"
@@ -13,8 +14,8 @@ namespace nador
 {
     class FontController : public IFontController
     {
-        using FontsList_t      = std::map<uint32_t, std::map<uint32_t, FontPtr>>;
-        using FontNameToId_t   = std::map<std::string, uint32_t>;
+        using FontsList_t      = std::unordered_map<uint32_t, std::unordered_map<uint32_t, FontPtr>>;
+        using FontNameToId_t   = std::unordered_map<std::string, uint32_t>;
         using PendingFutures_t = std::vector<nador::MoveableObjWrapper<std::future<void>, nador::FutureWaiter>>;
 
     public:

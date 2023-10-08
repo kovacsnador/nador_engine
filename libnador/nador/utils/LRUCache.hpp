@@ -39,7 +39,7 @@ namespace nador
         {
             if(maxSize == 0)
             {
-                throw LRUCacheException("LRUChache: maxSize needs to be > 0");
+                throw LRUCacheException{"LRUChache: maxSize needs to be > 0"};
             }
         }
 

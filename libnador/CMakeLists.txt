@@ -149,6 +149,7 @@ target_sources(${PROJECT_NAME}
 
     ${NADOR_SRC_DIR}/video/atlas/Atlas.cpp
     ${NADOR_SRC_DIR}/video/atlas/AtlasController.cpp
+    ${NADOR_SRC_DIR}/video/atlas/AtlasConfigParser.cpp
 
     ${NADOR_SRC_DIR}/video/buffers/IndexBuffer.cpp
     ${NADOR_SRC_DIR}/video/buffers/Texture.cpp
