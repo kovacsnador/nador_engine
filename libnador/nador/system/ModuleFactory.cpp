@@ -95,9 +95,9 @@ namespace nador
         return std::make_unique<FontController>(video, fileCtrl);
     }
 
-    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings, const atlas::AtlasConfigList_t& list)
+    IAtlasControllerUPtr ModuleFactory::CreateAtlasController(IAtlasController::AtlasList_t list, size_t cacheSize)
     {
-        return std::make_unique<AtlasController>(video, fileCtrl, settings, list);
+        return std::make_unique<AtlasController>(std::move(list), cacheSize);
     }
 
     IUiAppUPtr ModuleFactory::CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl)

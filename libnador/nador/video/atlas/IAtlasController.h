@@ -10,10 +10,12 @@ namespace nador
 	class IAtlasController
 	{
 	public:
+		using AtlasList_t = std::vector<std::shared_ptr<Atlas>>;
+
+		/*!
+		 * IAtlasController destructor.
+		 */
 		virtual ~IAtlasController() = default;
-	
-	public:
-		using atlases_t = std::vector<AtlasPtr>;
 
 		/*!
 		 * Gets the image data.
@@ -29,7 +31,7 @@ namespace nador
 		 *
 		 * \return	The atlases in container.
 		 */
-		virtual const atlases_t& GetAtlases() const = 0;
+		virtual const AtlasList_t& GetAtlases() const = 0;
 
 		/*!
 		 * Gets all atlas names.

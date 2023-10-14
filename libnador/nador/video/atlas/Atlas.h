@@ -66,8 +66,8 @@ namespace nador
          * \param atlasImagePath	The path of the atlas images folder.
          * \param baseConfig		The atlas base config data.
          */
-        Atlas(const IVideo*                 video,
-              const IFileController*        fileCtrl,
+        Atlas(const IVideoPtr video,
+              const IFileControllerPtr fileCtrl,
               const std::filesystem::path&  atlasImagePath,
               const atlas::AtlasConfig&     baseConfig);
 
@@ -135,8 +135,8 @@ namespace nador
         const std::string& GetConfigName() const;
 
     private:
-        const IVideo*          _video;
-        const IFileController* _fileCtrl;
+        const IVideoPtr          _video;
+        const IFileControllerPtr _fileCtrl;
 
         std::string           _textureName;
         std::string           _configName;

@@ -2,22 +2,16 @@
 
 namespace nador
 {
-    AtlasController::AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings, const atlas::AtlasConfigList_t& list)
-    : _video(std::move(video))
-    , _fileCtrl(std::move(fileCtrl))
-    , _cache(atlasSettings.atlasCacheSize, [](NADOR_MAYBE_UNUSED const auto& key, const auto& val) { val->DeloadTexture(); })
-    {
-        NADOR_ASSERT(_video);
-        NADOR_ASSERT(_fileCtrl);
-
-        for (const auto& atlasConfig : list)
+    AtlasController::AtlasController(IAtlasController::AtlasList_t atlasList, size_t cacheSize)
+    : _atlases(std::move(atlasList))
+    , _cache(cacheSize, [](NADOR_MAYBE_UNUSED const auto& key, const auto& val) { val->DeloadTexture(); })
+    {        
+        for(size_t i = 0; i < _atlases.size(); ++i)
         {
-            AtlasPtr atlasPtr = std::make_shared<Atlas>(_video.get(), _fileCtrl.get(), atlasSettings.atlasImagesPath, atlasConfig);
-            _atlases.push_back(atlasPtr);
-
+            const auto& atlasPtr = _atlases[i];
             for (const auto& img : atlasPtr->GetImageIds())
             {
-                _imageLookup[img] = _atlases.size() - 1;
+                _imageLookup[img] = i;
             }
         }
     }
@@ -45,7 +39,7 @@ namespace nador
         }
     }
 
-    const AtlasController::atlases_t& AtlasController::GetAtlases() const
+    const AtlasController::AtlasList_t& AtlasController::GetAtlases() const
     {
         return _atlases;
     }

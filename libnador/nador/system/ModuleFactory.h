@@ -30,7 +30,7 @@ namespace nador
         ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
         IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera);
         IFontControllerUPtr  CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl);
-        IAtlasControllerUPtr CreateAtlasController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl, const AtlasSettings& settings, const atlas::AtlasConfigList_t& list);
+        IAtlasControllerUPtr CreateAtlasController(IAtlasController::AtlasList_t list, size_t cacheSize);
         IUiAppUPtr           CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl);
         ITestControllerUPtr  CreateTestController();
     } // namespace ModuleFactory

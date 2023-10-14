@@ -20,12 +20,12 @@ namespace nador
     {
     }
 
-    Atlas::Atlas(const IVideo*                video,
-                 const IFileController*       fileCtrl,
+    Atlas::Atlas(const IVideoPtr video,
+                 const IFileControllerPtr fileCtrl,
                  const std::filesystem::path& atlasImagePath,
                  const atlas::AtlasConfig&    baseConfig)
-    : _video(video)
-    , _fileCtrl(fileCtrl)
+    : _video(std::move(video))
+    , _fileCtrl(std::move(fileCtrl))
     , _textureName(baseConfig.image)
     , _configName(baseConfig.config)
     , _atlasImagePath(atlasImagePath)
@@ -61,7 +61,7 @@ namespace nador
 
         if (textureData)
         {
-            _texture.reset(new Texture(_video, textureData.value()));
+            _texture.reset(new Texture(_video.get(), textureData.value()));
         }
         else
         {

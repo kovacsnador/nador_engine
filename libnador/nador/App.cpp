@@ -59,9 +59,18 @@ namespace nador
         IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
 
         // Atlas controller
-        auto atlasConfigData = fileCtrl->Read(config.atlasSettings.atlasConfigPath);
+        const auto& atlasSettings = config.atlasSettings;
+        auto atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
         auto atlasConfigList = atlas::AtlasConfigParser::ParseAtlasConfigs(atlasConfigData);
-        IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(video, fileCtrl, config.atlasSettings, atlasConfigList);
+
+        IAtlasController::AtlasList_t atlases;
+        atlases.reserve(atlasConfigList.size());
+        for(const auto& it : atlasConfigList)
+        {
+            atlases.emplace_back(std::make_shared<Atlas>(video, fileCtrl, atlasSettings.atlasImagesPath, it));
+        }
+
+        IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(atlases, atlasSettings.atlasCacheSize);
 
         IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
         ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();

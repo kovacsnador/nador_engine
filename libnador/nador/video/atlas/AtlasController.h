@@ -20,7 +20,7 @@ namespace nador
 		/*!
 		 * AtlasController construcor.
 		 */
-		AtlasController(const IVideoPtr video, const IFileControllerPtr fileCtrl, const AtlasSettings& atlasSettings, const atlas::AtlasConfigList_t& list);
+		AtlasController(IAtlasController::AtlasList_t atlasList, size_t cacheSize);
 
 		/*!
 		 * Gets the image data.
@@ -36,7 +36,7 @@ namespace nador
 		 *
 		 * \return	The atlases in container.
 		 */
-		const atlases_t& GetAtlases() const override;
+		const AtlasList_t& GetAtlases() const override;
 
 		/*!
 		 * Gets all atlas names.
@@ -46,11 +46,8 @@ namespace nador
 		strings_t GetAtlasNames() const override;
 
 	private:
-		const IVideoPtr          _video;
-        const IFileControllerPtr _fileCtrl;
-
 		image_lookup_t	_imageLookup;
-		atlases_t		_atlases;
+		AtlasList_t		_atlases;
 
 		mutable LRUCache<size_t, AtlasPtr> _cache;
 	};

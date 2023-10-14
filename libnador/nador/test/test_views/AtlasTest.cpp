@@ -46,7 +46,7 @@ namespace nador
 		static int32_t selectedItemImage = 0;
 
 		strings_t atlasNames = _atlasCtrl->GetAtlasNames();
-		IAtlasController::atlases_t atlases = _atlasCtrl->GetAtlases();
+		const auto& atlases = _atlasCtrl->GetAtlases();
 		
 		ImGui::ListBox("Atlases", &selectedItemAtlas,
 					   Imgui_StrContainerIter,
@@ -54,7 +54,7 @@ namespace nador
 
 		if((size_t)selectedItemAtlas < atlases.size())
 		{
-			AtlasPtr selectedAtlas = atlases.at(selectedItemAtlas);
+			const auto& selectedAtlas = atlases.at(selectedItemAtlas);
 			
 			strings_t imageNames = selectedAtlas->GetImageNames();
 			auto imagesTuple = std::tuple<strings_t, LisboxPred_t>(imageNames, ListStrCallback);
