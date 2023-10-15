@@ -13,7 +13,6 @@ namespace nador
     public:
         virtual ~IFontController() = default;
 
-    public:
         using FontSizesList_t = std::set<uint32_t>;
 
         virtual bool AddFontSize(uint32_t fontSize) = 0;
