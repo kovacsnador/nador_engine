@@ -342,7 +342,7 @@ namespace nador
 
     void Font::_LoadTextureIfNecessary()
     {
-        if (_texture == nullptr && _textureLoadData.bitmapLoadDatas.empty() == false)
+        if (_texture == nullptr && _textureLoadData.Empty() == false)
         {
             if (_state.load() == State::FAILED)
             {

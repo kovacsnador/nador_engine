@@ -49,6 +49,8 @@ namespace nador
             uint32_t height { 0 };
 
             std::vector<BitmapLoadData> bitmapLoadDatas {};
+
+            bool Empty() const noexcept { return bitmapLoadDatas.empty(); }
         };
 
     public:

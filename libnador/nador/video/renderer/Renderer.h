@@ -27,7 +27,7 @@ namespace nador
         void Begin() override;
 
         /*!
-         * The render function.
+         * The render flush function.
          */
         void Flush() override;
 
@@ -36,6 +36,9 @@ namespace nador
          */
         void End() override;
 
+        /*!
+         * The draw function.
+         */
         void Draw(const IMaterial* pMaterial, const RenderData& renderData, const glm::mat4& modelMatrix = IDENTITY_MATRIX) override;
 
         /*!
