@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "nador/video/font/IFontController.h"
+#include "nador/video/font/FontTextureLoadStrategy.h"
 #include "nador/common/MoveableObjWrapper.h"
 #include "nador/common/FutureWaiter.h"
 
@@ -23,10 +24,8 @@ namespace nador
 
         /*!
          * Font controller default constructor.
-         *
-         * \param video		The video api interface.
          */
-        FontController(const IVideoPtr video, const IFileControllerPtr fileCtrl);
+        FontController(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, uint32_t maxTextureSize);
 
         /*!
          * Add font size.
@@ -39,9 +38,9 @@ namespace nador
          * Creates a new font.
          *
          * \param fontId		The id of the font.
-         * \param filePath		The path of the font file.
+         * \param fileData		The font file data.
          */
-        void CreateFont(uint32_t fontId, std::string_view filePath) override;
+        void CreateFont(uint32_t fontId, const std::optional<FileData>& fileData) override;
 
         /*!
          * Gets the font.
@@ -105,12 +104,9 @@ namespace nador
         void Wait() override;
 
     private:
-        FontUPtr _CreateFont(FT_Library library, const FileData& data, uint32_t fontSize, std::string_view filePath, uint32_t maxTextureSize);
+        FontUPtr _CreateFont(FT_Library library, const FileData& data, uint32_t fontSize, uint32_t maxTextureSize);
 
-        void _RegisterFont(uint32_t fontId, uint32_t fontSize, FileData file, std::string_view fileName, uint32_t maxTextureSize);
-
-        const IVideoPtr          _video;
-        const IFileControllerPtr _fileCtrl;
+        void _RegisterFont(uint32_t fontId, uint32_t fontSize, FileData file, const std::string& fileName, uint32_t maxTextureSize);
 
         int32_t         _maxTextureSize;
         FontsList_t     _registeredFonts;
@@ -121,6 +117,8 @@ namespace nador
 
         uint32_t _defaultFontId { INVALID_FONT_VALUE };
         uint32_t _defaultFontSize { INVALID_FONT_VALUE };
+
+        font::FontTextureLoadStrategy_t<Texture> _fontTextureLoadStrategy;
 
         mutable std::mutex _mutex;
     };

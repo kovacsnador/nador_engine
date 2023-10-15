@@ -4,12 +4,12 @@
 
 namespace nador
 {
-    FontController::FontController(const IVideoPtr video, const IFileControllerPtr fileCtrl)
-    : _video(std::move(video))
-    , _fileCtrl(std::move(fileCtrl))
+    FontController::FontController(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, uint32_t maxTextureSize)
+    : _maxTextureSize(maxTextureSize)
+    , _fontTextureLoadStrategy(loadStrategy)
     {
-        NADOR_ASSERT(_video);
-        NADOR_ASSERT(_fileCtrl);
+        NADOR_ASSERT(_maxTextureSize > 0);
+        NADOR_ASSERT(_fontTextureLoadStrategy);
     }
 
     bool FontController::AddFontSize(uint32_t fontSize)
@@ -18,7 +18,7 @@ namespace nador
         return inserted;
     }
 
-    void FontController::CreateFont(uint32_t fontId, std::string_view filePath)
+    void FontController::CreateFont(uint32_t fontId, const std::optional<FileData>& file)
     {
         // clear outdated futures
         std::remove_if(_pendingFutures.begin(), _pendingFutures.end(), [this](const auto& it) { return nador::utils::isReadyFuture(it.obj); });
@@ -29,22 +29,15 @@ namespace nador
             return;
         }
 
-        uint32_t maxTextureSize = _video->GetMaxTextureSize();
-
         auto threadPool = GetThreadPool();
 
         auto future = threadPool->Enqueue(
-            [this, fontId, threadPool, maxTextureSize](std::string filePath) {
-                // read the font file
-                auto file = _fileCtrl->Read(filePath);
-
+            [this, fontId, threadPool, file]() {
                 if (file.has_value() == false)
                 {
-                    ENGINE_ERROR("Font file could not be opened: %s", filePath.c_str());
+                    ENGINE_ERROR("Font could not be ceated with id: %d", fontId);
                     return;
                 }
-
-                std::string fileName { _fileCtrl->GetFileName(filePath) };
 
                 std::vector<nador::ThreadPoolTask> batchTasks;
 
@@ -52,9 +45,9 @@ namespace nador
 
                 for (auto fontSize : _fontSizes)
                 {
-                    auto task = nador::CreatePackagedTask([this, fontId, fontSize, file, filePath, maxTextureSize] {
+                    auto task = nador::CreatePackagedTask([this, fontId, fontSize, file, filePath = file->GetPath().filename()] {
                         // loading the real font
-                        _RegisterFont(fontId, fontSize, file.value(), filePath, maxTextureSize);
+                        _RegisterFont(fontId, fontSize, file.value(), filePath.string(), _maxTextureSize);
                     });
                     futures.emplace_back(task->get_future());
                     batchTasks.emplace_back(std::move(task), nador::ETaskPriority::VERY_HIGH);
@@ -62,8 +55,7 @@ namespace nador
 
                 threadPool->Enqueue(batchTasks);
             },
-            nador::ETaskPriority::VERY_HIGH,
-            std::string(filePath));
+            nador::ETaskPriority::VERY_HIGH);
 
         _pendingFutures.emplace_back(std::move(future));
     }
@@ -157,7 +149,7 @@ namespace nador
         return false;
     }
 
-    void FontController::_RegisterFont(uint32_t fontId, uint32_t fontSize, FileData file, std::string_view fileName, uint32_t maxTextureSize)
+    void FontController::_RegisterFont(uint32_t fontId, uint32_t fontSize, FileData file, const std::string& fileName, uint32_t maxTextureSize)
     {
         FT_Library library;
 
@@ -167,14 +159,14 @@ namespace nador
             return;
         }
 
-        auto font = _CreateFont(library, file, fontSize, fileName, maxTextureSize);
+        auto font = _CreateFont(library, file, fontSize, maxTextureSize);
 
         FT_Done_FreeType(library);
 
         std::scoped_lock<std::mutex> lock(_mutex);
 
-        _registeredFonts[fontSize][fontId]        = std::move(font);
-        _fontNamesToIds[std::string { fileName }] = fontId;
+        _registeredFonts[fontSize][fontId] = std::move(font);
+        _fontNamesToIds[fileName]          = fontId;
     }
 
     void FontController::Wait()
@@ -182,11 +174,7 @@ namespace nador
         _pendingFutures.clear();
     }
 
-    FontUPtr FontController::_CreateFont(FT_Library       library,
-                                         const FileData&  file,
-                                         uint32_t         fontSize,
-                                         std::string_view filePath,
-                                         uint32_t         maxTextureSize)
+    FontUPtr FontController::_CreateFont(FT_Library library, const FileData& file, uint32_t fontSize, uint32_t maxTextureSize)
     {
         nador::Stopwatch<std::chrono::system_clock> sw;
 
@@ -197,7 +185,7 @@ namespace nador
             ENGINE_FATAL("FT_New_Face failed (there is probably a problem with your font file)");
         }
 
-        auto font = std::make_unique<Font>(_video.get(), face, fontSize, maxTextureSize, filePath.data());
+        auto font = std::make_unique<Font>(_fontTextureLoadStrategy, face, fontSize, maxTextureSize);
 
         FT_Done_Face(face);
 

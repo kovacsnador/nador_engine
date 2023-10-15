@@ -7,39 +7,40 @@
 
 namespace nador
 {
-    Font::Font(const IVideo* video, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName)
-    : _video(video)
-    , _fontSize(fontSize)
+    Font::Font(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize)
+    : _fontSize(fontSize)
     , _state(State::LOADING)
-    , _fileName(fileName)
+    , _loadStrategy(loadStrategy)
     {
+        NADOR_ASSERT(_loadStrategy);
+
         FT_Set_Pixel_Sizes(face, 0, fontSize);
         const FT_GlyphSlot glyph = face->glyph;
 
-        uint32_t rowWidth = 0;
-        uint32_t rowHeight = 0;
-        uint32_t textureWidth = 0;
+        uint32_t rowWidth      = 0;
+        uint32_t rowHeight     = 0;
+        uint32_t textureWidth  = 0;
         uint32_t textureHeight = 0;
 
-        uint32_t  g_index;
+        uint32_t g_index;
 
         size_t charCount = 0;
 
         /* Find minimum size for a texture holding all visible ASCII characters */
-        uint32_t  charCode = FT_Get_First_Char(face, &g_index);
-        while(g_index != 0)
+        uint32_t charCode = FT_Get_First_Char(face, &g_index);
+        while (g_index != 0)
         {
-            if(FT_Load_Char(face, charCode, FT_LOAD_BITMAP_METRICS_ONLY | FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT))
+            if (FT_Load_Char(face, charCode, FT_LOAD_BITMAP_METRICS_ONLY | FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT))
             {
                 ENGINE_WARNING("Loading characher failed! char: %d", charCode);
                 continue;
             }
 
-            if(rowWidth + glyph->bitmap.width + 1 >= maxTextureSize)
+            if (rowWidth + glyph->bitmap.width + 1 >= maxTextureSize)
             {
                 textureWidth = std::max(textureWidth, rowWidth);
                 textureHeight += rowHeight;
-                rowWidth = 0;
+                rowWidth  = 0;
                 rowHeight = 0;
             }
             rowWidth += glyph->bitmap.width + 1;
@@ -49,21 +50,21 @@ namespace nador
             charCount++;
         }
 
-        _bitmapLoadDatas.reserve(charCount);
+        _textureLoadData.bitmapLoadDatas.reserve(charCount);
 
         textureWidth = std::max(textureWidth, rowWidth);
         textureHeight += rowHeight;
 
         textureHeight = utils::NextUpPower(textureHeight, 2u);
-        textureWidth = utils::NextUpPower(textureWidth, 2u);
+        textureWidth  = utils::NextUpPower(textureWidth, 2u);
 
-        if(textureHeight > maxTextureSize || textureWidth > maxTextureSize)
+        if (textureHeight > maxTextureSize || textureWidth > maxTextureSize)
         {
             ENGINE_FATAL("Font texture size is to big for opengl");
-            _state = State::FAILED;
+            _state.store(State::FAILED);
         }
 
-        _textureLoadData.width = textureWidth;
+        _textureLoadData.width  = textureWidth;
         _textureLoadData.height = textureHeight;
 
         /* Paste all glyph bitmaps into the texture, remembering the offset */
@@ -73,7 +74,7 @@ namespace nador
         rowHeight = 0;
 
         charCode = FT_Get_First_Char(face, &g_index);
-        while(g_index != 0)
+        while (g_index != 0)
         {
             if (FT_Load_Char(face, charCode, FT_LOAD_RENDER))
             {
@@ -81,11 +82,11 @@ namespace nador
                 continue;
             }
 
-            if(ox + glyph->bitmap.width + 1 >= maxTextureSize)
+            if (ox + glyph->bitmap.width + 1 >= maxTextureSize)
             {
                 oy += rowHeight;
                 rowHeight = 0;
-                ox = 0;
+                ox        = 0;
             }
 
             uint32_t bitmapBufferSize = glyph->bitmap.width * glyph->bitmap.rows;
@@ -93,7 +94,7 @@ namespace nador
             std::unique_ptr<uint8_t[]> bitmapBuffer = std::make_unique<uint8_t[]>(bitmapBufferSize);
             std::memcpy(bitmapBuffer.get(), glyph->bitmap.buffer, bitmapBufferSize);
 
-            _bitmapLoadDatas.emplace_back(ox, oy, glyph->bitmap.width, glyph->bitmap.rows, std::move(bitmapBuffer));
+            _textureLoadData.bitmapLoadDatas.emplace_back(ox, oy, glyph->bitmap.width, glyph->bitmap.rows, std::move(bitmapBuffer));
 
             CharacterInfo c;
 
@@ -117,19 +118,18 @@ namespace nador
             charCode = FT_Get_Next_Char(face, charCode, &g_index);
         }
 
-        ENGINE_DEBUG("Generated a %d x %d (%d kb) texture atlas", textureWidth, textureHeight, textureWidth * textureHeight / maxTextureSize);
-
+        // Setup max height
         std::wstring ws(L"AgyŰ");
 
-        //setup converter
+        // setup converter
         using convert_type = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<convert_type, wchar_t> converter;
+        std::string                                 bigText = converter.to_bytes(ws);
+        _maxYSize                                           = GetBoundingBox(CalculateUTF8TextVertices(bigText.c_str())).y;
 
-        std::string bigText = converter.to_bytes(ws);
+        _state.store(State::FINISHED);
 
-        _maxYSize = GetBoundingBox(CalculateUTF8TextVertices(bigText.c_str())).y;
-
-        _state = State::FINISHED;
+        ENGINE_DEBUG("Generated a %d x %d (%d kb) texture atlas", textureWidth, textureHeight, textureWidth * textureHeight / maxTextureSize);
     }
 
     float_t Font::GetMaxHeight() const noexcept
@@ -143,20 +143,15 @@ namespace nador
         return _texture;
     }
 
-    const std::string& Font::GetFileName() const
-    {
-        return _fileName;
-    }
-
     RenderData Font::CalculateUTF8Text(const char* utf8Text, float_t newLineOffset)
     {
-        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(utf8Text);
+        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> {}.from_bytes(utf8Text);
         return CalculateUTF32Text(utf32Text.c_str(), newLineOffset);
     }
 
     RenderData Font::CalculateUTF16Text(const char* utf16Text, float_t newLineOffset)
     {
-        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf16<char32_t>, char32_t>{}.from_bytes(utf16Text);
+        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf16<char32_t>, char32_t> {}.from_bytes(utf16Text);
         return CalculateUTF32Text(utf32Text.c_str(), newLineOffset);
     }
 
@@ -179,15 +174,15 @@ namespace nador
         int32_t texture_w = _texture->GetWidth();
         int32_t texture_h = _texture->GetHeight();
 
-        std::vector<float_t> vertices(16, 0);
-        std::vector<float_t> texCoords(8, 0);
+        std::vector<float_t>  vertices(16, 0);
+        std::vector<float_t>  texCoords(8, 0);
         std::vector<uint32_t> indices(6, 0);
 
-        for(const char32_t* p = text; *p; p++)
+        for (const char32_t* p = text; *p; p++)
         {
             try
             {
-                if(*p == '\n')
+                if (*p == '\n')
                 {
                     x = 0;
                     y -= _fontSize * sx * newLineOffset;
@@ -198,7 +193,7 @@ namespace nador
 
                 bool isCharSpace = isspace(*p);
 
-                if(iterator == _characters.end())
+                if (iterator == _characters.end())
                 {
                     if (isCharSpace == false)
                     {
@@ -210,9 +205,9 @@ namespace nador
                 const CharacterInfo& c_info = iterator->second;
 
                 // Calculate the vertex and texture coordinates
-                float_t x2 = x + c_info.bl * sx;
-                float_t y2 = -y - c_info.bt * sy;
-                float_t width = c_info.bw * sx;
+                float_t x2     = x + c_info.bl * sx;
+                float_t y2     = -y - c_info.bt * sy;
+                float_t width  = c_info.bw * sx;
                 float_t height = c_info.bh * sy;
 
                 // Advance the cursor to the start of the next character
@@ -220,9 +215,9 @@ namespace nador
                 y += c_info.ay * sy;
 
                 // Skip glyphs that have no pixels
-                if(!width || !height)
+                if (!width || !height)
                 {
-                    if(isCharSpace)
+                    if (isCharSpace)
                     {
                         width = c_info.ax * sx;
                     }
@@ -233,18 +228,18 @@ namespace nador
                     }
                 }
 
-                vertices = { x2, -y2, 0.0f, 1.0f,
-                    x2 + width, -y2, 0.0f, 1.0f,
-                    x2, -y2 - height, 0.0f, 1.0f,
-                    x2 + width, -y2 - height, 0.0f, 1.0f };
+                vertices = { x2, -y2, 0.0f, 1.0f, x2 + width, -y2, 0.0f, 1.0f, x2, -y2 - height, 0.0f, 1.0f, x2 + width, -y2 - height, 0.0f, 1.0f };
 
-                texCoords = { c_info.tx, c_info.ty,
-                    c_info.tx + c_info.bw / texture_w, c_info.ty,
-                    c_info.tx, c_info.ty + c_info.bh / texture_h,
-                    c_info.tx + c_info.bw / texture_w, c_info.ty + c_info.bh / texture_h };
+                texCoords = { c_info.tx,
+                              c_info.ty,
+                              c_info.tx + c_info.bw / texture_w,
+                              c_info.ty,
+                              c_info.tx,
+                              c_info.ty + c_info.bh / texture_h,
+                              c_info.tx + c_info.bw / texture_w,
+                              c_info.ty + c_info.bh / texture_h };
 
-                indices = { i, i + 1, i + 2,
-                            i + 1, i + 3, i + 2 };
+                indices = { i, i + 1, i + 2, i + 1, i + 3, i + 2 };
 
                 renderData.AddVertices(&vertices[0], utils::VectorsizeInBytes(vertices));
                 renderData.AddTextureCoords(&texCoords[0], utils::VectorsizeInBytes(texCoords));
@@ -252,7 +247,7 @@ namespace nador
 
                 i += 4;
             }
-            catch(...)
+            catch (...)
             {
                 ENGINE_WARNING("Can't find glyphs: %d", *p);
                 continue;
@@ -263,13 +258,13 @@ namespace nador
 
     vertices_list_t Font::CalculateUTF8TextVertices(const char* text, float_t newLineOffset)
     {
-        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.from_bytes(text);
+        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> {}.from_bytes(text);
         return CalculateUTF32TextVertices(utf32Text.c_str(), newLineOffset);
     }
-    
+
     vertices_list_t Font::CalculateUTF16TextVertices(const char* text, float_t newLineOffset)
     {
-        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf16<char32_t>, char32_t>{}.from_bytes(text);
+        std::u32string utf32Text = std::wstring_convert<std::codecvt_utf16<char32_t>, char32_t> {}.from_bytes(text);
         return CalculateUTF32TextVertices(utf32Text.c_str(), newLineOffset);
     }
 
@@ -311,9 +306,9 @@ namespace nador
                 const CharacterInfo& c_info = iterator->second;
 
                 // Calculate the vertex and texture coordinates
-                float_t x2 = x + c_info.bl * sx;
-                float_t y2 = -y - c_info.bt * sy;
-                float_t width = c_info.bw * sx;
+                float_t x2     = x + c_info.bl * sx;
+                float_t y2     = -y - c_info.bt * sy;
+                float_t width  = c_info.bw * sx;
                 float_t height = c_info.bh * sy;
 
                 // Advance the cursor to the start of the next character
@@ -330,10 +325,7 @@ namespace nador
                     continue;
                 }
 
-                vertices = { x2, -y2, 0.0f, 1.0f,
-                    x2 + width, -y2, 0.0f, 1.0f,
-                    x2, -y2 - height, 0.0f, 1.0f,
-                    x2 + width, -y2 - height, 0.0f, 1.0f };
+                vertices = { x2, -y2, 0.0f, 1.0f, x2 + width, -y2, 0.0f, 1.0f, x2, -y2 - height, 0.0f, 1.0f, x2 + width, -y2 - height, 0.0f, 1.0f };
 
                 renderData.AddVertices(&vertices[0], utils::VectorsizeInBytes(vertices));
 
@@ -350,32 +342,29 @@ namespace nador
 
     void Font::_LoadTextureIfNecessary()
     {
-        if(_texture == nullptr)
+        if (_texture == nullptr && _textureLoadData.bitmapLoadDatas.empty() == false)
         {
-            if(_state == State::FAILED)
+            if (_state.load() == State::FAILED)
             {
                 ENGINE_FATAL("Font loading failed.");
                 return;
             }
 
-            if(_state == State::LOADING)
+            if (_state.load() == State::LOADING)
             {
-                ENGINE_WARNING("Font is still loading");
+                ENGINE_WARNING("Font is still loading...");
                 return;
             }
 
-            TextureSettings settings(TextureType::TEXTURE_2D,
-                                     TextureFilter::LINEAR,
-                                     TextureWrapping::CLAMP_TO_EDGE,
-                                     ColorFormat::ALPHA,
-                                     PixelStore::GL_UNPACK_ALIGNMENT_1);
+            _texture = _loadStrategy(_textureLoadData.width, _textureLoadData.height);
 
-            _texture = std::make_shared<Texture>(_video, nullptr, _textureLoadData.width, _textureLoadData.height, settings);
-
-            for(const auto& it : _bitmapLoadDatas)
+            for (const auto& it : _textureLoadData.bitmapLoadDatas)
             {
                 _texture->UploadSubTexture(it.bitmapBuffer.get(), it.xOffset, it.yOffset, it.bitmapWidth, it.bitmapRows);
             }
+
+            // free up memory
+            _textureLoadData = {};
         }
     }
-}
+} // namespace nador

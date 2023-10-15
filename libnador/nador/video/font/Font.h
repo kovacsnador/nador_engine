@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <atomic>
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
@@ -12,6 +13,7 @@
 #include "nador/utils/Types.h"
 #include "nador/video/buffers/Texture.h"
 #include "nador/video/renderer/RenderData.h"
+#include "nador/video/font/FontTextureLoadStrategy.h"
 
 namespace nador
 {
@@ -19,87 +21,48 @@ namespace nador
     {
         struct CharacterInfo
         {
+            float_t ax { 0 }; // advance.x
+            float_t ay { 0 }; // advance.y
 
-            /**
-             * CharacterInfo default constructor
-             */
-            CharacterInfo()
-                : ax(0)
-                , ay(0)
-                , bw(0)
-                , bh(0)
-                , bl(0)
-                , bt(0)
-                , tx(0)
-                , ty(0)
-            {
-                // no func
-            }
+            float_t bw { 0 }; // bitmap.width;
+            float_t bh { 0 }; // bitmap.height;
 
-            float_t ax;	// advance.x
-            float_t ay;	// advance.y
+            float_t bl { 0 }; // bitmap_left;
+            float_t bt { 0 }; // bitmap_top;
 
-            float_t bw;	// bitmap.width;
-            float_t bh;	// bitmap.height;
-
-            float_t bl;	// bitmap_left;
-            float_t bt;	// bitmap_top;
-
-            float_t tx;	// x offset of glyph in texture coordinates
-            float_t ty;	// y offset of glyph in texture coordinates
+            float_t tx { 0 }; // x offset of glyph in texture coordinates
+            float_t ty { 0 }; // y offset of glyph in texture coordinates
         };
-
-        using char_container_t = std::unordered_map<uint32_t, CharacterInfo>;
 
         struct BitmapLoadData
         {
-            BitmapLoadData() = default;
-
-            BitmapLoadData(int32_t xOffset, int32_t yOffset, uint32_t bitmapWidth, uint32_t bitmapRows, std::unique_ptr<uint8_t[]> bitmapBuffer)
-            : xOffset(xOffset)
-            , yOffset(yOffset)
-            , bitmapWidth(bitmapWidth)
-            , bitmapRows(bitmapRows)
-            , bitmapBuffer(std::move(bitmapBuffer))
-            {
-            }
-
-            int32_t xOffset = 0;
-            int32_t yOffset = 0;
-            uint32_t bitmapWidth = 0;
-            uint32_t bitmapRows = 0;
-            std::unique_ptr<uint8_t[]> bitmapBuffer = nullptr;
+            int32_t                    xOffset { 0 };
+            int32_t                    yOffset { 0 };
+            uint32_t                   bitmapWidth { 0 };
+            uint32_t                   bitmapRows { 0 };
+            std::unique_ptr<uint8_t[]> bitmapBuffer { nullptr };
         };
 
         struct TextureLoadData
         {
-            uint32_t width;
-            uint32_t height;
-        };
+            uint32_t width { 0 };
+            uint32_t height { 0 };
 
-        using bitmap_load_datas_t = std::vector<BitmapLoadData>;
+            std::vector<BitmapLoadData> bitmapLoadDatas {};
+        };
 
     public:
         static constexpr float_t DEFAULT_NEW_LINE_OFFSET = 1.1f;
 
         /*!
          * Font constructor.
-         *
-         * \param face		    The font face.
-         * \param fontSize	    The size of the font.
-         * \param fileName	    The name of the font file.
          */
-        Font(const IVideo* video, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize, const char* fileName);
+        Font(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, const FT_Face face, uint32_t fontSize, uint32_t maxTextureSize);
 
         /*!
          * Get the font texture.
          */
         const TexturePtr GetTexture();
-
-        /*!
-         * Get the font file name.
-         */
-        const std::string& GetFileName() const;
 
         /*!
          * Calculate the render data of the utf8 text.
@@ -147,21 +110,19 @@ namespace nador
             FAILED,
         };
 
-        const IVideo* _video;
+        uint32_t           _fontSize;
+        std::atomic<State> _state;
+        float_t            _maxYSize { 0 };
 
-        uint32_t            _fontSize;
-        char_container_t    _characters;
-        TexturePtr          _texture;
-        State               _state;
-        std::string         _fileName;
-        float_t             _maxYSize{ 0 };
+        std::unordered_map<uint32_t, CharacterInfo> _characters;
 
-        TextureLoadData     _textureLoadData;
-        bitmap_load_datas_t _bitmapLoadDatas;
-        
+        font::FontTextureLoadStrategy_t<Texture> _loadStrategy;
+
+        TexturePtr      _texture;
+        TextureLoadData _textureLoadData;
     };
 
     CREATE_PTR_TYPES(Font);
-}
+} // namespace nador
 
 #endif // !__FONT_H__

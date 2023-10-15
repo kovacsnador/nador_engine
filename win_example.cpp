@@ -30,12 +30,13 @@ void InitFonts()
     nador::Stopwatch sw;
 
     nador::IFontController* fontCtrl = nador::IApp::Get()->GetFontController();
+    nador::IFileController* fileCtrl = nador::IApp::Get()->GetFileController();
 
     fontCtrl->AddFontSize(FontSize::SMALL);
     fontCtrl->AddFontSize(FontSize::MEDIUM);
     fontCtrl->AddFontSize(FontSize::LARGE);
 
-    fontCtrl->CreateFont(Fonts::FREE_SANS, "res/fonts/FreeSans.ttf");
+    fontCtrl->CreateFont(Fonts::FREE_SANS, fileCtrl->Read("res/fonts/FreeSans.ttf"));
 
     // Sets the default font size
     fontCtrl->SetDefaultSystemFont(Fonts::FREE_SANS, FontSize::SMALL);

@@ -90,9 +90,9 @@ namespace nador
         return std::make_unique<Renderer>(video, renderPlugins, std::move(camera));
     }
 
-    IFontControllerUPtr ModuleFactory::CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl)
+    IFontControllerUPtr ModuleFactory::CreateFontController(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, uint32_t maxTextureSize)
     {
-        return std::make_unique<FontController>(video, fileCtrl);
+        return std::make_unique<FontController>(loadStrategy, maxTextureSize);
     }
 
     IAtlasControllerUPtr ModuleFactory::CreateAtlasController(IAtlasController::AtlasList_t list, size_t cacheSize)

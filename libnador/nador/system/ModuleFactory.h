@@ -9,6 +9,7 @@
 #include "nador/sound/ISoundController.h"
 #include "nador/video/renderer/IRenderer.h"
 #include "nador/video/font/IFontController.h"
+#include "nador/video/font/FontTextureLoadStrategy.h"
 #include "nador/video/atlas/IAtlasController.h"
 #include "nador/ui/IUiApp.h"
 #include "nador/test/ITestController.h"
@@ -29,7 +30,7 @@ namespace nador
         IImguiAdapterUPtr    CreateImGuiAdapter();
         ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
         IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera);
-        IFontControllerUPtr  CreateFontController(const IVideoPtr& video, const IFileControllerPtr& fileCtrl);
+        IFontControllerUPtr  CreateFontController(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, uint32_t maxTextureSize);
         IAtlasControllerUPtr CreateAtlasController(IAtlasController::AtlasList_t list, size_t cacheSize);
         IUiAppUPtr           CreateUiApp(const IVideoPtr& video, const IInputControllerPtr& inputCtrl, const IAtlasControllerPtr& atlasCtrl);
         ITestControllerUPtr  CreateTestController();

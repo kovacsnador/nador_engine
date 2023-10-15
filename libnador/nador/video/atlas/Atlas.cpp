@@ -29,9 +29,13 @@ namespace nador
         if(_textureLoader)
         {
             _texture = _textureLoader(_atlasTexturePath);
-            if(_texture)
+            if(_texture == nullptr)
             {
                 ENGINE_ERROR("Atlas texture could not be loaded: %s", _atlasTexturePath.string().c_str());
+            }
+            else
+            {
+                ENGINE_DEBUG("Atlas texture loaded: %s", _atlasTexturePath.string().c_str());
             }
         }
     }

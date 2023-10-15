@@ -51,13 +51,24 @@ namespace nador
                                  std::make_unique<BatchRenderer>(
                                      video, shaderCtrl->Get(EShader::BATCH), config.videoSettings.maxVertexCount, video->GetMaxTextureUnits()) });
 
-        // Create Camera
-        const auto& windowSizes   = config.windowSettings.windowDimension;
-        auto        projectionMtx = glm::ortho(0.0f, (float_t)windowSizes.x, 0.0f, (float_t)windowSizes.y, -1.0f, 1.0f);
-        auto        orthoCamera   = std::make_unique<Camera>(projectionMtx, OrthograpicViewMtxCalculation);
+        // Create Camera and renderer
+        const auto&  windowSizes   = config.windowSettings.windowDimension;
+        auto         projectionMtx = glm::ortho(0.0f, (float_t)windowSizes.x, 0.0f, (float_t)windowSizes.y, -1.0f, 1.0f);
+        auto         orthoCamera   = std::make_unique<Camera>(projectionMtx, OrthograpicViewMtxCalculation);
+        IRendererPtr renderer      = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
 
-        IRendererPtr       renderer = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
-        IFontControllerPtr fontCtrl = ModuleFactory::CreateFontController(video, fileCtrl);
+        // Create FontController
+        auto fontTextureLoadStrategy = [video](uint32_t width, uint32_t height) {
+            TextureSettings settings(TextureType::TEXTURE_2D,
+                                     TextureFilter::LINEAR,
+                                     TextureWrapping::CLAMP_TO_EDGE,
+                                     ColorFormat::ALPHA,
+                                     PixelStore::GL_UNPACK_ALIGNMENT_1);
+
+            return std::make_unique<Texture>(video.get(), nullptr, width, height, settings);
+        };
+
+        IFontControllerPtr fontCtrl = ModuleFactory::CreateFontController(fontTextureLoadStrategy, video->GetMaxTextureSize());
 
         // Atlas controller
         const auto& atlasSettings   = config.atlasSettings;
@@ -90,7 +101,7 @@ namespace nador
                 {
                     return std::make_unique<Texture>(video.get(), textureData.value());
                 }
-                return std::unique_ptr<Texture>{nullptr};
+                return std::unique_ptr<Texture> { nullptr };
             };
 
             atlases.emplace_back(std::make_shared<Atlas>(atlasSettings.atlasImagesPath / atlasCfg.image, imagesInAtlas, textureLoaderStrategy));
@@ -98,7 +109,7 @@ namespace nador
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(atlases, atlasSettings.atlasCacheSize);
 
         // Create UIApp
-        IUiAppPtr          uiApp    = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
+        IUiAppPtr uiApp = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
 
         // Create TestController
         ITestControllerPtr testCtrl = ModuleFactory::CreateTestController();
