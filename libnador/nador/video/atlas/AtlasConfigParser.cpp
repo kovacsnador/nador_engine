@@ -11,7 +11,7 @@ namespace nador
         }
         else
         {
-            throw atlas::AtlasJsonParserException("AtlasConfig parser error!");
+            throw atlas::AtlasParserException("AtlasConfig parser error!");
         }
     }
 
@@ -27,7 +27,7 @@ namespace nador
         }
         else
         {
-            throw atlas::AtlasJsonParserException("std::vector<AtlasConfig> parser error!");
+            throw atlas::AtlasParserException("std::vector<AtlasConfig> parser error!");
         }
     }
 

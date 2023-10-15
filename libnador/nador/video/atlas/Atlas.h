@@ -2,7 +2,7 @@
 #define __ATLAS_H__
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <filesystem>
 
@@ -14,29 +14,6 @@ namespace nador
 {
     struct Image
     {
-    public:
-        /*!
-         * AtlasImage default constructor.
-         */
-        Image() = default;
-
-        /*!
-         * AtlasImage constructor.
-         *
-         * \param width		The image width.
-         * \param height	The image height.
-         * \param name		The image name.
-         * \param atlasName	The atlas name.
-         * \param id		The image id.
-         * \param uvs		The uv coordiantes.
-         */
-        Image(const uint32_t          width,
-              const uint32_t          height,
-              const std::string&      name,
-              const std::string&      atlasName,
-              const video::EImageName id,
-              const glm::mat4x2&      uvs);
-
         uint32_t          width { 0 };
         uint32_t          height { 0 };
         std::string       name;
@@ -47,29 +24,24 @@ namespace nador
 
     struct ImageData
     {
-        const Image*      image;
-        const TexturePtr& texture;
+        const Image*    image;
+        const TexturePtr  texture;
     };
 
     class Atlas
     {
-        using image_container_t = std::map<video::EImageName, std::unique_ptr<Image>>;
+        using image_container_t = std::unordered_map<video::EImageName, std::unique_ptr<Image>>;
 
     public:
         using image_ids_t = std::vector<video::EImageName>;
+        using TextureFileLoaderStrategy_t = std::function<std::unique_ptr<Texture>(const std::filesystem::path&)>;
 
         /*!
          * Atlas constructor.
-         *
-         * \param video				The video api interface.
-         * \param fileCtrl	        The file controller.
-         * \param atlasImagePath	The path of the atlas images folder.
-         * \param baseConfig		The atlas base config data.
          */
-        Atlas(const IVideoPtr video,
-              const IFileControllerPtr fileCtrl,
-              const std::filesystem::path&  atlasImagePath,
-              const atlas::AtlasConfig&     baseConfig);
+        Atlas(const std::filesystem::path& atlasImagePath,
+              const std::vector<Image>     images,
+              const TextureFileLoaderStrategy_t& textureLoader);
 
         /*!
          * Loads the texture.
@@ -125,26 +97,23 @@ namespace nador
          *
          * \return	The texture file name.
          */
-        const std::string& GetTextureName() const;
+        std::string GetTextureName() const;
 
         /*!
          * Gets config name.
          *
          * \return	The config file name.
          */
-        const std::string& GetConfigName() const;
+        //const std::string& GetConfigName() const;
 
     private:
-        const IVideoPtr          _video;
-        const IFileControllerPtr _fileCtrl;
+        std::filesystem::path    _atlasTexturePath;
+        std::shared_ptr<Texture> _texture;
+        image_container_t        _images;
+        image_ids_t              _imageIds;
+        strings_t                _imageNames;
 
-        std::string           _textureName;
-        std::string           _configName;
-        std::filesystem::path _atlasImagePath;
-        TexturePtr            _texture;
-        image_container_t     _images;
-        image_ids_t           _imageIds;
-        strings_t             _imageNames;
+        TextureFileLoaderStrategy_t _textureLoader;
     };
 
     CREATE_PTR_TYPES(Atlas);

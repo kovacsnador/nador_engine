@@ -5,46 +5,15 @@
 
 namespace nador
 {
-    Image::Image(const uint32_t          width,
-                 const uint32_t          height,
-                 const std::string&      name,
-                 const std::string&      atlasName,
-                 const video::EImageName id,
-                 const glm::mat4x2&      uvs)
-    : width(width)
-    , height(height)
-    , name(name)
-    , atlasName(atlasName)
-    , id(id)
-    , uvs(uvs)
+    Atlas::Atlas(const std::filesystem::path& atlasTexturePath,
+                 const std::vector<Image>  images,
+                 const TextureFileLoaderStrategy_t& textureLoader)
+    : _atlasTexturePath(atlasTexturePath)
+    , _textureLoader(textureLoader)
     {
-    }
-
-    Atlas::Atlas(const IVideoPtr video,
-                 const IFileControllerPtr fileCtrl,
-                 const std::filesystem::path& atlasImagePath,
-                 const atlas::AtlasConfig&    baseConfig)
-    : _video(std::move(video))
-    , _fileCtrl(std::move(fileCtrl))
-    , _textureName(baseConfig.image)
-    , _configName(baseConfig.config)
-    , _atlasImagePath(atlasImagePath)
-    {
-        NADOR_ASSERT(_video);
-        NADOR_ASSERT(_fileCtrl);
-
-        auto configData = _fileCtrl->Read(_atlasImagePath / _configName);
-
-        if (configData.has_value() == false)
+        for(const auto& it : images)
         {
-            throw std::runtime_error("Atlas config data could not be opened!");
-        }
-
-        auto imageConfigs = atlas::AtlasConfigParser::ParseAtlasImageConfigs<video::EImageName>(configData);
-
-        for (const auto& it : imageConfigs)
-        {
-            _images[it.id] = std::make_unique<Image>(it.width, it.height, it.name, it.atlasName, it.id, it.uvs);
+            _images[it.id] = std::make_unique<Image>(it);
             _imageIds.push_back(it.id);
             _imageNames.push_back(it.name);
         }
@@ -53,19 +22,17 @@ namespace nador
     void Atlas::LoadTexture()
     {
         if (IsLoadedTexture())
-        {
-            return;
+        {   
+            return;     // Texture is already loaded. 
         }
 
-        auto textureData = _fileCtrl->Read(_atlasImagePath / _textureName);
-
-        if (textureData)
+        if(_textureLoader)
         {
-            _texture.reset(new Texture(_video.get(), textureData.value()));
-        }
-        else
-        {
-            ENGINE_ERROR("Atlas texture could not be loaded: %s", _textureName.c_str());
+            _texture = _textureLoader(_atlasTexturePath);
+            if(_texture)
+            {
+                ENGINE_ERROR("Atlas texture could not be loaded: %s", _atlasTexturePath.string().c_str());
+            }
         }
     }
 
@@ -85,6 +52,8 @@ namespace nador
         {
             return _images.at(name).get();
         }
+
+        ENGINE_ERROR("Image is not found in Atlas: %s", _atlasTexturePath.filename().string().c_str());
         return nullptr;
     }
 
@@ -104,13 +73,8 @@ namespace nador
         return _imageNames;
     }
 
-    const std::string& Atlas::GetTextureName() const
+    std::string Atlas::GetTextureName() const
     {
-        return _textureName;
-    }
-
-    const std::string& Atlas::GetConfigName() const
-    {
-        return _configName;
+        return _atlasTexturePath.filename().string();
     }
 } // namespace nador

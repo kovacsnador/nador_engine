@@ -28,12 +28,12 @@ namespace nador
     {
         nador::Stopwatch<std::chrono::system_clock> sw;
 
-        IWindowPtr          window    = ModuleFactory::CreateWindow(config.windowSettings);
-        IVideoPtr           video     = ModuleFactory::CreateVideo();
-        IFileControllerPtr  fileCtrl  = ModuleFactory::CreateFileController(config.rootFilePath);
+        IWindowPtr         window   = ModuleFactory::CreateWindow(config.windowSettings);
+        IVideoPtr          video    = ModuleFactory::CreateVideo();
+        IFileControllerPtr fileCtrl = ModuleFactory::CreateFileController(config.rootFilePath);
 
         // Create input handling and input controller
-        InputEventHandler InputEventHandler{nador::IsInputKeyHandledByOthers, nador::IsInputMouseHandledByOthers};
+        InputEventHandler   InputEventHandler { nador::IsInputKeyHandledByOthers, nador::IsInputMouseHandledByOthers };
         IInputControllerPtr inputCtrl = ModuleFactory::CreateInputController(window->GetNativeApiWindow(), std::move(InputEventHandler));
 
         // Attach after InputController created
@@ -45,35 +45,63 @@ namespace nador
         IShaderControllerPtr shaderCtrl = std::make_shared<ShaderController>(video);
 
         IRenderer::rendererPlugins_t rendererPlugins;
-        rendererPlugins.insert({ ERenderPlugin::EBaseRenderer, std::make_unique<BaseRenderer>(video, shaderCtrl, config.videoSettings.maxVertexCount) });
         rendererPlugins.insert(
-            { ERenderPlugin::EBatchRenderer,
-              std::make_unique<BatchRenderer>(video, shaderCtrl->Get(EShader::BATCH), config.videoSettings.maxVertexCount, video->GetMaxTextureUnits()) });
+            { ERenderPlugin::EBaseRenderer, std::make_unique<BaseRenderer>(video, shaderCtrl, config.videoSettings.maxVertexCount) });
+        rendererPlugins.insert({ ERenderPlugin::EBatchRenderer,
+                                 std::make_unique<BatchRenderer>(
+                                     video, shaderCtrl->Get(EShader::BATCH), config.videoSettings.maxVertexCount, video->GetMaxTextureUnits()) });
 
         // Create Camera
-        const auto& windowSizes = config.windowSettings.windowDimension;
-        auto projectionMtx = glm::ortho(0.0f, (float_t)windowSizes.x, 0.0f, (float_t)windowSizes.y, -1.0f, 1.0f);
-        auto orthoCamera = std::make_unique<Camera>(projectionMtx, OrthograpicViewMtxCalculation);
+        const auto& windowSizes   = config.windowSettings.windowDimension;
+        auto        projectionMtx = glm::ortho(0.0f, (float_t)windowSizes.x, 0.0f, (float_t)windowSizes.y, -1.0f, 1.0f);
+        auto        orthoCamera   = std::make_unique<Camera>(projectionMtx, OrthograpicViewMtxCalculation);
 
-        IRendererPtr        renderer  = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
-        IFontControllerPtr  fontCtrl  = ModuleFactory::CreateFontController(video, fileCtrl);
+        IRendererPtr       renderer = ModuleFactory::CreateRenderer(video, rendererPlugins, std::move(orthoCamera));
+        IFontControllerPtr fontCtrl = ModuleFactory::CreateFontController(video, fileCtrl);
 
         // Atlas controller
-        const auto& atlasSettings = config.atlasSettings;
-        auto atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
-        auto atlasConfigList = atlas::AtlasConfigParser::ParseAtlasConfigs(atlasConfigData);
+        const auto& atlasSettings   = config.atlasSettings;
+        auto        atlasConfigData = fileCtrl->Read(atlasSettings.atlasConfigPath);
+        auto        atlasConfigList = atlas::AtlasConfigParser::ParseAtlasConfigs(atlasConfigData);
 
         IAtlasController::AtlasList_t atlases;
         atlases.reserve(atlasConfigList.size());
-        for(const auto& it : atlasConfigList)
+        for (const auto& atlasCfg : atlasConfigList)
         {
-            atlases.emplace_back(std::make_shared<Atlas>(video, fileCtrl, atlasSettings.atlasImagesPath, it));
-        }
 
+            auto configData = fileCtrl->Read(atlasSettings.atlasImagesPath / atlasCfg.config);
+            if (configData.has_value() == false)
+            {
+                throw atlas::AtlasParserException("Atlas config data could not be opened!");
+            }
+
+            auto imageConfigs = atlas::AtlasConfigParser::ParseAtlasImageConfigs<video::EImageName>(configData);
+
+            std::vector<Image> imagesInAtlas;
+            imagesInAtlas.reserve(imageConfigs.size());
+            for (const auto& it : imageConfigs)
+            {
+                imagesInAtlas.emplace_back(it.width, it.height, it.name, it.atlasName, it.id, it.uvs);
+            }
+
+            auto textureLoaderStrategy = [video, fileCtrl](const std::filesystem::path& p) {
+                auto textureData = fileCtrl->Read(p);
+                if (textureData)
+                {
+                    return std::make_unique<Texture>(video.get(), textureData.value());
+                }
+                return std::unique_ptr<Texture>{nullptr};
+            };
+
+            atlases.emplace_back(std::make_shared<Atlas>(atlasSettings.atlasImagesPath / atlasCfg.image, imagesInAtlas, textureLoaderStrategy));
+        }
         IAtlasControllerPtr atlasCtrl = ModuleFactory::CreateAtlasController(atlases, atlasSettings.atlasCacheSize);
 
-        IUiAppPtr           uiApp     = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
-        ITestControllerPtr  testCtrl  = ModuleFactory::CreateTestController();
+        // Create UIApp
+        IUiAppPtr          uiApp    = ModuleFactory::CreateUiApp(video, inputCtrl, atlasCtrl);
+
+        // Create TestController
+        ITestControllerPtr testCtrl = ModuleFactory::CreateTestController();
 
         auto app = std::make_unique<App>(config,
                                          std::move(window),
@@ -207,7 +235,7 @@ namespace nador
 
                 auto screenSize = _renderer->GetScreenSize();
 
-                glm::vec3 worldPosition{0, screenSize.y - fontSize, 0};
+                glm::vec3 worldPosition { 0, screenSize.y - fontSize, 0 };
 
                 glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0), worldPosition);
                 glm::mat4 scaleMatrix = glm::scale(glm::vec3(fontSize, fontSize, 1));

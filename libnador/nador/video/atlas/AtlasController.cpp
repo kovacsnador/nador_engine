@@ -28,13 +28,13 @@ namespace nador
 
         if (_cache.Exist(key))
         {
-            auto& atlas = _cache.Get(key);
+            Atlas* atlas = _cache.Get(key);
             return atlas->GetImageData(name);
         }
         else
         {
             const auto& atlas = _atlases.at(key);
-            _cache.Insert(key, atlas);
+            _cache.Insert(key, atlas.get());
             return atlas->GetImageData(name);
         }
     }

@@ -15,9 +15,9 @@ namespace nador
 {
     namespace atlas
     {
-        struct AtlasJsonParserException : public std::runtime_error
+        struct AtlasParserException : public std::runtime_error
         {
-            AtlasJsonParserException(const std::string& msg)
+            AtlasParserException(const std::string& msg)
             : std::runtime_error(msg)
             {
             }
@@ -80,7 +80,7 @@ namespace nador
             }
             else
             {
-                throw AtlasJsonParserException("std::vector<AtlasConfig> parser error!");
+                throw AtlasParserException("std::vector<AtlasConfig> parser error!");
             }
         }
 

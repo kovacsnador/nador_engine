@@ -12,48 +12,47 @@
 
 namespace nador
 {
-	class AtlasController : public IAtlasController
-	{
-		using image_lookup_t = std::unordered_map<video::EImageName, size_t>;
-	
-	public:
-		/*!
-		 * AtlasController construcor.
-		 */
-		AtlasController(IAtlasController::AtlasList_t atlasList, size_t cacheSize);
+    class AtlasController : public IAtlasController
+    {
+        using image_lookup_t = std::unordered_map<video::EImageName, size_t>;
 
-		/*!
-		 * Gets the image data.
-		 *
-		 * \param name	The image id.
-		 *
-		 * \return	The Image data.
-		 */
-		ImageData GetImage(video::EImageName name) const override;
+    public:
+        /*!
+         * AtlasController construcor.
+         */
+        AtlasController(IAtlasController::AtlasList_t atlasList, size_t cacheSize);
 
-		/*!
-		 * Gets all atlases.
-		 *
-		 * \return	The atlases in container.
-		 */
-		const AtlasList_t& GetAtlases() const override;
+        /*!
+         * Gets the image data.
+         *
+         * \param name	The image id.
+         *
+         * \return	The Image data.
+         */
+        ImageData GetImage(video::EImageName name) const override;
 
-		/*!
-		 * Gets all atlas names.
-		 *
-		 * \return	The atlases names.
-		 */
-		strings_t GetAtlasNames() const override;
+        /*!
+         * Gets all atlases.
+         *
+         * \return	The atlases in container.
+         */
+        const AtlasList_t& GetAtlases() const override;
 
-	private:
-		image_lookup_t	_imageLookup;
-		AtlasList_t		_atlases;
+        /*!
+         * Gets all atlas names.
+         *
+         * \return	The atlases names.
+         */
+        strings_t GetAtlasNames() const override;
 
-		mutable LRUCache<size_t, AtlasPtr> _cache;
-	};
+    private:
+        image_lookup_t    _imageLookup;
+        const AtlasList_t _atlases;
 
-	CREATE_PTR_TYPES(AtlasController);
-}
+        mutable LRUCache<size_t, Atlas*> _cache;
+    };
+
+    CREATE_PTR_TYPES(AtlasController);
+} // namespace nador
 
 #endif // !__ATLAS_CONTROLLER_H__
-
