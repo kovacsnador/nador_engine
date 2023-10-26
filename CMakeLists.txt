@@ -1,6 +1,6 @@
 # https://decovar.dev/blog/2021/03/08/cmake-cpp-library/#the-library
 
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.18.1)
 
 project("nador_win_example" VERSION 0.1 DESCRIPTION "The nador engine example application (win).")
 

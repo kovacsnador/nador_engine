@@ -28,7 +28,7 @@ namespace nador
         IFileControllerUPtr  CreateFileController(const std::filesystem::path& rootFilePath);
         IInputControllerUPtr CreateInputController(void* nativeWindow, InputEventHandler handler);
         IImguiAdapterUPtr    CreateImGuiAdapter();
-        ISoundControllerUPtr CreateSoundController(const IFileControllerPtr& fileCtrl);
+        ISoundControllerUPtr CreateSoundController();
         IRendererUPtr        CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera);
         IFontControllerUPtr  CreateFontController(const font::FontTextureLoadStrategy_t<Texture>& loadStrategy, uint32_t maxTextureSize);
         IAtlasControllerUPtr CreateAtlasController(IAtlasController::AtlasList_t list, size_t cacheSize);

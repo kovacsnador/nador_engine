@@ -28,11 +28,8 @@
 
 namespace nador
 {
-    OpenAlSoundContoller::OpenAlSoundContoller(const IFileControllerPtr fileCtrl)
-    : _fileCtrl(fileCtrl)
+    OpenAlSoundContoller::OpenAlSoundContoller()
     {
-        NADOR_ASSERT(_fileCtrl);
-
         // Create device
         const ALCchar* defaultDeviceString = alcGetString(/*device*/ nullptr, ALC_DEFAULT_DEVICE_SPECIFIER);
 
@@ -105,11 +102,19 @@ namespace nador
         std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [this](const auto& it) { return nador::utils::isReadyFuture(it.obj); });
     }
 
-    bool OpenAlSoundContoller::LoadSound(const char* filePath, uint32_t soundId)
+    bool OpenAlSoundContoller::LoadSound(const std::optional<FileData>& soundFile, uint32_t soundId)
     {
         auto threadPool = GetThreadPool();
 
-        auto addSound = [this](std::string filePath, uint32_t soundId) {
+        auto addSound = [this](std::optional<FileData> soundFile, uint32_t soundId) {
+            if(soundFile.has_value() == false)
+            {
+                ENGINE_ERROR("Sound file could not be opended id: %d", soundId);
+                return false;
+            }
+
+            auto filePath = soundFile->GetPath().string();
+
             bool isMp3 = std::regex_match(filePath, std::regex("(.*)\\.mp3$"));
             bool isWav = std::regex_match(filePath, std::regex("(.*)\\.wav$"));
 
@@ -119,13 +124,7 @@ namespace nador
                 return false;
             }
 
-            auto soundFile = _fileCtrl->Read(filePath);
-
-            if(soundFile.has_value() == false)
-            {
-                ENGINE_ERROR("Sound file could not be opended: %s", filePath.c_str());
-                return false;
-            }
+            //auto soundFile = _fileCtrl->Read(filePath);
 
             SoundPtr soundPtr  = std::make_shared<Sound>();
             soundPtr->soundId  = soundId;
@@ -173,7 +172,7 @@ namespace nador
             return inserted; // on "inserted" true on "assign" false
         };
 
-        auto future = threadPool->Enqueue(addSound, ETaskPriority::HIGH, filePath, soundId);
+        auto future = threadPool->Enqueue(addSound, ETaskPriority::HIGH, soundFile, soundId);
         _pendingSoundLoading.emplace_back(std::move(future));
         return true;
     }

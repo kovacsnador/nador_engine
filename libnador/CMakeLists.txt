@@ -1,6 +1,6 @@
 # https://decovar.dev/blog/2021/03/08/cmake-cpp-library/#the-library
 
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.18.1)
 
 project(nador VERSION 1.0)
 
@@ -74,6 +74,7 @@ set(NADOR_SRC_DIR nador)
 set(TINYXML2_DIR dep/tinyxml2)
 set(GLFW_DIR dep/glfw)
 set(GLEW_DIR dep/glew)
+set(DR_SOUND_LIB dep/dr_libs)
 
 set(OPENAL_SOFT_DIR dep/openal-soft)
 set(FREETYPE_DIR dep/freetype)
@@ -85,11 +86,14 @@ option(NADOR_EIMAGE_NAME_PATH "Path to EImageName.h" "")
 
 add_library(${PROJECT_NAME} STATIC)
 
-add_subdirectory(${GLEW_DIR}/build/cmake)
+if(NOT ANDROID)
+    add_subdirectory(${GLEW_DIR}/build/cmake)
+    target_link_libraries(${PROJECT_NAME} LINK_PRIVATE glew_s)
+endif()
+
 add_subdirectory(${OPENAL_SOFT_DIR})
 add_subdirectory(${FREETYPE_DIR})
 
-target_link_libraries(${PROJECT_NAME} LINK_PRIVATE glew_s)
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE OpenAL)
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE freetype)
 
@@ -237,6 +241,13 @@ if(NOT NADOR_EIMAGE_NAME_PATH)
     message(FATAL_ERROR "NADOR_EIMAGE_NAME_PATH is not set")
 endif()
 
+if(NOT ANDORID)
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/${GLEW_DIR}/include
+        )
+endif()
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         # where the library itself will look for its internal headers
@@ -244,8 +255,8 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}/nador
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/${GLEW_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${OPENAL_SOFT_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/${DR_SOUND_LIB}
         ${CMAKE_CURRENT_SOURCE_DIR}/${FREETYPE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/${IMGUI_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/dep

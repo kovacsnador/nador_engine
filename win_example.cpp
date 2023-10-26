@@ -51,9 +51,10 @@ void InitSounds()
     nador::Stopwatch sw;
 
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
+    nador::IFileController* fileCtrl = nador::IApp::Get()->GetFileController();
 
-    soundCtrl->LoadSound("res/sounds/TestSound.wav", Sound::TEST_SOUND_1);
-    soundCtrl->LoadSound("res/sounds/TestSound_Mono.wav", Sound::TEST_SOUND_2);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound.wav"), Sound::TEST_SOUND_1);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound_Mono.wav"), Sound::TEST_SOUND_2);
 
     NADOR_DEBUG("InitSounds duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }

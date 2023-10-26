@@ -74,7 +74,7 @@ namespace nador
         /*!
          * OpenAlSoundController default constructor.
          */
-        OpenAlSoundContoller(const IFileControllerPtr fileCtrl);
+        OpenAlSoundContoller();
 
         /*!
          * OpenAlSoundController destructor.
@@ -86,10 +86,10 @@ namespace nador
         /*!
          * Add sound to the sound contoller with the given sound id.
          *
-         * \param fileName    The sound file name.
+         * \param soundFile    The sound file data.
          * \param soundId     The sound id.
          */
-        bool LoadSound(const char* fileName, uint32_t soundId) override;
+        bool LoadSound(const std::optional<FileData>& soundFile, uint32_t soundId) override;
 
         /*!
          * Creates a sound source from the sound id.
@@ -122,8 +122,6 @@ namespace nador
         sound_data_list_t GetAllSoundData() const override;
 
     private:
-        const IFileControllerPtr _fileCtrl;
-
         ALCdevice*  _pDevice { nullptr };
         ALCcontext* _pContext { nullptr };
 

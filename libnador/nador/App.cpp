@@ -39,7 +39,8 @@ namespace nador
         // Attach after InputController created
         window->AttachImGuiAdapter(ModuleFactory::CreateImGuiAdapter());
 
-        ISoundControllerPtr soundCtrl = ModuleFactory::CreateSoundController(fileCtrl);
+        // create sound controller
+        ISoundControllerPtr soundCtrl = ModuleFactory::CreateSoundController();
 
         // Create renderer and plugins
         IShaderControllerPtr shaderCtrl = std::make_shared<ShaderController>(video);

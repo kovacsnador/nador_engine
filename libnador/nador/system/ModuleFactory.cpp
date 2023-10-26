@@ -80,9 +80,9 @@ namespace nador
         return std::make_unique<ImguiAdapter>();
     }
 
-    ISoundControllerUPtr ModuleFactory::CreateSoundController(const IFileControllerPtr& fileCtrl)
+    ISoundControllerUPtr ModuleFactory::CreateSoundController()
 	{
-		return std::make_unique<OpenAlSoundContoller>(fileCtrl);
+		return std::make_unique<OpenAlSoundContoller>();
 	}
 
     IRendererUPtr ModuleFactory::CreateRenderer(const IVideoPtr& video, IRenderer::rendererPlugins_t& renderPlugins, std::unique_ptr<Camera> camera)

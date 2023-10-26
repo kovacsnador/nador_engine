@@ -2,8 +2,10 @@
 #define __ISOUND_CONTROLLER_H__
 
 #include <functional>
+#include <optional>
 
 #include "nador/utils/Types.h"
+#include "nador/system/file/FileData.h"
 
 namespace nador
 {
@@ -66,10 +68,10 @@ namespace nador
 		/*!
 		 * Add sound to the sound contoller with the given sound id.
 		 *
-		 * \param fileName    The sound file name.
+		 * \param fileData    The sound file data.
 		 * \param soundId     The sound id.
 		 */
-		virtual bool LoadSound(const char* fileName, uint32_t soundId) = 0;
+		virtual bool LoadSound(const std::optional<FileData>& fileData, uint32_t soundId) = 0;
 
 		/*!
 		 * Creates a sound source from the sound id.
