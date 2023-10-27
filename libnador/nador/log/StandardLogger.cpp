@@ -3,6 +3,7 @@
 #include <array>
 
 #include "nador/log/StandardLogger.h"
+#include "StandardLogger.h"
 
 static constexpr size_t s_standardLoggerBuffer = 2500;
 
@@ -66,4 +67,41 @@ void nador::StandardLogger::EngineError(std::string_view logMsg) const noexcept
 void nador::StandardLogger::EngineFatal(std::string_view logMsg) const noexcept
 {
     Fatal(logMsg);
+}
+
+nador::StandardLogger& nador::StandardLogger::Write(ELogType type, std::string_view logMsg)
+{
+    switch (type)
+    {
+    case nador::ELogType::DEBUG:
+        Debug(logMsg);
+        break;
+    case nador::ELogType::WARNING:
+        Warning(logMsg);
+        break;
+    case nador::ELogType::ERROR:
+        Error(logMsg);
+        break;
+    case nador::ELogType::FATAL:
+        Fatal(logMsg);
+        break;
+
+    case nador::ELogType::ENGINE_DEBUG:
+        EngineDebug(logMsg);
+        break;
+    case nador::ELogType::ENGINE_WARNING:
+        EngineWarning(logMsg);
+        break;
+    case nador::ELogType::ENGINE_ERROR:
+        EngineError(logMsg);
+        break;
+    case nador::ELogType::ENGINE_FATAL:
+        EngineFatal(logMsg);
+        break;
+
+    default:
+        break;
+    }
+
+    return *this;
 }

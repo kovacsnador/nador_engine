@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string_view>
 #include <array>
+#include <functional>
 
 #define NADOR_LOG nador::GetLogInterface()
 
@@ -106,7 +107,7 @@ namespace nador
         ENGINE_DEBUG,
         ENGINE_WARNING,
         ENGINE_ERROR,
-        ENGINE_FATAL,
+        ENGINE_FATAL
     };
 
     inline const char* GetLogTypeName(ELogType type)
@@ -137,6 +138,8 @@ namespace nador
     class ILog
     {
     public:
+        struct FlushRequest{};
+
         /*!
          * Wrapper function to log messages.
          *
@@ -178,6 +181,8 @@ namespace nador
 
     ILog* GetLoggingInterface();
     void  SetLoggingInterface(std::unique_ptr<ILog> log);
+
+    void SetCrashHandler(std::function<void(uint32_t)> callback);
 
     static constexpr size_t s_timeStringLenght = 100;
     static constexpr size_t s_millisecondsStringLenght = 4;

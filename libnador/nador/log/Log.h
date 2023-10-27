@@ -9,12 +9,15 @@
 #include <thread>
 #include <variant>
 #include <functional>
+#include <chrono>
 
 #include "nador/log/ILog.h"
 #include "nador/log/StandardLogger.h"
 
 namespace nador
 {
+    using namespace std::chrono_literals;
+
     template <size_t BufferSize = 2000>
     class Log : public ILog
     {
@@ -26,8 +29,10 @@ namespace nador
         using queueElement_t = std::variant<logMessage_t, TerminalSignal>;
 
     public:
-        using log_cb = std::function<void(std::string_view)>;
-        using logFormatStrategy_cb
+        using LogCallbackMsg_t = std::variant<std::string_view, FlushRequest>;
+
+        using LogCallback_t = std::function<void(ELogType, LogCallbackMsg_t)>;
+        using LogFormatStrategyCb_t
             = std::function<int32_t(char*, size_t, std::string_view, std::string_view, std::string_view, std::string_view, int32_t)>;
 
         Log()
@@ -35,16 +40,24 @@ namespace nador
         {
             nador::StandardLogger standardLogger;
 
-            // setup default standard logging
-            RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger](std::string_view msg) { standardLogger.Debug(msg); });
-            RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger](std::string_view msg) { standardLogger.Warning(msg); });
-            RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger](std::string_view msg) { standardLogger.Error(msg); });
-            RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger](std::string_view msg) { standardLogger.Fatal(msg); });
+            auto logCallback = [standardLogger](ELogType type, LogCallbackMsg_t event) mutable {
+                if (std::holds_alternative<std::string_view>(event))
+                {
+                    auto msg = std::get<std::string_view>(event);
+                    standardLogger.Write(type, msg);
+                }
+            };
 
-            RegisterCallback(nador::ELogType::DEBUG, [standardLogger](std::string_view msg) { standardLogger.Debug(msg); });
-            RegisterCallback(nador::ELogType::WARNING, [standardLogger](std::string_view msg) { standardLogger.Warning(msg); });
-            RegisterCallback(nador::ELogType::ERROR, [standardLogger](std::string_view msg) { standardLogger.Error(msg); });
-            RegisterCallback(nador::ELogType::FATAL, [standardLogger](std::string_view msg) { standardLogger.Fatal(msg); });
+            // setup default standard logging
+            RegisterCallback(nador::ELogType::ENGINE_DEBUG, logCallback);
+            RegisterCallback(nador::ELogType::ENGINE_WARNING, logCallback);
+            RegisterCallback(nador::ELogType::ENGINE_ERROR, logCallback);
+            RegisterCallback(nador::ELogType::ENGINE_FATAL, logCallback);
+
+            RegisterCallback(nador::ELogType::DEBUG, logCallback);
+            RegisterCallback(nador::ELogType::WARNING, logCallback);
+            RegisterCallback(nador::ELogType::ERROR, logCallback);
+            RegisterCallback(nador::ELogType::FATAL, logCallback);
         }
 
         ~Log()
@@ -62,7 +75,7 @@ namespace nador
             }
         }
 
-        bool RegisterCallback(ELogType type, log_cb callback)
+        bool RegisterCallback(ELogType type, LogCallback_t callback)
         {
             std::scoped_lock<std::mutex> lock(_mtx);
 
@@ -72,12 +85,13 @@ namespace nador
 
         void SetLevel(nador::ELogLevel level) noexcept { _level = level; }
 
-        void SetLogFormatStrategy(logFormatStrategy_cb strategy) noexcept { _logFormatStrategy = strategy; }
+        void SetLogFormatStrategy(LogFormatStrategyCb_t strategy) noexcept { _logFormatStrategy = strategy; }
 
         void SetTimeFormat(std::string_view timeFormat) noexcept { _timeFormat = timeFormat; }
 
     private:
-        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...) override
+        void LogMessageImpl(ELogType type, const char* file, int32_t line, const char* func, nador::ELogLevel level, std::string_view msg, ...)
+            override
         {
             if (level >= _level)
             {
@@ -140,28 +154,52 @@ namespace nador
 
         void WorkerThread()
         {
+            auto lastFlush = std::chrono::system_clock::now();
+
+            auto flushRequestCallback = [this]()
+            {
+                for (const auto& it : _logCallbacks)
+                {
+                    it.second(ELogType::DEBUG, FlushRequest {});
+                }
+            };
+
+            constexpr auto flushTimeout = 500ms;
+
             for (;;)
             {
                 std::unique_lock<std::mutex> lock(_mtx);
-                _cv.wait(lock, [this] { return _logQueue.size(); });
+                _cv.wait_for(lock, flushTimeout, [this] { return _logQueue.size(); });
 
-                auto elem = _logQueue.front();
-                _logQueue.pop();
-
-                if (std::holds_alternative<TerminalSignal>(elem))
+                auto now = std::chrono::system_clock::now();
+                // send only flush event trough callback
+                if (_logQueue.empty() || now - flushTimeout > lastFlush)
                 {
-                    break;
+                    flushRequestCallback();
+                    lastFlush = now;
                 }
-
-                const auto& [logType, msg] = std::get<logMessage_t>(elem);
-
-                auto iter = _logCallbacks.find(logType);
-                if (iter != _logCallbacks.end())
+                
+                if(_logQueue.empty() == false)
                 {
-                    // call the message callback
-                    if (iter->second)
+                    // queue is not empty, sending real message
+                    auto elem = _logQueue.front();
+                    _logQueue.pop();
+
+                    if (std::holds_alternative<TerminalSignal>(elem))
                     {
-                        iter->second(msg);
+                        break;
+                    }
+
+                    const auto& [logType, msg] = std::get<logMessage_t>(elem);
+
+                    auto iter = _logCallbacks.find(logType);
+                    if (iter != _logCallbacks.end())
+                    {
+                        // call the message callback
+                        if (iter->second)
+                        {
+                            iter->second(logType, msg);
+                        }
                     }
                 }
             }
@@ -171,15 +209,15 @@ namespace nador
 
         ELogLevel _level { ELogLevel::DEBUG };
 
-        std::unordered_map<ELogType, log_cb> _logCallbacks;
+        std::unordered_map<ELogType, LogCallback_t> _logCallbacks;
 
         std::condition_variable _cv;
         std::thread             _workerThread;
 
         std::queue<queueElement_t> _logQueue;
 
-        logFormatStrategy_cb _logFormatStrategy { nullptr };
-        std::string          _timeFormat { "%Y-%m-%d %H:%M:%S" };
+        LogFormatStrategyCb_t _logFormatStrategy { nullptr };
+        std::string           _timeFormat { "%Y-%m-%d %H:%M:%S" };
     };
 } // namespace nador
 

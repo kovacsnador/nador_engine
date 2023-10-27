@@ -64,47 +64,73 @@ void SetupLogging()
     auto log = std::make_unique<nador::Log<>>();
 
     nador::StandardLogger standardLogger;
-    nador::StreamLogger   engineStreamLogger(nador::GetStream<std::ofstream>("logs/nador_engine.log"));
-    nador::StreamLogger   userstreamLogger(nador::GetStream<std::ofstream>("logs/nador.log"));
 
-    // setup default standard logging
-    log->RegisterCallback(nador::ELogType::ENGINE_DEBUG, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
-        standardLogger.Debug(msg);
-        engineStreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::ENGINE_WARNING, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
-        standardLogger.Warning(msg);
-        engineStreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::ENGINE_ERROR, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
-        standardLogger.Error(msg);
-        engineStreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::ENGINE_FATAL, [standardLogger, engineStreamLogger](std::string_view msg) mutable {
-        standardLogger.Fatal(msg);
-        engineStreamLogger << msg;
-        throw std::runtime_error(msg.data());
-    });
+    auto engineStream = nador::GetStream<std::ofstream>("logs/nador_engine.log");
+    auto engineBuffer = std::make_shared<nador::StreamBuffer<20000>>();
+    nador::StreamLogger engineStreamLogger(engineStream, engineBuffer);
 
-    log->RegisterCallback(nador::ELogType::DEBUG, [standardLogger, userstreamLogger](std::string_view msg) mutable {
-        standardLogger.Debug(msg);
-        userstreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::WARNING, [standardLogger, userstreamLogger](std::string_view msg) mutable {
-        standardLogger.Warning(msg);
-        userstreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::ERROR, [standardLogger, userstreamLogger](std::string_view msg) mutable {
-        standardLogger.Error(msg);
-        userstreamLogger << msg;
-    });
-    log->RegisterCallback(nador::ELogType::FATAL, [standardLogger, userstreamLogger](std::string_view msg) mutable {
-        standardLogger.Fatal(msg);
-        userstreamLogger << msg;
-        throw std::runtime_error(msg.data());
-    });
+
+    auto userStream = nador::GetStream<std::ofstream>("logs/nador.log");
+    auto userBuffer = std::make_shared<nador::StreamBuffer<20000>>();
+    nador::StreamLogger userstreamLogger(userStream, userBuffer);
+
+
+    auto engineLogCallback = [standardLogger, engineStreamLogger](nador::ELogType logType, auto event) mutable {
+        if (std::holds_alternative<std::string_view>(event))
+        {
+            auto msg = std::get<std::string_view>(event);
+            standardLogger.Write(logType, msg);
+            engineStreamLogger.Write(msg);
+
+            if(logType == nador::ELogType::ENGINE_FATAL)
+            {
+                throw std::runtime_error(msg.data());
+            }
+        }
+        else if (std::holds_alternative<nador::ILog::FlushRequest>(event))
+        {
+            engineStreamLogger.FlushBuffer();
+        }
+    };
+
+    auto userLogCallback = [standardLogger, userstreamLogger](nador::ELogType logType, auto event) mutable {
+        if (std::holds_alternative<std::string_view>(event))
+        {
+            auto msg = std::get<std::string_view>(event);
+            standardLogger.Write(logType, msg);
+            userstreamLogger.Write(msg);
+
+            if(logType == nador::ELogType::FATAL)
+            {
+                throw std::runtime_error(msg.data());
+            }
+        }
+        else if (std::holds_alternative<nador::ILog::FlushRequest>(event))
+        {
+            userstreamLogger.FlushBuffer();
+        }
+    };
+
+
+    // setup engine logging
+    log->RegisterCallback(nador::ELogType::ENGINE_DEBUG, engineLogCallback);
+    log->RegisterCallback(nador::ELogType::ENGINE_WARNING, engineLogCallback);
+    log->RegisterCallback(nador::ELogType::ENGINE_ERROR, engineLogCallback);
+    log->RegisterCallback(nador::ELogType::ENGINE_FATAL, engineLogCallback);
+
+    // setup user logging
+    log->RegisterCallback(nador::ELogType::DEBUG, userLogCallback);
+    log->RegisterCallback(nador::ELogType::WARNING, userLogCallback);
+    log->RegisterCallback(nador::ELogType::ERROR, userLogCallback);
+    log->RegisterCallback(nador::ELogType::FATAL, userLogCallback);
 
     nador::SetLoggingInterface(std::move(log));
+
+    nador::SetCrashHandler([engineStreamLogger, userstreamLogger](uint32_t error) mutable {
+        engineStreamLogger.FlushBuffer();
+        userstreamLogger.FlushBuffer();
+        std::cerr << "Crash signal with code: " << error << '\n';
+    });
 }
 
 int main(void)

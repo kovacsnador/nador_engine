@@ -7,6 +7,19 @@
 namespace nador
 {
     static std::unique_ptr<ILog> g_logInterface {nullptr};
+    static std::function<void(uint32_t)> g_crashHandler {};
+
+#ifdef _WIN32
+#include <Windows.h>
+    void CrashHandler(DWORD exceptionCode)
+    {
+        if(g_crashHandler)
+        {
+            g_crashHandler(exceptionCode);
+        }
+    }
+#endif
+
 
     ILog* GetLoggingInterface()
     {
@@ -16,6 +29,15 @@ namespace nador
     void SetLoggingInterface(std::unique_ptr<ILog> log)
     {
         g_logInterface = std::move(log);
+    }
+
+    void SetCrashHandler(std::function<void(uint32_t)> callback)
+    {
+        g_crashHandler = callback;
+
+#ifdef _WIN32
+        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)CrashHandler);
+#endif
     }
 
     TimestampArray GetCurrentTimestamp(std::string_view format)
