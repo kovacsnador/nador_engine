@@ -18,7 +18,14 @@ namespace nador
         bool showDebugWindow { false };
         bool showDebugInfo { false };
 
-        bool operator==(const WindowSettings& other) const = default;
+        bool operator==(const WindowSettings& other) const
+        {
+            return appName == other.appName &&
+                    windowDimension == other.windowDimension &&
+                    vSync == other.vSync &&
+                    showDebugWindow == other.showDebugWindow &&
+                    showDebugInfo == other.showDebugInfo;
+        }
     };
 
     inline void Parse(const tinyxml2::XMLElement* elem, WindowSettings& settings)

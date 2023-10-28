@@ -12,8 +12,6 @@
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "C:/MinGW/bin/gcc.exe",
-            "cStandard": "c23",
-            "cppStandard": "c++23",
             "intelliSenseMode": "windows-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools",
             "compileCommands": "${workspaceFolder}/build/compile_commands.json"

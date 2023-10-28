@@ -11,7 +11,10 @@ namespace nador
     {
         size_t maxVertexCount;
 
-        bool operator==(const VideoSettings& other) const = default;
+        bool operator==(const VideoSettings& other) const
+        {
+            return maxVertexCount == other.maxVertexCount;
+        }
     };
 
     inline void Parse(const tinyxml2::XMLElement* elem, VideoSettings& settings)

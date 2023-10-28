@@ -1,6 +1,7 @@
 #include <chrono>
 #include <ctime>
 #include <cstring>
+#include <stdio.h>
 
 #include "nador/log/ILog.h"
 
@@ -9,14 +10,24 @@ namespace nador
     static std::unique_ptr<ILog> g_logInterface {nullptr};
     static std::function<void(uint32_t)> g_crashHandler {};
 
-#ifdef _WIN32
+#ifdef PLATFORM_WINDOWS
 #include <Windows.h>
-    void CrashHandler(DWORD exceptionCode)
+
+    static LONG WINAPI CrashHandler([[maybe_unused]] EXCEPTION_POINTERS* ExceptionInfo)
     {
         if(g_crashHandler)
         {
+            int32_t exceptionCode = {0};
+
+            if(ExceptionInfo && ExceptionInfo->ExceptionRecord)
+            {
+                exceptionCode = ExceptionInfo->ExceptionRecord->ExceptionCode;
+            }
+
             g_crashHandler(exceptionCode);
         }
+
+        return EXCEPTION_EXECUTE_HANDLER;
     }
 #endif
 
@@ -35,8 +46,8 @@ namespace nador
     {
         g_crashHandler = callback;
 
-#ifdef _WIN32
-        SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)CrashHandler);
+#ifdef PLATFORM_WINDOWS
+        SetUnhandledExceptionFilter(CrashHandler);
 #endif
     }
 
@@ -57,7 +68,7 @@ namespace nador
         std::strftime(timeString, sizeof(timeString), format.data(), localTime);
 
         char millisecondsString[s_millisecondsStringLenght];
-        std::snprintf(millisecondsString, sizeof(millisecondsString), "%.3d", static_cast<int>(milliseconds % 1000));
+        ::snprintf(millisecondsString, sizeof(millisecondsString), "%.3d", static_cast<int>(milliseconds % 1000));
 
         TimestampArray result;
 

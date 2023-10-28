@@ -42,7 +42,7 @@ namespace nador
 		_state = EState::IDLE;
 	}
 
-	void UiButton::OnTick(NADOR_MAYBE_UNUSED IUiLogicState* uiLogicState, bool mouseOver)
+	void UiButton::OnTick([[maybe_unused]] IUiLogicState* uiLogicState, bool mouseOver)
 	{
 		if (mouseOver)
 		{	

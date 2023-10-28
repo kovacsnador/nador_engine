@@ -93,7 +93,7 @@ namespace nador
             imagesInAtlas.reserve(imageConfigs.size());
             for (const auto& it : imageConfigs)
             {
-                imagesInAtlas.emplace_back(it.width, it.height, it.name, it.atlasName, it.id, it.uvs);
+                imagesInAtlas.emplace_back(Image{it.width, it.height, it.name, it.atlasName, it.id, it.uvs});
             }
 
             auto textureLoaderStrategy = [video, fileCtrl](const std::filesystem::path& p) {

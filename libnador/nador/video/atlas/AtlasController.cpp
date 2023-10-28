@@ -4,7 +4,7 @@ namespace nador
 {
     AtlasController::AtlasController(IAtlasController::AtlasList_t atlasList, size_t cacheSize)
     : _atlases(std::move(atlasList))
-    , _cache(cacheSize, [](NADOR_MAYBE_UNUSED const auto& key, const auto& val) { val->DeloadTexture(); })
+    , _cache(cacheSize, []([[maybe_unused]] const auto& key, const auto& val) { val->DeloadTexture(); })
     {        
         for(size_t i = 0; i < _atlases.size(); ++i)
         {

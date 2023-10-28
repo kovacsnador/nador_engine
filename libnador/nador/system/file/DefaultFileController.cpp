@@ -35,7 +35,7 @@ namespace nador
             const auto fileSize = std::filesystem::file_size(p);
             if (fileSize > 0)
             {
-                auto data = std::make_shared<char[]>(fileSize);
+                auto data = std::shared_ptr<char[]>(new char[fileSize]);
                 file.read(data.get(), fileSize);
                 if (file)
                 {

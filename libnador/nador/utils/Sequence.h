@@ -78,7 +78,7 @@ namespace nador
 
             _sequence    = std::move(other._sequence);
             _currentIter = _sequence.begin() + idx;
-            
+
             return *this;
         }
 
@@ -124,9 +124,9 @@ namespace nador
             }
         }
 
-        UserDataTy*               _userData { nullptr };
-        sequence_list_t           _sequence;
-        sequence_list_t::iterator _currentIter;
+        UserDataTy*                        _userData { nullptr };
+        sequence_list_t                    _sequence;
+        typename sequence_list_t::iterator _currentIter;
 
         EventListener<DurationTy> _listener;
         DurationTy                _deltaBuffer { 0 };
@@ -135,7 +135,8 @@ namespace nador
     template <typename ObjTy, typename ContainterTy, typename FuncTy, typename DurationTy = std::chrono::milliseconds>
     constexpr auto CreateElemSequence(const ContainterTy& items, FuncTy func, DurationTy duration = 16ms)
     {
-        std::vector<ElementSequence<DurationTy, ObjTy&>> result;
+        using valueType = ElementSequence<DurationTy, ObjTy&>;
+        std::vector<valueType> result;
 
         DurationTy zero {};
 
@@ -145,11 +146,11 @@ namespace nador
 
             if (it != std::begin(items))
             {
-                result.emplace_back(duration, callback);
+                result.emplace_back(valueType{duration, callback});
             }
             else
             {
-                result.emplace_back(zero, callback);
+                result.emplace_back(valueType{zero, callback});
             }
         }
         return result;

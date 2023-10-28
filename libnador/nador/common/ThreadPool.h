@@ -9,7 +9,9 @@
 #include <mutex>
 #include <memory>
 #include <functional>
+#ifdef NADOR_CPP20_OR_LATER
 #include <concepts>
+#endif
 #include <any>
 #include <unordered_map>
 #include <optional>
@@ -32,7 +34,9 @@ namespace nador
     {
     public:
         template <typename PackagedTaskTy>
+#ifdef NADOR_CPP20_OR_LATER
             requires std::invocable<PackagedTaskTy>
+#endif
         ThreadPoolTask(std::shared_ptr<PackagedTaskTy>&& packagedTask, ETaskPriority priority)
         : _function([packagedTask = std::move(packagedTask)] { (*packagedTask)(); })
         , _priority(priority)
@@ -51,8 +55,10 @@ namespace nador
     };
 
     template <typename FunctionTy, typename... Args>
+#ifdef NADOR_CPP20_OR_LATER
         requires std::invocable<FunctionTy, Args...>
-    NADOR_NODISCARD auto CreatePackagedTask(FunctionTy&& function, Args&&... args)
+#endif
+    [[nodiscard]] auto CreatePackagedTask(FunctionTy&& function, Args&&... args)
     {
         using returnType_t = std::result_of_t<std::decay_t<FunctionTy>(Args...)>;
 
@@ -128,7 +134,9 @@ namespace nador
         ~ThreadPool();
 
         template <typename FunctionTy, typename... Args>
+#ifdef NADOR_CPP20_OR_LATER
             requires std::invocable<FunctionTy, Args...>
+#endif
         std::future<std::result_of_t<std::decay_t<FunctionTy>(Args...)>> Enqueue(FunctionTy&& function, ETaskPriority priority, Args&&... args)
         {
             auto packagedTask = CreatePackagedTask(std::forward<FunctionTy>(function), std::forward<Args>(args)...);

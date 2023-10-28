@@ -5,13 +5,11 @@
 
 namespace nador
 {
-    Atlas::Atlas(const std::filesystem::path& atlasTexturePath,
-                 const std::vector<Image>  images,
-                 const TextureFileLoaderStrategy_t& textureLoader)
+    Atlas::Atlas(const std::filesystem::path& atlasTexturePath, const std::vector<Image>& images, const TextureFileLoaderStrategy_t& textureLoader)
     : _atlasTexturePath(atlasTexturePath)
     , _textureLoader(textureLoader)
     {
-        for(const auto& it : images)
+        for (const auto& it : images)
         {
             _images[it.id] = std::make_unique<Image>(it);
             _imageIds.push_back(it.id);
@@ -22,14 +20,14 @@ namespace nador
     void Atlas::LoadTexture()
     {
         if (IsLoadedTexture())
-        {   
-            return;     // Texture is already loaded. 
+        {
+            return; // Texture is already loaded.
         }
 
-        if(_textureLoader)
+        if (_textureLoader)
         {
             _texture = _textureLoader(_atlasTexturePath);
-            if(_texture == nullptr)
+            if (_texture == nullptr)
             {
                 ENGINE_ERROR("Atlas texture could not be loaded: %s", _atlasTexturePath.string().c_str());
             }

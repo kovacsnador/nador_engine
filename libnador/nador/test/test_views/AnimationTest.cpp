@@ -100,7 +100,7 @@ void PlayRender(std::string_view name, nador::PackedSequence<nador::UiImage>& an
     ImGui::EndGroup();
 }
 
-void nador::AnimationTest::OnDebugRender(NADOR_MAYBE_UNUSED IRenderer* renderer)
+void nador::AnimationTest::OnDebugRender([[maybe_unused]] IRenderer* renderer)
 {
     PlayRender("Move animation:", _simpleAnim, 1);
     PlayRender("Image animation:", _imageAnim, 2);

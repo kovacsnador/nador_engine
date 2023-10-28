@@ -135,9 +135,6 @@ void SetupLogging()
 
 int main(void)
 {
-    // Logger setup
-    //SetupLogging();
-
     std::chrono::milliseconds ms{};
     nador::utils::MeasureTime(ms, SetupLogging);
 

@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 endif(NOT CMAKE_BUILD_TYPE)
 
-set(CMAKE_CXX_STANDARD                  20)
+set(CMAKE_CXX_STANDARD                  17)
 
 set(CMAKE_CXX_FLAGS                     "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG               "${CMAKE_CXX_FLAGS} -O0 -g")
@@ -25,7 +25,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY      ${OUTPUT_DIR}/${CMAKE_BUILD_TYPE}/bin)
 
 set(NADOR_EIMAGE_NAME_PATH              ${CMAKE_CURRENT_SOURCE_DIR}/res/atlas/__atlases)
 
-set(NADOR_WINDOW_API                "SDL2" CACHE STRING "" FORCE)
+set(NADOR_WINDOW_API                    "SDL2" CACHE STRING "" FORCE)
 
 add_subdirectory(libnador)
 

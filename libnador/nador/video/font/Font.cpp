@@ -94,7 +94,8 @@ namespace nador
             std::unique_ptr<uint8_t[]> bitmapBuffer = std::make_unique<uint8_t[]>(bitmapBufferSize);
             std::memcpy(bitmapBuffer.get(), glyph->bitmap.buffer, bitmapBufferSize);
 
-            _textureLoadData.bitmapLoadDatas.emplace_back(ox, oy, glyph->bitmap.width, glyph->bitmap.rows, std::move(bitmapBuffer));
+            BitmapLoadData loadData{ox, oy, glyph->bitmap.width, glyph->bitmap.rows, std::move(bitmapBuffer)};
+            _textureLoadData.bitmapLoadDatas.emplace_back(std::move(loadData));
 
             CharacterInfo c;
 

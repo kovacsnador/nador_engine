@@ -19,7 +19,7 @@ namespace nador
     class LRUCache
     {
         using list_t              = std::list<std::pair<KeyTy, ValueTy>>;
-        using list_iter_t         = list_t::iterator;
+        using list_iter_t         = typename list_t::iterator;
         using map_t               = std::unordered_map<KeyTy, list_iter_t>;
 
     public:

@@ -12,6 +12,8 @@
 #include <memory>
 #include <cstring>
 
+#include "nador/utils/CppMacros.h"
+
 namespace nador
 {
 #define CREATE_PTR_TYPES(TYPE) \
@@ -22,14 +24,6 @@ using TYPE##WPtr = std::weak_ptr<TYPE>
 
 using strings_t = std::vector<std::string>;
 }
-
-#if __cplusplus >= 201703L
-#define NADOR_MAYBE_UNUSED [[maybe_unused]]
-#define NADOR_NODISCARD [[nodiscard]]
-#else
-#define NADOR_MAYBE_UNUSED
-#define NADOR_NODISCARD
-#endif
 
 
 

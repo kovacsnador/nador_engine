@@ -24,8 +24,8 @@ namespace nador
 
     struct ImageData
     {
-        const Image*    image;
-        const TexturePtr  texture;
+        const Image*     image;
+        const TexturePtr texture;
     };
 
     class Atlas
@@ -33,15 +33,13 @@ namespace nador
         using image_container_t = std::unordered_map<video::EImageName, std::unique_ptr<Image>>;
 
     public:
-        using image_ids_t = std::vector<video::EImageName>;
+        using image_ids_t                 = std::vector<video::EImageName>;
         using TextureFileLoaderStrategy_t = std::function<std::unique_ptr<Texture>(const std::filesystem::path&)>;
 
         /*!
          * Atlas constructor.
          */
-        Atlas(const std::filesystem::path& atlasImagePath,
-              const std::vector<Image>     images,
-              const TextureFileLoaderStrategy_t& textureLoader);
+        Atlas(const std::filesystem::path& atlasImagePath, const std::vector<Image>& images, const TextureFileLoaderStrategy_t& textureLoader);
 
         /*!
          * Loads the texture.
@@ -104,7 +102,7 @@ namespace nador
          *
          * \return	The config file name.
          */
-        //const std::string& GetConfigName() const;
+        // const std::string& GetConfigName() const;
 
     private:
         std::filesystem::path    _atlasTexturePath;

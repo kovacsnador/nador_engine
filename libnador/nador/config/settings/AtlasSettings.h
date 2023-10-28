@@ -13,7 +13,12 @@ namespace nador
         std::filesystem::path atlasImagesPath;
         size_t                atlasCacheSize;
 
-        bool operator==(const AtlasSettings& other) const = default;
+        bool operator==(const AtlasSettings& other) const
+        {
+            return atlasConfigPath == other.atlasConfigPath &&
+                    atlasImagesPath == other.atlasImagesPath &&
+                    atlasCacheSize == other.atlasCacheSize;
+        }
     };
 
     inline void Parse(const tinyxml2::XMLElement* elem, AtlasSettings& settings)
