@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <execution>
 
 #include "nador/video/renderer/RenderData.h"
 #include "nador/utils/Utils.h"
@@ -129,18 +130,22 @@ namespace nador
 
     void operator*=(vertices_list_t& v, const glm::mat4& m)
     {
-        for (auto& it : v)
-        {
-            auto x = m[0].x * it.x + m[1].x * it.y + m[2].x * it.z + m[3].x * it.w;
-            auto y = m[0].y * it.x + m[1].y * it.y + m[2].y * it.z + m[3].y * it.w;
-            auto z = m[0].z * it.x + m[1].z * it.y + m[2].z * it.z + m[3].z * it.w;
-            auto w = m[0].w * it.x + m[1].w * it.y + m[2].w * it.z + m[3].w * it.w;
+        const auto& m0 = m[0];
+        const auto& m1 = m[1];
+        const auto& m2 = m[2];
+        const auto& m3 = m[3];
+
+        std::for_each(std::execution::par, v.begin(), v.end(), [&](auto& it) {
+            auto x = m0.x * it.x + m1.x * it.y + m2.x * it.z + m3.x * it.w;
+            auto y = m0.y * it.x + m1.y * it.y + m2.y * it.z + m3.y * it.w;
+            auto z = m0.z * it.x + m1.z * it.y + m2.z * it.z + m3.z * it.w;
+            auto w = m0.w * it.x + m1.w * it.y + m2.w * it.z + m3.w * it.w;
 
             it.x = x;
             it.y = y;
             it.z = z;
             it.w = w;
-        }
+        });
     }
 
     glm::vec2 GetBoundingBox(const vertices_list_t& vertices)
