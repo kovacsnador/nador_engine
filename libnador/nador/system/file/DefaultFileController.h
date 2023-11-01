@@ -22,7 +22,7 @@ namespace nador
          *
          * \return The file data.
          */
-        std::optional<FileData> Read(const std::filesystem::path& path) const override;
+        [[nodiscard]] std::optional<FileData> Read(const std::filesystem::path& path) const override;
 
         /*!
          * Writes a file.
