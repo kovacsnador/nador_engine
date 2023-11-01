@@ -19,6 +19,7 @@ namespace nador
 
 		virtual void OnTick(float_t) {};
 		virtual void OnRender(IRenderer*) {};
+		virtual void OnUiRender(IRenderer*) {};
 
 		virtual void OnKeyPressed(EKeyCode) {};
 		virtual void OnKeyHolded(EKeyCode) {};
@@ -33,6 +34,7 @@ namespace nador
 		bool _isListening{ false };
 
 		onRender_listener_t _onRenderListener;
+		onUiRender_listener_t _onUiRenderListener;
 		onTick_listener_t	_onTickListener;
 
 		onKey_listener_t _onKeyPressedListener;

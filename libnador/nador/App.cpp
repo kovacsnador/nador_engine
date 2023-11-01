@@ -201,6 +201,9 @@ namespace nador
         // Render event
         g_onRenderEvent(GetRenderer());
 
+        // Ui Render event
+        g_onUiRenderEvent(GetRenderer());
+
         // Render debug event
         g_onDebugRenderEvent(GetRenderer());
 

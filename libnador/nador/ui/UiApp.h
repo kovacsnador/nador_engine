@@ -61,7 +61,7 @@ namespace nador
 
     protected:
         void OnTick(float_t deltaTime) override;
-        void OnRender(IRenderer* renderer) override;
+        void OnUiRender(IRenderer* renderer) override;
 
         void OnKeyPressed(EKeyCode keycode) override;
         void OnKeyHolded(EKeyCode keycode) override;

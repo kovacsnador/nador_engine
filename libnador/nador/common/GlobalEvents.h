@@ -51,6 +51,10 @@ namespace nador
 	extern onRender_event_t g_onRenderEvent;
 
 	//=====================================================================
+	CREATE_EVENT_TYPE_ARG_1(onUiRender, IRenderer*);
+	extern onUiRender_event_t g_onUiRenderEvent;
+
+	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_1(onDebugRender, IRenderer*);
 	extern onDebugRender_event_t g_onDebugRenderEvent;
 }

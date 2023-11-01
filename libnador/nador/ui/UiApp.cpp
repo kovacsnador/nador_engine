@@ -159,7 +159,7 @@ namespace nador
 		}
 	}
 
-	void UiApp::OnRender(IRenderer* renderer)
+	void UiApp::OnUiRender(IRenderer* renderer)
 	{
 		for (auto& layer : _layers)
 		{
