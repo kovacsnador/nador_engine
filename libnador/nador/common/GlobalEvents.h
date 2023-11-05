@@ -16,6 +16,18 @@ namespace nador
 	extern onWindowClose_event_t g_onWindowCloseEvent;
 
 	//=====================================================================
+	CREATE_EVENT_TYPE_ARG_0(onAppStart);
+	extern onAppStart_event_t g_onAppStartEvent;
+
+	//=====================================================================
+	CREATE_EVENT_TYPE_ARG_0(onAppStop);
+	extern onAppStop_event_t g_onAppStopEvent;
+
+	//=====================================================================
+	CREATE_EVENT_TYPE_ARG_0(onWindowClose);
+	extern onWindowClose_event_t g_onWindowCloseEvent;
+
+	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_1(onKey, EKeyCode);
 	extern onKey_event_t g_onKeyPressedEvent;
 	extern onKey_event_t g_onKeyHoldedEvent;

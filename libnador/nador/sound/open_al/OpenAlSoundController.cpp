@@ -130,21 +130,25 @@ namespace nador
             soundPtr->soundId  = soundId;
             soundPtr->fileName = filePath;
 
-            int16_t* pcmData = nullptr;
+            std::unique_ptr<int16_t, std::function<void(int16_t*)>> pcmData{};
 
             if (isWav)
             {
-                pcmData = drwav_open_memory_and_read_pcm_frames_s16(
+                auto data = drwav_open_memory_and_read_pcm_frames_s16(
                     soundFile->Begin(), soundFile->GetSize(), &soundPtr->channels, &soundPtr->sampleRate, &soundPtr->totalPcmFrameCount, nullptr);
+
+                pcmData = {data, [](auto* p){ drwav_free(p, nullptr); }};
             }
             else if (isMp3)
             {
                 drmp3_config mp3Config;
-                pcmData = drmp3_open_memory_and_read_pcm_frames_s16(
+                auto data = drmp3_open_memory_and_read_pcm_frames_s16(
                     soundFile->Begin(), soundFile->GetSize(), &mp3Config, &soundPtr->totalPcmFrameCount, nullptr);
 
                 soundPtr->channels   = mp3Config.channels;
                 soundPtr->sampleRate = mp3Config.sampleRate;
+
+                pcmData = {data, [](auto* p){ drmp3__free_default(p, nullptr); }};
             }
 
             if (pcmData == nullptr)
@@ -158,12 +162,9 @@ namespace nador
             alec(alGenBuffers(1, &soundPtr->bufferId));
             alec(alBufferData(soundPtr->bufferId,
                               soundPtr->channels > 1 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16,
-                              pcmData,
+                              pcmData.get(),
                               (ALsizei)soundPtr->getPcmDataSize(),
                               soundPtr->sampleRate));
-
-            // delete pcmData
-            drwav_free(pcmData, nullptr);
 
             ENGINE_DEBUG("Sound added from file %s with id %d", filePath.c_str(), soundId);
 

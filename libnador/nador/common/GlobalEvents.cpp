@@ -3,6 +3,9 @@
 namespace nador
 {
     onWindowClose_event_t g_onWindowCloseEvent;
+    
+    onAppStart_event_t g_onAppStartEvent;
+    onAppStop_event_t g_onAppStopEvent;
 
     onKey_event_t g_onKeyPressedEvent;
     onKey_event_t g_onKeyHoldedEvent;
@@ -19,6 +22,6 @@ namespace nador
     onTickEnd_event_t       g_onTickEndEvent;
 
     onRender_event_t      g_onRenderEvent;
-    onUiRender_event_t      g_onUiRenderEvent;
+    onUiRender_event_t    g_onUiRenderEvent;
     onDebugRender_event_t g_onDebugRenderEvent;
 } // namespace nador

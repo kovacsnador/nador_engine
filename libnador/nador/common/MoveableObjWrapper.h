@@ -27,8 +27,8 @@ namespace nador
         MoveableObjWrapper& operator=(MoveableObjWrapper&&) = default;
 
         // delete
-        MoveableObjWrapper(MoveableObjWrapper&)            = delete;
-        MoveableObjWrapper& operator=(MoveableObjWrapper&) = delete;
+        MoveableObjWrapper(const MoveableObjWrapper&)            = delete;
+        MoveableObjWrapper& operator=(const MoveableObjWrapper&) = delete;
 
         ObjTy obj;
 

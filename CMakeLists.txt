@@ -27,6 +27,8 @@ set(NADOR_EIMAGE_NAME_PATH              ${CMAKE_CURRENT_SOURCE_DIR}/res/atlas/__
 
 set(NADOR_WINDOW_API                    "SDL2" CACHE STRING "" FORCE)
 
+set(DEMO_SOURCE_FOLDER                  ${CMAKE_CURRENT_SOURCE_DIR}/demo/src)
+
 add_subdirectory(libnador)
 
 add_executable(${PROJECT_NAME})
@@ -34,11 +36,15 @@ add_executable(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/libnador
+    ${DEMO_SOURCE_FOLDER}
+    ${DEMO_SOURCE_FOLDER}
 )
 
 target_sources(${PROJECT_NAME}
     PRIVATE
     win_example.cpp
+    ${DEMO_SOURCE_FOLDER}/Game.cpp
+    ${DEMO_SOURCE_FOLDER}/screens/MainScreen.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nador)

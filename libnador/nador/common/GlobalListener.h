@@ -17,6 +17,11 @@ namespace nador
 
 		bool isListening() const noexcept { return _isListening; }
 
+		virtual void OnWindowClose() {};
+
+		virtual void OnAppStart() {};
+		virtual void OnAppStop() {};
+
 		virtual void OnTick(float_t) {};
 		virtual void OnRender(IRenderer*) {};
 		virtual void OnUiRender(IRenderer*) {};
@@ -32,6 +37,11 @@ namespace nador
 
 	private:
 		bool _isListening{ false };
+
+		onWindowClose_listener_t _onWindowCloseListener;
+
+		onAppStart_listener_t _onAppStartListener;
+		onAppStop_listener_t _onAppStopListener;
 
 		onRender_listener_t _onRenderListener;
 		onUiRender_listener_t _onUiRenderListener;

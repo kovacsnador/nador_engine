@@ -213,11 +213,17 @@ namespace nador
 
     void App::Run()
     {
+        // fire on app start event
+        g_onAppStartEvent();
+
         // The application loop
         while (ShouldClose() == false)
         {
             Tick();
         }
+
+        // fire on app stop event
+        g_onAppStopEvent();
     }
 
     void App::_TickEnd()

@@ -63,7 +63,11 @@ namespace nador
         template <typename R>
         bool isReadyFuture(const std::future<R>& future)
         {
-            return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+            if(future.valid())
+            {
+                return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+            }
+            return true;
         }
 
         /*!

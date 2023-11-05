@@ -2,6 +2,7 @@
 #define __NADOR_I_UI_APP_H__
 
 #include <map>
+#include <deque>
 
 #include "nador/ui/UiCommon.h"
 #include "nador/ui/IUiElement.h"
@@ -11,7 +12,7 @@ namespace nador
 	class IUiApp
 	{
 	public:
-		using ui_element_list_t = std::list<IUiElement*>;
+		using ui_element_list_t = std::deque<IUiElement*>;
 		using ui_layer_list_t = std::map<EUiLayer, ui_element_list_t>;
 
 		virtual ~IUiApp() = default;

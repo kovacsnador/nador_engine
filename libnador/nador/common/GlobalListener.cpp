@@ -4,6 +4,15 @@ namespace nador
 {
 	void GlobalListener::StartGlobalListening()
 	{
+		g_onWindowCloseEvent += _onWindowCloseListener;
+		_onWindowCloseListener.SetCallback(std::bind(&GlobalListener::OnWindowClose, this));
+
+		g_onAppStartEvent += _onAppStartListener;
+		_onAppStartListener.SetCallback(std::bind(&GlobalListener::OnAppStart, this));
+
+		g_onAppStopEvent += _onAppStopListener;
+		_onAppStopListener.SetCallback(std::bind(&GlobalListener::OnAppStop, this));
+
 		g_onTickEvent += _onTickListener;
 		_onTickListener.SetCallback(std::bind(&GlobalListener::OnTick, this, arg::_1));
 
@@ -37,6 +46,11 @@ namespace nador
 	void GlobalListener::StopGlobalListening()
 	{
 		_isListening = false;
+
+		g_onWindowCloseEvent -= _onWindowCloseListener;
+
+		g_onAppStartEvent -= _onAppStartListener;
+		g_onAppStopEvent -= _onAppStopListener;
 
 		g_onTickEvent -= _onTickListener;
 		g_onRenderEvent -= _onRenderListener;
