@@ -14,11 +14,12 @@ namespace nador
     class ITestController
     {
     public:
-        using pair_t      = std::pair<std::string, std::function<void()>>;
-        using test_list_t = std::vector<pair_t>;
+        using ToggleGameCallback_t = std::function<void(bool)>;
+        using pair_t               = std::pair<std::string, std::function<void()>>;
+        using ButtonsList_t        = std::vector<pair_t>;
 
         using AdditionalWindows_t = std::variant<CameraWindow>;
-        using WindowsList_t = std::vector<AdditionalWindows_t>;
+        using WindowsList_t       = std::vector<AdditionalWindows_t>;
 
         using ToggleDebugTextCb_t = std::function<void()>;
 
@@ -27,17 +28,13 @@ namespace nador
         template <typename T, typename... Args>
         void AddTest(const std::string& name, Args&&... args)
         {
-            _tests.push_back(std::make_pair(name, [this, args...]() {
-                _currentTest = std::make_unique<T>(args...);
-                }));
+            _tests.push_back(std::make_pair(name, [this, args...]() { _currentTest = std::make_unique<T>(args...); }));
         }
 
-        /*!
-         * Get the tests.
-         *
-         * \return The test conatnier
-         */
-        virtual const test_list_t& GetTests() const = 0;
+        void AddCustomButton(const std::string& name, std::function<void()> callback)
+        {
+            _customButtons.emplace_back(std::make_pair(name, callback));
+        }
 
         /*!
          * On tick function.
@@ -63,8 +60,10 @@ namespace nador
         virtual void AddWindow(AdditionalWindows_t&& window) = 0;
 
     protected:
-        test_list_t         _tests {};
-        ITestUPtr           _currentTest { nullptr };
+        ButtonsList_t _tests {};
+        ITestUPtr     _currentTest { nullptr };
+
+        ButtonsList_t _customButtons {};
     };
     CREATE_PTR_TYPES(ITestController);
 } // namespace nador

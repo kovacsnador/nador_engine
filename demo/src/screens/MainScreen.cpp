@@ -2,8 +2,8 @@
 
 demo::MainScreen::MainScreen(nador::IUiApp* uiApp)
 : _uiApp(uiApp)
-, _background({0,0}, {0,0}, nador::video::EImageName::MARIO_BACKGROUND, {nador::EHorizontalAlignment::STRETCH, nador::EVerticalAlignment::STRETCH})
 {
+    _background = std::make_shared<nador::UiImage>(nador::video::EImageName::MARIO_BACKGROUND);
 }
 
 demo::MainScreen::~MainScreen()
@@ -13,10 +13,10 @@ demo::MainScreen::~MainScreen()
 
 void demo::MainScreen::Start()
 {
-    _uiApp->AddElementToLayer(nador::EUiLayer::BACKGROUND, &_background);
+    _uiApp->AddElementToLayer(nador::EUiLayer::BACKGROUND, _background.get());
 }
 
 void demo::MainScreen::Stop()
 {
-    _uiApp->RemoveElementFromLayer(nador::EUiLayer::BACKGROUND, &_background);
+    _uiApp->RemoveElementFromLayer(nador::EUiLayer::BACKGROUND, _background.get());
 }

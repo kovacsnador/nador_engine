@@ -68,11 +68,23 @@ namespace nador
         }
 
         ImGui::SetCursorPos({ 8, 50 });
-        for (auto& it : _tests)
+        for (auto& [name, cb] : _tests)
         {
-            if (ImGui::Button(it.first.c_str()))
+            if (ImGui::Button(name.c_str()))
             {
-                it.second();
+                cb();
+            }
+        }
+
+        float y = 50;
+        ImGui::SetCursorPos({ 300, y });
+        ImGui::Text("Custom Buttons:");
+        for(const auto& [name, cb] : _customButtons)
+        {
+            ImGui::SetCursorPos({ 300, y += 24 });
+            if (ImGui::Button(name.c_str()))
+            {
+                cb();
             }
         }
     }

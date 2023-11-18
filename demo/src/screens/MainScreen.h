@@ -12,12 +12,19 @@ namespace demo
         MainScreen(nador::IUiApp* uiApp);
         ~MainScreen();
 
+        MainScreen(const MainScreen& other) = default;
+        MainScreen& operator=(const MainScreen& other) = default;
+
+        MainScreen(MainScreen&& other) = default;
+        MainScreen& operator=(MainScreen&& other) = default; 
+
         void Start();
         void Stop();
 
     private:
         nador::IUiApp* _uiApp;
-        nador::UiImage _background;
+
+        std::shared_ptr<nador::UiImage> _background;
     };
 
 } // namespace demo

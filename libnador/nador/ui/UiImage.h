@@ -16,13 +16,16 @@ namespace nador
 		UiImage(const glm::ivec2& position,
 				const glm::ivec2& size,
 				video::EImageName imageName,
-				UiAlignment aligner = UiAlignment(),
+				UiAlignment aligner = {},
 				IUiElement* parent = nullptr);
 
 		UiImage(const glm::ivec2& position,
 			const glm::ivec2& size,
-			UiAlignment aligner = UiAlignment(),
+			UiAlignment aligner = {},
 			IUiElement* parent = nullptr);
+
+		// Full screnn image
+		UiImage(video::EImageName imageName, UiAlignment aligner = {EHorizontalAlignment::STRETCH, EVerticalAlignment::STRETCH}, IUiElement* parent = nullptr);
 
 		void SetImage(video::EImageName imageName);
 		void SetOpacity(float_t opacity) noexcept;

@@ -430,4 +430,9 @@ namespace nador
             it->SetUiAppHandler(_uiApp);
         }
     }
+
+    IUiApp* IUiElement::GetUiApp() const noexcept
+    {
+        return _uiApp;
+    }
 } // namespace nador

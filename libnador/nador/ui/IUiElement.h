@@ -213,6 +213,8 @@ namespace nador
         virtual bool OnKeyHolded(EKeyCode /*keyCode*/) { return false; };
         virtual bool OnKeyReleased(EKeyCode /*keyCode*/) { return false; };
 
+        IUiApp* GetUiApp() const noexcept;
+
     private:
         bool OnMousePressedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position);
         bool OnMouseReleasedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position);

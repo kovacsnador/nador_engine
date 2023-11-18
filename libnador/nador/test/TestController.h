@@ -26,13 +26,6 @@ namespace nador
         TestController();
 
         /*!
-         * Get the tests.
-         *
-         * \return The test conatnier
-         */
-        const test_list_t& GetTests() const override { return _tests; }
-
-        /*!
          * On tick function.
          *
          * \param  The delta time between ticks.

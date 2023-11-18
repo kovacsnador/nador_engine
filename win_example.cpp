@@ -78,11 +78,10 @@ static void InitSounds()
     nador::Stopwatch sw;
 
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
-    nador::IFileController* fileCtrl = nador::IApp::Get()->GetFileController();
+    nador::IFileController*  fileCtrl  = nador::IApp::Get()->GetFileController();
 
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound.wav"), Sound::TEST_SOUND_1);
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound_Mono.wav"), Sound::TEST_SOUND_2);
-
 
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/mario_theme.mp3"), MARIO_THEME);
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_1-up.wav"), SMB_1_UP);
@@ -118,15 +117,13 @@ void SetupLogging()
 
     nador::StandardLogger standardLogger;
 
-    auto engineStream = nador::GetStream<std::ofstream>("logs/nador_engine.log");
-    auto engineBuffer = std::make_shared<nador::StreamBuffer<20000>>();
+    auto                engineStream = nador::GetStream<std::ofstream>("logs/nador_engine.log");
+    auto                engineBuffer = std::make_shared<nador::StreamBuffer<20000>>();
     nador::StreamLogger engineStreamLogger(engineStream, engineBuffer);
 
-
-    auto userStream = nador::GetStream<std::ofstream>("logs/nador.log");
-    auto userBuffer = std::make_shared<nador::StreamBuffer<20000>>();
+    auto                userStream = nador::GetStream<std::ofstream>("logs/nador.log");
+    auto                userBuffer = std::make_shared<nador::StreamBuffer<20000>>();
     nador::StreamLogger userstreamLogger(userStream, userBuffer);
-
 
     auto engineLogCallback = [standardLogger, engineStreamLogger](nador::ELogType logType, auto event) mutable {
         if (std::holds_alternative<std::string_view>(event))
@@ -135,7 +132,7 @@ void SetupLogging()
             standardLogger.Write(logType, msg);
             engineStreamLogger.Write(msg);
 
-            if(logType == nador::ELogType::ENGINE_FATAL)
+            if (logType == nador::ELogType::ENGINE_FATAL)
             {
                 throw std::runtime_error(msg.data());
             }
@@ -153,7 +150,7 @@ void SetupLogging()
             standardLogger.Write(logType, msg);
             userstreamLogger.Write(msg);
 
-            if(logType == nador::ELogType::FATAL)
+            if (logType == nador::ELogType::FATAL)
             {
                 throw std::runtime_error(msg.data());
             }
@@ -163,7 +160,6 @@ void SetupLogging()
             userstreamLogger.FlushBuffer();
         }
     };
-
 
     // setup engine logging
     log->RegisterCallback(nador::ELogType::ENGINE_DEBUG, engineLogCallback);
@@ -188,7 +184,7 @@ void SetupLogging()
 
 int main(void)
 {
-    std::chrono::milliseconds ms{};
+    std::chrono::milliseconds ms {};
     nador::utils::MeasureTime(ms, SetupLogging);
 
     NADOR_DEBUG("SetupLogging duration: %dms", ms.count());
@@ -201,10 +197,14 @@ int main(void)
         nador::IAppPtr app = nador::App::CreateApp(config);
 
         // create demo game
-        demo::Game game(app);
+        auto demoGame = demo::CreateGame(app);
 
         // Adding default tests
         app->InitializeDefaultTests();
+
+        // add game tougle
+        auto testCtrl = app->GetTestController();
+        testCtrl->AddCustomButton("Toggle Game", [&demoGame]() { demoGame->Suspend(!demoGame->IsSuspended()); });
 
         InitFonts();
         InitSounds();

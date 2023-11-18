@@ -17,6 +17,12 @@ namespace nador
     {
     }
 
+    UiImage::UiImage(video::EImageName imageName, UiAlignment aligner, IUiElement* parent)
+    : IUiElement({0,0}, {0,0}, aligner, parent)
+    , _imageName(imageName)
+    {
+    }
+
     void UiImage::SetImage(video::EImageName imageName)
     {
         if (imageName != _imageName)

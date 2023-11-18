@@ -31,7 +31,7 @@ namespace nador
             }
 
             // setup rendering context
-            ImGui::Begin("Camera Settings");
+            ImGui::Begin(_windowName.c_str());
             auto imguiRenderEnd = Finally([] { ImGui::End(); });
 
             auto position = _camera->GetPosition();
