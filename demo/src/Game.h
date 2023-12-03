@@ -5,6 +5,7 @@
 #include "nador/common/GlobalListener.h"
 
 #include "screens/MainScreen.h"
+#include "Assets.h"
 
 namespace demo
 {

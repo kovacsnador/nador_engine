@@ -5,11 +5,16 @@
 
 namespace nador
 {
-    IUiElement::IUiElement(const glm::ivec2& position, const glm::ivec2& size, UiAlignment alignment, IUiElement* parent, bool isShow)
-    : _alignment(alignment)
-    , _isShow(isShow)
-    , _position(position)
+    UiSquare::UiSquare(const glm::ivec2& pos, const glm::ivec2& size, UiAlignment alignment)
+    : _position(pos)
     , _size(size)
+    , _alignment(alignment)
+    {
+    }
+
+    IUiElement::IUiElement(const glm::ivec2& position, const glm::ivec2& size, UiAlignment alignment, IUiElement* parent, bool isShow)
+    : UiSquare(position, size, alignment)
+    , _isShow(isShow)
     {
         SetParent(parent);
     }
@@ -44,6 +49,11 @@ namespace nador
         _isShow = true;
     };
 
+    void IUiElement::Show(bool show) noexcept
+    {
+        _isShow = show;
+    }
+
     void IUiElement::Hide() noexcept
     {
         _isShow = false;
@@ -57,63 +67,6 @@ namespace nador
     bool IUiElement::IsHide() const noexcept
     {
         return !_isShow;
-    };
-
-    const glm::ivec2& IUiElement::GetSize() const noexcept
-    {
-        return _size;
-    };
-
-    void IUiElement::SetSize(const glm::ivec2& size) noexcept
-    {
-        if (size != _size)
-        {
-            _size = size;
-        }
-    };
-
-    void IUiElement::SetSize(int32_t width, int32_t height) noexcept
-    {
-        SetSize({ width, height });
-    };
-
-    void IUiElement::SetWidth(int32_t width) noexcept
-    {
-        if (_size.x != width)
-        {
-            _size.x = width;
-        }
-    };
-
-    void IUiElement::SetHeight(int32_t height) noexcept
-    {
-        if (_size.y != height)
-        {
-            _size.y = height;
-        }
-    };
-
-    const glm::ivec2& IUiElement::GetPosition() const noexcept
-    {
-        return _position;
-    };
-
-    void IUiElement::SetPosition(const glm::ivec2& position) noexcept
-    {
-        if (position != _position)
-        {
-            _position = position;
-        }
-    };
-
-    const UiAlignment& IUiElement::GetAligner() const noexcept
-    {
-        return _alignment;
-    };
-
-    void IUiElement::SetAlignment(const UiAlignment& aligner) noexcept
-    {
-        _alignment = aligner;
     };
 
     IUiElement* IUiElement::GetParent() const noexcept
@@ -159,18 +112,24 @@ namespace nador
 
     void IUiElement::AddChild(IUiElement* elem)
     {
-        elem->SetParent(this);
+        if (elem)
+        {
+            elem->SetParent(this);
 
-        utils::Remove(_childrens, elem);
-        _childrens.push_back(elem);
+            utils::Remove(_childrens, elem);
+            _childrens.push_back(elem);
+        }
     }
 
     void IUiElement::PushToBack(IUiElement* elem)
     {
-        elem->SetParent(this);
+        if (elem)
+        {
+            elem->SetParent(this);
 
-        utils::Remove(_childrens, elem);
-        _childrens.push_front(elem);
+            utils::Remove(_childrens, elem);
+            _childrens.push_front(elem);
+        }
     }
 
     void IUiElement::RemoveChild(IUiElement* elem)
@@ -209,14 +168,9 @@ namespace nador
         _defaultMouseHandling = handled;
     }
 
-    const glm::vec3& IUiElement::GetScale() const noexcept
-    {
-        return _scale;
-    }
-
     void IUiElement::SetScale(const glm::vec3& scale) noexcept
     {
-        _scale = scale;
+        SetScaleImpl(scale);
 
         for (auto& it : _childrens)
         {
@@ -253,11 +207,13 @@ namespace nador
             return;
         }
 
-        OnRender(renderer, _vertices);
+        const auto& vertices = GetVertices();
+
+        OnRender(renderer, vertices);
 
         if (drawDebugEdge)
         {
-            _edgeDrawer.Render(renderer, _vertices, _scale);
+            _edgeDrawer.Render(renderer, vertices, GetScale());
         }
 
         for (auto& it : _childrens)
@@ -298,28 +254,13 @@ namespace nador
         return OnKeyAndMouseEventImpl(&IUiElement::OnCharImpl, &IUiElement::OnCharPressed, text);
     }
 
-    const quadVertices_t& IUiElement::GetVertices() const noexcept
-    {
-        return _vertices;
-    }
-
-    void IUiElement::SetOffset(const glm::ivec2& offset) noexcept
-    {
-        _offset = offset;
-    }
-
-    const glm::ivec2& IUiElement::GetOffset() const noexcept
-    {
-        return _offset;
-    }
-
     void IUiElement::UpdateVertices(const quadVertices_t& parentVertices)
     {
-        _vertices = _alignment.GenerateVertices(_position + _offset, _size, parentVertices);
+        const auto& vertices = UpdateVerticesImpl(parentVertices);
 
         for (auto& it : _childrens)
         {
-            it->UpdateVertices(_vertices);
+            it->UpdateVertices(vertices);
         }
     }
 
@@ -347,7 +288,7 @@ namespace nador
 
     bool IUiElement::OnMousePressedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
     {
-        if (IsPointOverOnVertices(position, _vertices))
+        if (IsPointOverOnVertices(position, GetVertices()))
         {
             if (_uiApp)
             {
@@ -365,7 +306,7 @@ namespace nador
 
     bool IUiElement::OnMouseReleasedWithPositionCheck(EMouseButton mouseButton, const glm::vec2& position)
     {
-        if (IsPointOverOnVertices(position, _vertices))
+        if (IsPointOverOnVertices(position, GetVertices()))
         {
             OnMouseReleased(mouseButton, position);
 
@@ -408,7 +349,7 @@ namespace nador
 
     bool IUiElement::IsOver(const glm::vec2& point) const noexcept
     {
-        return IsPointOverOnVertices(point, _vertices);
+        return IsPointOverOnVertices(point, GetVertices());
     }
 
     const std::string& IUiElement::GetName() const noexcept

@@ -101,6 +101,11 @@ namespace nador
 		return vertices;
 	}
 
+	UiAlignment UiAlignment::Stretch()
+	{	
+		return {EHorizontalAlignment::STRETCH, EVerticalAlignment::STRETCH};
+	}
+
 	glm::vec4 GetPivot(const quadVertices_t& vertices)
 	{
 		return (vertices[0] + vertices[1] + vertices[2] + vertices[3]) * 0.25f;

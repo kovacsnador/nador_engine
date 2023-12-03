@@ -37,7 +37,7 @@ namespace nador
 		renderer->Flush();
 	
 		// takes the left bottom corner
-		renderer->SetScissor({ vertices[0].x, vertices[0].y }, _size);
+		renderer->SetScissor({ vertices[0].x, vertices[0].y }, GetSize());
 	}
 
 	void UiScrollList::OnMousePressed(EMouseButton /*mouseButton*/, const glm::vec2& position)

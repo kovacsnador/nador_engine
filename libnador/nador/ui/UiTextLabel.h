@@ -29,7 +29,7 @@ namespace nador
 		void SetText(std::string_view text);
 
 		void SetColor(const glm::vec4& color) { _material.uColor = color; }
-		void SetFontScale(const glm::vec3& scale) { _fontScale = scale; }
+		void SetFontScale(const glm::vec3& scale) { _fontScale = scale; Update(); }
 
 		void SetFontSize(uint32_t fontSize) { SetFontScale({ fontSize, fontSize, 1 }); };
 

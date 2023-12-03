@@ -7,50 +7,6 @@
 
 #include "Game.h"
 
-enum Fonts : uint32_t
-{
-    FREE_SANS = 1,
-    SUPER_MARIO_BROS_3
-};
-
-enum FontSize : uint32_t
-{
-    SMALL  = 32,
-    MEDIUM = 64,
-    LARGE  = 128,
-};
-
-enum Sound : uint32_t
-{
-    TEST_SOUND_1 = 1,
-    TEST_SOUND_2,
-
-    MARIO_THEME,
-    SMB_1_UP,
-    SMB_BOWSERFALLS,
-    SMB_BOWSERFIRE,
-    SMB_BREAKBLOCK,
-    SMB_BUMP,
-    SMB_COIN,
-    SMB_FIREBALL,
-    SMB_FIREWORKS,
-    SMB_FLAGPOLE,
-    SMB_GAMEOVER,
-    SMB_JUMP_SMALL,
-    SMB_JUMP_SUPER,
-    SMB_KICK,
-    SMB_MARIODIE,
-    SMB_PAUSE,
-    SMB_PIPE,
-    SMB_POWERUP_APPEARS,
-    SMB_POWERUP,
-    SMB_STAGE_CLEAR,
-    SMB_STOMP,
-    SMB_VINE,
-    SMB_WARNING,
-    SMB_WORLD_CLEAR
-};
-
 static void InitFonts()
 {
     nador::Stopwatch sw;
@@ -58,15 +14,15 @@ static void InitFonts()
     nador::IFontController* fontCtrl = nador::IApp::Get()->GetFontController();
     nador::IFileController* fileCtrl = nador::IApp::Get()->GetFileController();
 
-    fontCtrl->AddFontSize(FontSize::SMALL);
-    fontCtrl->AddFontSize(FontSize::MEDIUM);
-    fontCtrl->AddFontSize(FontSize::LARGE);
+    fontCtrl->AddFontSize(demo::FontSize::SMALL);
+    fontCtrl->AddFontSize(demo::FontSize::MEDIUM);
+    fontCtrl->AddFontSize(demo::FontSize::LARGE);
 
-    fontCtrl->CreateFont(Fonts::FREE_SANS, fileCtrl->Read("res/fonts/FreeSans.ttf"));
-    fontCtrl->CreateFont(Fonts::SUPER_MARIO_BROS_3, fileCtrl->Read("res/fonts/Super-Mario-Bros--3.ttf"));
+    fontCtrl->CreateFont(demo::Fonts::FREE_SANS, fileCtrl->Read("res/fonts/FreeSans.ttf"));
+    fontCtrl->CreateFont(demo::Fonts::SUPER_MARIO_BROS_3, fileCtrl->Read("res/fonts/Super-Mario-Bros--3.ttf"));
 
     // Sets the default font size
-    fontCtrl->SetDefaultSystemFont(Fonts::FREE_SANS, FontSize::SMALL);
+    fontCtrl->SetDefaultSystemFont(demo::Fonts::FREE_SANS, demo::FontSize::SMALL);
 
     fontCtrl->Wait();
 
@@ -80,33 +36,33 @@ static void InitSounds()
     nador::ISoundController* soundCtrl = nador::IApp::Get()->GetSoundController();
     nador::IFileController*  fileCtrl  = nador::IApp::Get()->GetFileController();
 
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound.wav"), Sound::TEST_SOUND_1);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound_Mono.wav"), Sound::TEST_SOUND_2);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound.wav"), demo::Sound::TEST_SOUND_1);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/TestSound_Mono.wav"), demo::Sound::TEST_SOUND_2);
 
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/mario_theme.mp3"), MARIO_THEME);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_1-up.wav"), SMB_1_UP);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bowserfalls.wav"), SMB_BOWSERFALLS);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bowserfire.wav"), SMB_BOWSERFIRE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_breakblock.wav"), SMB_BREAKBLOCK);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bump.wav"), SMB_BUMP);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_coin.wav"), SMB_COIN);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_fireball.wav"), SMB_FIREBALL);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_fireworks.wav"), SMB_FIREWORKS);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_flagpole.wav"), SMB_FLAGPOLE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_gameover.wav"), SMB_GAMEOVER);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_jump-small.wav"), SMB_JUMP_SMALL);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_jump-super.wav"), SMB_JUMP_SUPER);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_kick.wav"), SMB_KICK);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_mariodie.wav"), SMB_MARIODIE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_pause.wav"), SMB_PAUSE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_pipe.wav"), SMB_PIPE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_powerup_appears.wav"), SMB_POWERUP_APPEARS);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_powerup.wav"), SMB_POWERUP);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_stage_clear.wav"), SMB_STAGE_CLEAR);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_stomp.wav"), SMB_STOMP);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_vine.wav"), SMB_VINE);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_warning.wav"), SMB_WARNING);
-    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_world_clear.wav"), SMB_WORLD_CLEAR);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/mario_theme.mp3"), demo::Sound::MARIO_THEME);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_1-up.wav"), demo::Sound::SMB_1_UP);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bowserfalls.wav"), demo::Sound::SMB_BOWSERFALLS);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bowserfire.wav"), demo::Sound::SMB_BOWSERFIRE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_breakblock.wav"), demo::Sound::SMB_BREAKBLOCK);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_bump.wav"), demo::Sound::SMB_BUMP);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_coin.wav"), demo::Sound::SMB_COIN);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_fireball.wav"), demo::Sound::SMB_FIREBALL);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_fireworks.wav"), demo::Sound::SMB_FIREWORKS);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_flagpole.wav"), demo::Sound::SMB_FLAGPOLE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_gameover.wav"), demo::Sound::SMB_GAMEOVER);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_jump-small.wav"), demo::Sound::SMB_JUMP_SMALL);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_jump-super.wav"), demo::Sound::SMB_JUMP_SUPER);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_kick.wav"), demo::Sound::SMB_KICK);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_mariodie.wav"), demo::Sound::SMB_MARIODIE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_pause.wav"), demo::Sound::SMB_PAUSE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_pipe.wav"), demo::Sound::SMB_PIPE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_powerup_appears.wav"), demo::Sound::SMB_POWERUP_APPEARS);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_powerup.wav"), demo::Sound::SMB_POWERUP);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_stage_clear.wav"), demo::Sound::SMB_STAGE_CLEAR);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_stomp.wav"), demo::Sound::SMB_STOMP);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_vine.wav"), demo::Sound::SMB_VINE);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_warning.wav"), demo::Sound::SMB_WARNING);
+    soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_world_clear.wav"), demo::Sound::SMB_WORLD_CLEAR);
 
     NADOR_DEBUG("InitSounds duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }
@@ -196,6 +152,10 @@ int main(void)
         // Create the main Application.
         nador::IAppPtr app = nador::App::CreateApp(config);
 
+        // Init assets
+        InitFonts();
+        InitSounds();
+
         // create demo game
         auto demoGame = demo::CreateGame(app);
 
@@ -205,9 +165,6 @@ int main(void)
         // add game tougle
         auto testCtrl = app->GetTestController();
         testCtrl->AddCustomButton("Toggle Game", [&demoGame]() { demoGame->Suspend(!demoGame->IsSuspended()); });
-
-        InitFonts();
-        InitSounds();
 
         // Application loop
         app->Run();

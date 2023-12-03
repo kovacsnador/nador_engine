@@ -29,7 +29,7 @@ namespace nador
 	{
 		_renderData.SetVertices(vertices);
 
-		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
+		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, GetScale());
 
 		_renderData.vertices *= modelMtx;
 
@@ -80,7 +80,7 @@ namespace nador
 
 		_material.uDimensions = GetSize();
 
-		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, _scale);
+		glm::mat4 modelMtx = CreateModelMtxWithScale(vertices, GetScale());
 
 		renderer->Draw(&_material, _renderData, modelMtx);
 	}

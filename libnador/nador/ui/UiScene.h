@@ -8,6 +8,8 @@ namespace nador
 	class UiScene : public IUiElement
 	{
 	public:
+		UiScene();
+
 		UiScene(const glm::ivec2& position, const glm::ivec2& size, UiAlignment aligner, IUiElement* parent = nullptr, bool isShow = true);
 
 		virtual ~UiScene() = default;

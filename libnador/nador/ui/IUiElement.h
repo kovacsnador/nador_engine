@@ -12,6 +12,59 @@
 
 namespace nador
 {
+    class UiSquare
+    {
+    public:
+        UiSquare() = default;
+        UiSquare(const glm::ivec2& pos, const glm::ivec2& size, UiAlignment alignment);
+
+        UiSquare& operator=(const UiSquare&) = default;
+        UiSquare(const UiSquare&)            = default;
+
+        UiSquare& operator=(UiSquare&&) = default;
+        UiSquare(UiSquare&&)            = default;
+
+        virtual ~UiSquare() = default;
+
+        const glm::ivec2& GetPosition() const noexcept { return _position; }
+        void              SetPosition(const glm::ivec2& pos) noexcept { _position = pos; }
+
+        const glm::ivec2& GetSize() const noexcept { return _size; }
+        void              SetSize(const glm::ivec2& size) noexcept { _size = size; }
+        void              SetSize(int32_t width, int32_t height) noexcept { _size = { width, height }; }
+        void              SetWidth(int32_t width) noexcept { _size.x = width; }
+        void              SetHeight(int32_t height) noexcept { _size.y = height; }
+
+        const glm::vec3& GetScale() const noexcept { return _scale; }
+
+        const glm::ivec2& GetOffset() const noexcept { return _offset; }
+        void              SetOffset(const glm::ivec2& offset) noexcept { _offset = offset; }
+
+        const UiAlignment& GetAligner() const noexcept { return _alignment; }
+        void               SetAlignment(const UiAlignment& align) noexcept { _alignment = align; }
+
+        const quadVertices_t& GetVertices() const noexcept { return _vertices; }
+
+    protected:
+        void SetScaleImpl(const glm::vec3& scale) noexcept { _scale = scale; }
+
+        const quadVertices_t& UpdateVerticesImpl(const quadVertices_t& parentVertices)
+        {
+            _vertices = _alignment.GenerateVertices(_position + _offset, _size, parentVertices);
+            return _vertices;
+        }
+
+    private:
+        glm::ivec2 _position { 0, 0 };
+        glm::ivec2 _size { 0, 0 };
+        glm::vec3  _scale { 1, 1, 1 };
+        glm::ivec2 _offset { 0, 0 };
+
+        UiAlignment _alignment;
+
+        quadVertices_t _vertices;
+    };
+
     class IRenderer;
     class IUiLogicState;
     class IUiApp;
@@ -19,7 +72,7 @@ namespace nador
     class IUiElement;
     CREATE_PTR_TYPES(IUiElement);
 
-    class IUiElement : private NonCopyable
+    class IUiElement : public UiSquare, private NonCopyable
     {
     public:
         using ui_element_list_t = std::list<IUiElement*>;
@@ -60,6 +113,11 @@ namespace nador
         void Show() noexcept;
 
         /*!
+         * Shows the ui element.
+         */
+        void Show(bool show) noexcept;
+
+        /*!
          * Hides the ui element.
          */
         void Hide() noexcept;
@@ -71,55 +129,12 @@ namespace nador
          */
         bool IsShow() const noexcept;
 
+        /*!
+         * Gets if the ui element is hidden.
+         *
+         * \return True if it's hidden false otherwise.
+         */
         bool IsHide() const noexcept;
-
-        /*!
-         * Gets the ui element size.
-         *
-         * \return	The size.
-         */
-        const glm::ivec2& GetSize() const noexcept;
-
-        /*!
-         * Sets the ui element size.
-         *
-         * \param size	The new size.
-         */
-        void SetSize(const glm::ivec2& size) noexcept;
-
-        void SetSize(int32_t width, int32_t height) noexcept;
-
-        void SetWidth(int32_t width) noexcept;
-
-        void SetHeight(int32_t height) noexcept;
-
-        /*!
-         * Gets the ui element position.
-         *
-         * \return	The position.
-         */
-        const glm::ivec2& GetPosition() const noexcept;
-
-        /*!
-         * Sets the ui element position.
-         *
-         * \param position	The new position.
-         */
-        void SetPosition(const glm::ivec2& position) noexcept;
-
-        /*!
-         * Gets the ui element alignment.
-         *
-         * \return	The alignment.
-         */
-        const UiAlignment& GetAligner() const noexcept;
-
-        /*!
-         * Sets the ui element orientation.
-         *
-         * \param alignment	The new alignment.
-         */
-        void SetAlignment(const UiAlignment& aligner) noexcept;
 
         /*!
          * Gets the parent ui element.
@@ -148,6 +163,19 @@ namespace nador
         void AddChild(IUiElement* elem);
 
         /*!
+         * Add children specialization.
+         *
+         * \param elem	The child ui element.
+         */
+        template <template <typename T> class SmartPtrT,
+                  typename T,
+                  typename = std::enable_if_t<std::is_same_v<std::shared_ptr<T>, SmartPtrT<T>> || std::is_same_v<std::unique_ptr<T>, SmartPtrT<T>>>>
+        void AddChild(const SmartPtrT<T>& elem)
+        {
+            AddChild(elem.get());
+        }
+
+        /*!
          * Remove children ui element.
          *
          * \param elem	The child ui element.
@@ -160,8 +188,7 @@ namespace nador
         void HandleInputEventBeforeChildren(bool beforeChildren) noexcept;
         void SetDefaultMouseHandling(bool handled) noexcept;
 
-        void             SetScale(const glm::vec3& scale) noexcept; 
-        const glm::vec3& GetScale() const noexcept;
+        void SetScale(const glm::vec3& scale) noexcept;
 
         void OnTickImpl(IUiLogicState* uiLogicState);
         void OnRenderImpl(IRenderer* renderer, bool drawDebugEdge);
@@ -177,11 +204,6 @@ namespace nador
         bool OnKeyReleasedImpl(EKeyCode keyCode);
 
         bool OnCharImpl(const std::string& text);
-
-        const quadVertices_t& GetVertices() const noexcept;
-
-        void              SetOffset(const glm::ivec2& offset) noexcept;
-        const glm::ivec2& GetOffset() const noexcept;
 
         void UpdateVertices(const quadVertices_t& parentVertices);
 
@@ -272,16 +294,7 @@ namespace nador
         IUiElement*       _parent;
         ui_element_list_t _childrens;
 
-        UiAlignment _alignment;
-
         bool _isShow { true };
-
-        quadVertices_t _vertices;
-
-        glm::ivec2 _position { 0, 0 };
-        glm::ivec2 _size { 0, 0 };
-        glm::vec3  _scale { 1, 1, 1 };
-        glm::ivec2 _offset { 0, 0 };
 
         std::string _name;
 

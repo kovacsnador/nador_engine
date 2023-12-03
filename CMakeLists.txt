@@ -45,6 +45,7 @@ target_sources(${PROJECT_NAME}
     win_example.cpp
     ${DEMO_SOURCE_FOLDER}/Game.cpp
     ${DEMO_SOURCE_FOLDER}/screens/MainScreen.cpp
+    ${DEMO_SOURCE_FOLDER}/Common.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nador)

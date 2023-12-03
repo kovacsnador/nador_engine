@@ -138,7 +138,7 @@ namespace nador
 		{
 			renderer->Flush();
 
-			renderer->SetScissor({ vertices[0].x, vertices[0].y }, _size);
+			renderer->SetScissor({ vertices[0].x, vertices[0].y }, GetSize());
 		}
 	}
 

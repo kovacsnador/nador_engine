@@ -38,6 +38,8 @@ namespace nador
 		EVerticalAlignment	 eVerticAlign{ EVerticalAlignment::TOP };
 
 		quadVertices_t GenerateVertices(const glm::ivec2& pos, const glm::ivec2& size, const quadVertices_t& parent) const;
+
+		static UiAlignment Stretch();
 	};
 
 	bool IsPointOverOnVertices(const glm::vec2& point, const quadVertices_t& vertices);

@@ -100,7 +100,7 @@ namespace nador
 
 		glm::mat4 modelMatrix = glm::translate(IDENTITY_MATRIX, position);
 
-		glm::mat4 scaleMatrix = glm::scale(_fontScale * _scale);
+		glm::mat4 scaleMatrix = glm::scale(_fontScale * GetScale());
 
 		modelMatrix *= scaleMatrix;
 
@@ -156,6 +156,6 @@ namespace nador
 
 	int32_t UiTextLabel::GetTextWidth() const noexcept
 	{
-		return _size.x;
+		return GetSize().x;
 	}
 }

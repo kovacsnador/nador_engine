@@ -76,6 +76,22 @@ namespace nador
         }
 
         /*!
+         * EventListener copy constructor.
+         *
+         * \param other		The other object to move.
+         */
+        EventListener(const EventListener& other) noexcept
+        : _callback(other._callback)
+        , _events(other._events)
+        , _suspended(other._suspended)
+        {
+            for (auto& it : _events)
+            {
+                *it += *this;
+            }
+        }
+
+        /*!
          * EventListener move constructor.
          *
          * \param other		The other object to move.
@@ -91,6 +107,28 @@ namespace nador
             {
                 *it += *this;
             }
+        }
+
+        /*!
+         * EventListener copy assign operator.
+         *
+         * \param other		The other object to move.
+         */
+        EventListener& operator=(const EventListener& other) noexcept
+        {
+            if (&other != this)
+            {
+                _callback  = other._callback;
+                _suspended = other._suspended;
+                _events    = other._events;
+
+                for (auto& it : _events)
+                {
+                    *it += *this;
+                }
+            }
+
+			return *this;
         }
 
         /*!

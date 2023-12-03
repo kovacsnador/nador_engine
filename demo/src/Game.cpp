@@ -33,6 +33,8 @@ bool demo::Game::IsSuspended()
 
 std::unique_ptr<demo::Game> demo::CreateGame(nador::IAppPtr app)
 {
-    MainScreen mainScreen(app->GetUiApp());
+    auto font = app->GetFontController()->GetFont(Fonts::SUPER_MARIO_BROS_3, FontSize::MEDIUM);
+
+    MainScreen mainScreen(app->GetUiApp(), font);
     return std::make_unique<Game>(app, mainScreen);
 }
