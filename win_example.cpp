@@ -64,6 +64,8 @@ static void InitSounds()
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_warning.wav"), demo::Sound::SMB_WARNING);
     soundCtrl->LoadSound(fileCtrl->Read("res/sounds/mario/smb_world_clear.wav"), demo::Sound::SMB_WORLD_CLEAR);
 
+    soundCtrl->Wait();
+
     NADOR_DEBUG("InitSounds duration: %d ms", sw.Stop<std::chrono::milliseconds>().count());
 }
 
@@ -138,7 +140,7 @@ void SetupLogging()
     });
 }
 
-int main(void)
+int main()
 {
     std::chrono::milliseconds ms {};
     nador::utils::MeasureTime(ms, SetupLogging);
@@ -164,7 +166,7 @@ int main(void)
 
         // add game tougle
         auto testCtrl = app->GetTestController();
-        testCtrl->AddCustomButton("Toggle Game", [&demoGame]() { demoGame->Suspend(!demoGame->IsSuspended()); });
+        testCtrl->AddCustomButton("Toggle Demo Game", [&demoGame]() { demoGame->Suspend(!demoGame->IsSuspended()); });
 
         // Application loop
         app->Run();

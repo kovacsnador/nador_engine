@@ -9,7 +9,6 @@
 
 namespace demo
 {
-
     class Game : protected nador::GlobalListener 
     {
     public:
@@ -26,7 +25,6 @@ namespace demo
 
         MainScreen _mainScreen;
     };
-
 
     std::unique_ptr<Game> CreateGame(nador::IAppPtr app);
 }
