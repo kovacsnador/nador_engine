@@ -99,7 +99,7 @@ namespace nador
         _currentSoundSources.remove_if([](const ISoundSourcePtr& s) { return s == nullptr || s->GetState() != ESoundSourceState::PLAYING; });
 
         // remove pending sound loads
-        std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [this](const auto& it) { return nador::utils::isReadyFuture(it.obj); });
+        std::remove_if(_pendingSoundLoading.begin(), _pendingSoundLoading.end(), [](const auto& it) { return nador::utils::isReadyFuture(it.obj); });
     }
 
     bool OpenAlSoundContoller::LoadSound(const std::optional<FileData>& soundFile, uint32_t soundId)

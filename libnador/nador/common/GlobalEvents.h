@@ -1,5 +1,5 @@
-#ifndef __GLOBAL_EVENTS_H__
-#define __GLOBAL_EVENTS_H__
+#ifndef __NADOR_GLOBAL_EVENTS_H__
+#define __NADOR_GLOBAL_EVENTS_H__
 
 #include <chrono>
 
@@ -22,10 +22,6 @@ namespace nador
 	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_0(onAppStop);
 	extern onAppStop_event_t g_onAppStopEvent;
-
-	//=====================================================================
-	CREATE_EVENT_TYPE_ARG_0(onWindowClose);
-	extern onWindowClose_event_t g_onWindowCloseEvent;
 
 	//=====================================================================
 	CREATE_EVENT_TYPE_ARG_1(onKey, EKeyCode);
@@ -71,6 +67,6 @@ namespace nador
 	extern onDebugRender_event_t g_onDebugRenderEvent;
 }
 
-#endif // !__GLOBAL_EVENTS_H__
+#endif // !__NADOR_GLOBAL_EVENTS_H__
 
 

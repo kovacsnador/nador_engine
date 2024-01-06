@@ -36,7 +36,7 @@ namespace nador
             = std::function<int32_t(char*, size_t, std::string_view, std::string_view, std::string_view, std::string_view, int32_t)>;
 
         Log()
-        : _workerThread(Log::WorkerThread, this)
+        : _workerThread([this](){ WorkerThread(); })
         {
             nador::StandardLogger standardLogger;
 

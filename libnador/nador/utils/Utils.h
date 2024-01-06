@@ -63,7 +63,7 @@ namespace nador
         template <typename R>
         bool isReadyFuture(const std::future<R>& future)
         {
-            if(future.valid())
+            if (future.valid())
             {
                 return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
             }
@@ -154,18 +154,41 @@ namespace nador
             return std::invoke(std::forward<CallableTy>(c), std::forward<Args>(args)...);
         }
 
-        template<typename DurationTy, typename CallableTy, typename... Args>
+        template <typename DurationTy, typename CallableTy, typename... Args>
         decltype(auto) MeasureTime(DurationTy& dur_out, CallableTy&& c, Args&&... args)
         {
             Stopwatch sw;
 
             auto before = [&sw] { sw.Start(); };
-            auto after  = [&sw, &dur_out] () mutable { 
-                dur_out = sw.Stop<DurationTy>();
-            };
+            auto after  = [&sw, &dur_out]() mutable { dur_out = sw.Stop<DurationTy>(); };
 
             return WrappCallable(before, after, std::forward<CallableTy>(c), std::forward<Args>(args)...);
         }
+
+        template <typename ValueT, typename BeginCBT, typename EndCBT>
+        struct IterableWrapper
+        {
+            using iterator       = decltype(std::declval<BeginCBT>()(std::declval<ValueT&>()));
+            using const_iterator = decltype(std::declval<BeginCBT>()(std::declval<const ValueT&>()));
+
+            IterableWrapper(ValueT& value, BeginCBT beginCb, EndCBT endCb)
+            : _value(value)
+            , _beginCb(beginCb)
+            , _endCb(endCb)
+            {
+            }
+
+            iterator       begin() { return _beginCb(_value); }
+            const_iterator begin() const { return _beginCb(_value); }
+            iterator       end() { return _endCb(_value); }
+            const_iterator end() const { return _endCb(_value); }
+
+        private:
+            ValueT&  _value;
+            BeginCBT _beginCb;
+            EndCBT   _endCb;
+        };
+
     } // namespace utils
 } // namespace nador
 

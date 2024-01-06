@@ -4,8 +4,6 @@
 #include "nador/log/ILog.h"
 #include "Renderer.h"
 
-static constexpr size_t MAX_VERTEX_COUNT = 10000;
-
 namespace nador
 {
     Renderer::Renderer(const IVideoPtr video, rendererPlugins_t& renderers, std::unique_ptr<Camera> camera)
@@ -106,6 +104,16 @@ namespace nador
     void Renderer::DisableScissor() const
     {
         _video->DisableScissor();
+    }
+
+    void Renderer::ClearColorRGBA(float_t red, float_t green, float_t blue, float_t alpha) const
+    {
+        _video->ClearColorRGBA(red, green, blue, alpha);
+    }
+
+    void Renderer::ClearColorRGBA(const glm::vec4& color) const
+    {
+        ClearColorRGBA(color.r, color.g, color.b, color.a);
     }
 
     void Renderer::_SwitchRendererIfNecessary(IRenderPlugin* nextRenderer)

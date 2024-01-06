@@ -59,6 +59,12 @@ namespace demo
         void Start();
         void Stop();
 
+        template<typename ListenerT>
+        void RegisterListener(ListenerT& listener)
+        {
+            _buttonEvent->operator+=(listener);
+        }
+
     private:
         glm::ivec2 _CalculateMarioPos(const std::shared_ptr<nador::UiTextLabel>& label) const noexcept;
 
@@ -82,6 +88,7 @@ namespace demo
         nador::onKey_listener_t _keyReleasedListener;
 
         std::shared_ptr<nador::ISoundSource> _music;
+        std::shared_ptr<nador::Event<size_t>> _buttonEvent;
     };
 
 } // namespace demo

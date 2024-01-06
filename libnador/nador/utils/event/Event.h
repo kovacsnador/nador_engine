@@ -93,7 +93,8 @@ namespace nador
          */
         void operator()(Args... args)
         {
-            for (auto it : _listeners)
+            auto tempListeners = _listeners;
+            for (auto it : tempListeners)
             {
                 it->operator()(args...);
             }
@@ -115,28 +116,40 @@ namespace nador
     };
 } // namespace nador
 
+#ifndef CREATE_EVENT_TYPE_ARG_0
 #define CREATE_EVENT_TYPE_ARG_0(NAME)                                                                                                                \
     using NAME##_event_t    = nador::Event<>;                                                                                                        \
     using NAME##_listener_t = nador::EventListener<>
+#endif
 
+#ifndef CREATE_EVENT_TYPE_ARG_1
 #define CREATE_EVENT_TYPE_ARG_1(NAME, ARG_1)                                                                                                         \
     using NAME##_event_t    = nador::Event<ARG_1>;                                                                                                   \
     using NAME##_listener_t = nador::EventListener<ARG_1>
+#endif
 
+#ifndef CREATE_EVENT_TYPE_ARG_2
 #define CREATE_EVENT_TYPE_ARG_2(NAME, ARG_1, ARG_2)                                                                                                  \
     using NAME##_event_t    = nador::Event<ARG_1, ARG_2>;                                                                                            \
     using NAME##_listener_t = nador::EventListener<ARG_1, ARG_2>
+#endif
 
+#ifndef CREATE_EVENT_TYPE_ARG_3
 #define CREATE_EVENT_TYPE_ARG_3(NAME, ARG_1, ARG_2, ARG_3)                                                                                           \
     using NAME##_event_t    = nador::Event<ARG_1, ARG_2, ARG_3>;                                                                                     \
     using NAME##_listener_t = nador::EventListener<ARG_1, ARG_2, ARG_3>
+#endif
 
+#ifndef CREATE_EVENT_TYPE_ARG_4
 #define CREATE_EVENT_TYPE_ARG_4(NAME, ARG_1, ARG_2, ARG_3, ARG_4)                                                                                    \
     using NAME##_event_t    = nador::Event<ARG_1, ARG_2, ARG_3, ARG_4>;                                                                              \
     using NAME##_listener_t = nador::EventListener<ARG_1, ARG_2, ARG_3, ARG_4>
+#endif
 
+#ifndef CREATE_EVENT_TYPE_ARG_5
 #define CREATE_EVENT_TYPE_ARG_5(NAME, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)                                                                             \
     using NAME##_event_t    = nador::Event<ARG_1, ARG_2, ARG_3, ARG_4, ARG_5>;                                                                       \
     using NAME##_listener_t = nador::EventListener<ARG_1, ARG_2, ARG_3, ARG_4, ARG_5>
+#endif
 
 #endif // !__NADOR_EVENT_H__

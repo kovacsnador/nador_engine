@@ -49,6 +49,17 @@ namespace nador
 	glm::vec4 GetPivot(const quadVertices_t& vertices);
 
 	glm::mat4 CreateModelMtxWithScale(const quadVertices_t& vertices, const glm::vec3& scale);
+
+	template<typename Vec2T>
+	quadVertices_t GenerateVertices(const Vec2T& size)
+	{
+		return {
+			0.0f,		0.0f,		1.0f, 1.0f,
+			size.x,		0.0f,		1.0f, 1.0f,
+			size.x,		size.y,		1.0f, 1.0f,
+			0.0f,		size.y,		1.0f, 1.0f,
+		};
+	}
 }
 
 #endif // !__UI_COMMON_H__

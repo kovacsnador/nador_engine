@@ -5,7 +5,7 @@
 
 #include "nador/system/IWindow.h"
 
-class SDL_Window;
+struct SDL_Window;
 
 namespace nador
 {

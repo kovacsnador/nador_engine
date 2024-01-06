@@ -47,6 +47,11 @@ set(NADOR_CXX_FLAGS             "${NADOR_CXX_FLAGS} -DDR_WAV_IMPLEMENTATION")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NADOR_CXX_FLAGS}")
 
+# If clang
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -femulated-tls")
+endif()
+
 set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -85,6 +90,11 @@ set(SDL_2_DIR dep/sdl2)
 option(NADOR_EIMAGE_NAME_PATH "Path to EImageName.h" "")
 
 add_library(${PROJECT_NAME} STATIC)
+
+# Link against pthread on MinGW
+if(MINGW)
+    target_link_libraries(${PROJECT_NAME} PRIVATE -pthread)
+endif()
 
 if(NOT ANDROID)
     add_subdirectory(${GLEW_DIR}/build/cmake)

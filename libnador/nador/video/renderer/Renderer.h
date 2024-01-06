@@ -54,6 +54,9 @@ namespace nador
         void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const override;
         void DisableScissor() const override;
 
+        void ClearColorRGBA(const glm::vec4& color) const override;
+        void ClearColorRGBA(float_t red, float_t green, float_t blue, float_t alpha) const override;
+
         uint32_t GetDrawCount() const noexcept override;
 
         void    SetCamera(std::unique_ptr<Camera> camera) noexcept override;

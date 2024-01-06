@@ -5,6 +5,7 @@
 demo::MainScreen::MainScreen(nador::IUiApp* uiApp, std::shared_ptr<nador::Font> font, std::shared_ptr<nador::ISoundSource> mainMusic)
 : _uiApp(uiApp)
 , _music(std::move(mainMusic))
+, _buttonEvent(std::make_shared<nador::Event<size_t>>())
 {
     _scene = std::make_shared<nador::UiScene>();
 
@@ -86,6 +87,9 @@ void demo::MainScreen::_OnKeyPressed(nador::EKeyCode keycode)
             _menuButtons[--selected]->Select(true);
             Audio::Play(Sound::SMB_KICK);
         }
+        break;
+    case nador::EKeyCode::ENTER:
+        _buttonEvent->operator()(selected);
         break;
     default:
         break;

@@ -1,16 +1,22 @@
 #include "Game.h"
 #include "Audio.h"
+#include "gameplay/Entity.h"
+#include "gameplay/Drawer.h"
+#include "utils/MapParser.h"
 
-demo::Game::Game(nador::IAppPtr app, MainScreen mainScreen)
+demo::Game::Game(nador::IAppPtr app, std::unique_ptr<MainScreen> mainScreen, std::unique_ptr<GameScreen> gameScreen)
 : _app(app)
 , _mainScreen(std::move(mainScreen))
+, _gameScreen(std::move(gameScreen))
+, _mainScreenEventListener(std::make_unique<nador::EventListener<size_t>>([this](size_t button) { _SwitchScreen(button); }))
 {
     StartGlobalListening();
+    _mainScreen->RegisterListener(*_mainScreenEventListener);
 }
 
 void demo::Game::OnAppStart()
 { 
-    _mainScreen.Start();
+    _mainScreen->Start();
 }
 
 void demo::Game::Suspend(bool suspend)
@@ -18,12 +24,12 @@ void demo::Game::Suspend(bool suspend)
     if(suspend)
     {
         StopGlobalListening();
-        _mainScreen.Stop();
+        _mainScreen->Stop();
     }
     else
     {
         StartGlobalListening();
-        _mainScreen.Start();
+        _mainScreen->Start();
     }
 }
 
@@ -32,12 +38,36 @@ bool demo::Game::IsSuspended()
     return !isListening();
 }
 
+void demo::Game::_SwitchScreen(size_t button)
+{
+    if(button == 0)
+    {
+        _mainScreen->Stop();
+        _gameScreen->Start();
+    }
+}
+
 std::unique_ptr<demo::Game> demo::CreateGame(nador::IAppPtr app)
 {
     auto font = app->GetFontController()->GetFont(Fonts::SUPER_MARIO_BROS_3, FontSize::MEDIUM);
     auto soundCtrl = app->GetSoundController();
     Audio::Init(soundCtrl);
 
-    MainScreen mainScreen(app->GetUiApp(), font, soundCtrl->CreateSoundSource(Sound::MARIO_THEME));
-    return std::make_unique<Game>(app, mainScreen);
+    auto mainScreen = std::make_unique<MainScreen>(app->GetUiApp(), font, soundCtrl->CreateSoundSource(Sound::MARIO_THEME));
+
+    std::vector<GameElement> elements;
+    elements.emplace_back(Entity<1>{glm::ivec2{0, 0}, nador::video::EImageName::BLOCKROW_1_COLUMN_1});
+
+    Map map{elements};
+
+    Drawer drawer{app->GetAtlasController()};
+
+    World world{map, drawer};
+    auto gameScreen = std::make_unique<GameScreen>(world);
+
+    auto fileCtrl = app->GetFileController();
+    auto fileData = fileCtrl->Read("res/mario_maps/mario_world_1.txt");
+    MapParser mp(fileData.value());
+    
+    return std::make_unique<Game>(app, std::move(mainScreen), std::move(gameScreen));
 }

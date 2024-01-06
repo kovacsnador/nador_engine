@@ -5,6 +5,8 @@
 #include "nador/common/GlobalListener.h"
 
 #include "screens/MainScreen.h"
+#include "screens/GameScreen.h"
+
 #include "Assets.h"
 
 namespace demo
@@ -12,7 +14,7 @@ namespace demo
     class Game : protected nador::GlobalListener 
     {
     public:
-        Game(nador::IAppPtr app, MainScreen mainScreen);
+        Game(nador::IAppPtr app, std::unique_ptr<MainScreen> mainScreen, std::unique_ptr<GameScreen> gameScreen);
 
         void OnAppStart() override;
 
@@ -21,9 +23,14 @@ namespace demo
         bool IsSuspended();
 
     private:
+        void _SwitchScreen(size_t button);
+
         nador::IAppPtr _app;
 
-        MainScreen _mainScreen;
+        std::unique_ptr<MainScreen> _mainScreen;
+        std::unique_ptr<GameScreen> _gameScreen;
+
+        std::unique_ptr<nador::EventListener<size_t>> _mainScreenEventListener;
     };
 
     std::unique_ptr<Game> CreateGame(nador::IAppPtr app);

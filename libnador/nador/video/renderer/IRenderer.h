@@ -29,6 +29,8 @@ namespace nador
         virtual void    SetCamera(std::unique_ptr<Camera> camera) noexcept = 0;
         virtual Camera* GetCamera() const noexcept                         = 0;
 
+        virtual void ClearColorRGBA(const glm::vec4& color) const = 0;
+        virtual void ClearColorRGBA(float_t red, float_t green, float_t blue, float_t alpha) const = 0;
         virtual void SetScissor(const glm::ivec2& position, const glm::ivec2& size) const = 0;
         virtual void DisableScissor() const                                               = 0;
 

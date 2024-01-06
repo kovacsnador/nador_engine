@@ -53,13 +53,7 @@ namespace nador
 	quadVertices_t UiApp::GetScreenVertices() const
 	{
 		const glm::vec2& scrennSize = GetScreenSize();
-
-		return {
-			0.0f,			0.0f,			1.0f, 1.0f,
-			scrennSize.x,	0.0f,			1.0f, 1.0f,
-			scrennSize.x,	scrennSize.y,	1.0f, 1.0f,
-			0.0f,			scrennSize.y,	1.0f, 1.0f,
-		};
+		return GenerateVertices(scrennSize);
 	}
 
 	void UiApp::AddElementToLayer(EUiLayer eLayer, IUiElement* elem)

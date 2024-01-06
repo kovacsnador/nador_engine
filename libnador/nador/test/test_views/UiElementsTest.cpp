@@ -87,7 +87,7 @@ namespace nador
 
         if (font)
         {
-            _uiButtonWithText->SetUiTextLabel(font, "Text\nText");
+            _uiButtonWithText->SetUiTextLabel(font, "Text\nLongerText");
         }
 
         _uiRoundEdgeOverlay.reset(new UiRoundEdgeOverlay({ 250, 250 }, { 100, 250 }, { 1.0f, 1.0f, 0.0f, .3f }));

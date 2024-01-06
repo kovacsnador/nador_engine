@@ -58,13 +58,13 @@ TEST_P(ThreadPoolTest, Destructor_Test)
     auto testFuncion = [count = GetParam()] {
         nador::ThreadPool threadPool(std::thread::hardware_concurrency());
 
-        std::atomic_size_t count { 0 };
+        std::atomic_size_t c { 0 };
 
         std::vector<std::future<void>> futures;
 
         for (size_t i = 0; i < GetParam(); ++i)
         {
-            auto future = threadPool.Enqueue([&count] { count++; }, nador::ETaskPriority::VERY_HIGH);
+            auto future = threadPool.Enqueue([&c] () mutable { c++; }, nador::ETaskPriority::VERY_HIGH);
             futures.emplace_back(std::move(future));
         }
     };
