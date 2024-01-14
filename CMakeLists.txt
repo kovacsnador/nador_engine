@@ -49,6 +49,8 @@ target_sources(${PROJECT_NAME}
     ${DEMO_SOURCE_FOLDER}/screens/GameScreen.cpp
     ${DEMO_SOURCE_FOLDER}/gameplay/Map.cpp
     ${DEMO_SOURCE_FOLDER}/gameplay/World.cpp
+    ${DEMO_SOURCE_FOLDER}/gameplay/Mario.cpp
+    ${DEMO_SOURCE_FOLDER}/gameplay/Block.cpp
     ${DEMO_SOURCE_FOLDER}/Common.cpp
 )
 

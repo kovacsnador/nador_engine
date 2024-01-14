@@ -55,19 +55,16 @@ std::unique_ptr<demo::Game> demo::CreateGame(nador::IAppPtr app)
 
     auto mainScreen = std::make_unique<MainScreen>(app->GetUiApp(), font, soundCtrl->CreateSoundSource(Sound::MARIO_THEME));
 
-    std::vector<GameElement> elements;
-    elements.emplace_back(Entity<1>{glm::ivec2{0, 0}, nador::video::EImageName::BLOCKROW_1_COLUMN_1});
+    auto fileCtrl = app->GetFileController();
+    auto fileData = fileCtrl->Read("res/mario_maps/mario_world_1.txt");
+    MapParser mapParser(fileData.value());
 
-    Map map{elements};
+    Map map{mapParser.GetMap()};
 
     Drawer drawer{app->GetAtlasController()};
 
-    World world{map, drawer};
+    World world{map, drawer, mapParser.GetMarioStartPosition()};
     auto gameScreen = std::make_unique<GameScreen>(world);
-
-    auto fileCtrl = app->GetFileController();
-    auto fileData = fileCtrl->Read("res/mario_maps/mario_world_1.txt");
-    MapParser mp(fileData.value());
     
     return std::make_unique<Game>(app, std::move(mainScreen), std::move(gameScreen));
 }

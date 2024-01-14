@@ -19,4 +19,9 @@ namespace demo
         _world.OnRender(renderer);
     }
 
+    void GameScreen::OnKeyPressed(nador::EKeyCode keyCode)
+    {
+        _world.OnKeyPressed(keyCode);
+    }
+
 } // namespace demo

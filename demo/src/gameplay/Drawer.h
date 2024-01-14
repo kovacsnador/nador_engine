@@ -29,7 +29,7 @@ namespace demo
             NADOR_ASSERT(size.x > 0);
             NADOR_ASSERT(size.y > 0);
             
-            _size = size; 
+            _size = size;
         }
 
         template<size_t N>
@@ -39,7 +39,6 @@ namespace demo
             auto screenVertices = nador::GenerateVertices(screenSize);
             std::for_each(std::begin(entity.tiles), std::end(entity.tiles), [this, renderer, &screenVertices](const auto& tile){ _Draw(renderer, screenVertices, tile); });
         }
-
 
     private:
         void _Draw(nador::IRenderer* renderer, const nador::quadVertices_t& screenVertices, const Tile& tile)

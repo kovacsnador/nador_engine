@@ -54,6 +54,8 @@ namespace demo
         void OnTick(float_t) override;
         void OnRender(nador::IRenderer* renderer) override;
 
+        void OnKeyPressed(nador::EKeyCode keyCode) override;
+
     private:
         World _world;
 
