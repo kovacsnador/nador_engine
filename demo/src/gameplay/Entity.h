@@ -13,12 +13,12 @@ namespace demo
 {
     struct Tile
     {
-        glm::ivec2               pos;
+        glm::vec2               pos;
         nador::video::EImageName imageName;
 
-        bool IsCollide(const glm::ivec2& p, const glm::ivec2& size = { 40, 40 })
+        bool IsCollide(const glm::vec2& p, const glm::vec2& size = { 40, 40 }) const
         {
-            return (p.x >= pos.x && p.x <= pos.x + size.x && p.y >= pos.y && p.y <= pos.y + size.y);
+            return (p.x > pos.x && p.x < pos.x + size.x && p.y > pos.y && p.y < pos.y + size.y);
         }
     };
 
@@ -27,15 +27,18 @@ namespace demo
     {
         std::array<Tile, N> tiles;
 
-        void Move(const glm::ivec2& move)
+        void Move(const glm::vec2& move)
         {
             std::for_each(tiles.begin(), tiles.end(), [&move](auto& t) { t.pos += move; });
         }
 
-        bool IsCollide(const glm::ivec2& from, const glm::ivec2& to, glm::ivec2 size = { 40, 40 })
+        std::tuple<bool, glm::vec2> IsCollide(const glm::vec2& from, const glm::vec2& to, glm::vec2 size = { 40, 40 }) const
         {
+            glm::vec2 destination = to;
+
             // Calculate direction vector
-            glm::ivec2 direction = from - to;
+            //glm::vec2 direction = from - to;
+            glm::vec2 direction = to - from;
 
             // Calculate the distance between the two points
             float distance = glm::length(glm::vec2(direction));
@@ -47,17 +50,49 @@ namespace demo
             auto numPoints = static_cast<int>(distance) + 1;
 
             bool collide { false };
-            std::for_each(tiles.begin(), tiles.end(), [&to, &size, &collide, numPoints, normalizedDirection](const auto& t) {
+            std::for_each(tiles.begin(), tiles.end(), [&destination, &from, /*&to,*/ &size, &collide, numPoints, normalizedDirection](const auto& t) mutable {
                 // Calculate and print intermediate points
                 for (int i = 0; i < numPoints && collide == false; ++i)
                 {
                     // Calculate interpolated point
-                    glm::ivec2 interpolatedPoint = to + glm::ivec2{i * normalizedDirection.x, i * normalizedDirection.y}; 
-                    collide = t.IsCollide(interpolatedPoint, size);
+                    //glm::vec2 interpolatedPoint = to + glm::vec2{i * normalizedDirection.x, i * normalizedDirection.y};
+                    glm::vec2 interpolatedPoint = from + glm::vec2{i * normalizedDirection.x, i * normalizedDirection.y};
+
+                    // top left
+                    collide |= t.IsCollide(interpolatedPoint, size);
+                    
+                    // bottom right
+                    collide |= t.IsCollide(interpolatedPoint + size, size);
+
+                    // top right
+                    collide |= t.IsCollide(interpolatedPoint + glm::vec2{size.x, 0}, size);
+                    
+                    // bottom left
+                    collide |= t.IsCollide(interpolatedPoint + glm::vec2{0, size.y}, size);
+
+                    if(collide == false)
+                    {
+                        destination = interpolatedPoint;
+                    }
                 }
             });
 
-            return collide;
+            return {collide, destination};
+        }
+        
+        template<size_t M>
+        std::tuple<bool, glm::vec2> IsCollide(const Entity<M>& other, const glm::vec2& move, glm::vec2 size = { 40, 40 }) const
+        {
+            for(const auto& it : other.tiles)
+            {
+                auto [collide, pos] = IsCollide(it.pos, it.pos + move, size);
+
+                if(collide)
+                {
+                    return {collide, pos - it.pos};
+                }
+            }
+            return {false, move};
         }
     };
 

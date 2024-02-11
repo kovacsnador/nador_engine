@@ -1,9 +1,12 @@
 #ifndef __NADOR_DEMO_WORLD_H__
 #define __NADOR_DEMO_WORLD_H__
 
+#include <vector>
+
 #include "Map.h"
 #include "Drawer.h"
 #include "Mario.h"
+#include "ObjectMovement.h"
 
 #include "nador/common/KeyCodes.h"
 
@@ -16,12 +19,13 @@ namespace demo
         : _map(map)
         , _drawer(std::move(drawer))
         , _backgroundColor(bgcolor)
-        , _mario(marioStartPos)
+        , _mario(marioStartPos, nador::g_onTickEvent)
         {
         }
 
         void OnRender(nador::IRenderer* renderer);
         void OnKeyPressed(nador::EKeyCode keyCode);
+        void OnKeyReleased(nador::EKeyCode keyCode);
 
     private:
         Map       _map;
@@ -29,6 +33,13 @@ namespace demo
         glm::vec4 _backgroundColor;
 
         Mario _mario;
+
+        /*std::vector<ObjectMovement<Mario>> _movements;
+
+        std::unordered_map<nador::EKeyCode, std::unique_ptr<ObjectMovement<Mario>>> _marioMovements;
+        std::unique_ptr<ObjectMovement<Mario>> _marioTeardownMovement;*/
+
+
     };
 } // namespace demo
 

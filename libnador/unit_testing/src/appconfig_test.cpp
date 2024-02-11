@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "nador/config/AppConfig.h"
 
@@ -12,7 +13,7 @@ class NadorConfigTest : public ::testing::TestWithParam<NadorConfigTestValue>
 {
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     NadorConfigTest,
     NadorConfigTest,
     ::testing::Values(

@@ -46,7 +46,7 @@ void demo::MainScreen::Start()
 
     if (_music)
     {
-        _music->Play();
+        //_music->Play();
     }
 }
 

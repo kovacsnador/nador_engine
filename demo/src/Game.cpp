@@ -64,7 +64,7 @@ std::unique_ptr<demo::Game> demo::CreateGame(nador::IAppPtr app)
     Drawer drawer{app->GetAtlasController()};
 
     World world{map, drawer, mapParser.GetMarioStartPosition()};
-    auto gameScreen = std::make_unique<GameScreen>(world);
+    auto gameScreen = std::make_unique<GameScreen>(std::move(world));
     
     return std::make_unique<Game>(app, std::move(mainScreen), std::move(gameScreen));
 }

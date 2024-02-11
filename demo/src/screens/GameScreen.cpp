@@ -24,4 +24,9 @@ namespace demo
         _world.OnKeyPressed(keyCode);
     }
 
+    void GameScreen::OnKeyReleased(nador::EKeyCode keyCode)
+    {
+         _world.OnKeyReleased(keyCode);
+    }
+
 } // namespace demo

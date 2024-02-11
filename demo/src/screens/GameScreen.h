@@ -55,6 +55,7 @@ namespace demo
         void OnRender(nador::IRenderer* renderer) override;
 
         void OnKeyPressed(nador::EKeyCode keyCode) override;
+        void OnKeyReleased(nador::EKeyCode keyCode) override;
 
     private:
         World _world;
