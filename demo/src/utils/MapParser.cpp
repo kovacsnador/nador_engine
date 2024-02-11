@@ -30,15 +30,15 @@ namespace demo
                 rightShift(currentPosition);
                 break;
             case 'G':   // ground
-                _map.push_back(Entity<1>{currentPosition, nador::video::EImageName::BLOCKROW_1_COLUMN_5});
+                _map.push_back(Entity<1>{currentPosition, {tileSize, tileSize}, nador::video::EImageName::BLOCKROW_1_COLUMN_5});
                 rightShift(currentPosition);
                 break;
             case 'B':   // block
-                _map.push_back(Entity<1>{currentPosition, nador::video::EImageName::BLOCKROW_1_COLUMN_2});
+                _map.push_back(Entity<1>{currentPosition, {tileSize, tileSize}, nador::video::EImageName::BLOCKROW_1_COLUMN_2});
                 rightShift(currentPosition);
                 break; 
             case 'C':   // coin
-                _map.push_back(Entity<1>{currentPosition, nador::video::EImageName::BLOCKROW_2_COLUMN_10});
+                _map.push_back(Entity<1>{currentPosition, {tileSize, tileSize}, nador::video::EImageName::BLOCKROW_2_COLUMN_10});
                 rightShift(currentPosition); 
                 break;
             case 'M':   // mario position

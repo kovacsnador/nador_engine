@@ -4,6 +4,7 @@
 #include <array>
 #include <algorithm>
 #include <variant>
+#include <tuple>
 
 #include "nador/utils/Types.h"
 
@@ -13,86 +14,74 @@ namespace demo
 {
     struct Tile
     {
-        glm::vec2               pos;
-        nador::video::EImageName imageName;
+        glm::vec2                   pos;
+        glm::vec2                   size{40, 40};
+        nador::video::EImageName    imageName;
 
-        bool IsCollide(const glm::vec2& p, const glm::vec2& size = { 40, 40 }) const
+        bool IsOverlapping(const Tile& other) const noexcept
         {
-            return (p.x > pos.x && p.x < pos.x + size.x && p.y > pos.y && p.y < pos.y + size.y);
+            // Check for overlap in each dimension (x and y)
+            bool overlapX = pos.x + size.x - 1 > other.pos.x && pos.x < other.pos.x + other.size.x - 1;
+            bool overlapY = pos.y + size.y - 1 > other.pos.y && pos.y < other.pos.y + other.size.y - 1;
+
+            // If there's overlap in both dimensions, the tiles are overlapping
+            return overlapX && overlapY;
+        }
+
+        bool operator==(const Tile& other) const noexcept
+        {
+            return std::tie(pos, size, imageName) == std::tie(other.pos, other.size, other.imageName);
         }
     };
 
     template <size_t N>
     struct Entity
     {
+        static_assert(N > 0);
+
         std::array<Tile, N> tiles;
+
+        glm::vec2 GetPosition()
+        {
+            // gets the first tile position
+            return tiles.begin()->pos;
+        }
+
+        template<size_t OtherN>
+        bool operator==(const Entity<OtherN>& other)
+        {
+            if constexpr (OtherN == N)
+            {
+                return other.tiles == tiles;
+            }
+            return false;
+        }
 
         void Move(const glm::vec2& move)
         {
             std::for_each(tiles.begin(), tiles.end(), [&move](auto& t) { t.pos += move; });
         }
 
-        std::tuple<bool, glm::vec2> IsCollide(const glm::vec2& from, const glm::vec2& to, glm::vec2 size = { 40, 40 }) const
+        void SetPosition(const glm::vec2& newPos)
         {
-            glm::vec2 destination = to;
+            auto movement = newPos - GetPosition();
+            Move(movement);
+        }
 
-            // Calculate direction vector
-            //glm::vec2 direction = from - to;
-            glm::vec2 direction = to - from;
-
-            // Calculate the distance between the two points
-            float distance = glm::length(glm::vec2(direction));
-
-            // Normalize the direction vector
-            glm::vec2 normalizedDirection = glm::normalize(glm::vec2(direction));
-
-            // Number of points to generate (pixel by pixel)
-            auto numPoints = static_cast<int>(distance) + 1;
-
-            bool collide { false };
-            std::for_each(tiles.begin(), tiles.end(), [&destination, &from, /*&to,*/ &size, &collide, numPoints, normalizedDirection](const auto& t) mutable {
-                // Calculate and print intermediate points
-                for (int i = 0; i < numPoints && collide == false; ++i)
+        template<size_t M>
+        bool CheckCollision(const Entity<M>& other) const noexcept
+        {
+            for(const auto& tile1 : other.tiles)
+            {
+                for(const auto& tile2 : tiles)
                 {
-                    // Calculate interpolated point
-                    //glm::vec2 interpolatedPoint = to + glm::vec2{i * normalizedDirection.x, i * normalizedDirection.y};
-                    glm::vec2 interpolatedPoint = from + glm::vec2{i * normalizedDirection.x, i * normalizedDirection.y};
-
-                    // top left
-                    collide |= t.IsCollide(interpolatedPoint, size);
-                    
-                    // bottom right
-                    collide |= t.IsCollide(interpolatedPoint + size, size);
-
-                    // top right
-                    collide |= t.IsCollide(interpolatedPoint + glm::vec2{size.x, 0}, size);
-                    
-                    // bottom left
-                    collide |= t.IsCollide(interpolatedPoint + glm::vec2{0, size.y}, size);
-
-                    if(collide == false)
+                    if(tile1.IsOverlapping(tile2))
                     {
-                        destination = interpolatedPoint;
+                        return true;
                     }
                 }
-            });
-
-            return {collide, destination};
-        }
-        
-        template<size_t M>
-        std::tuple<bool, glm::vec2> IsCollide(const Entity<M>& other, const glm::vec2& move, glm::vec2 size = { 40, 40 }) const
-        {
-            for(const auto& it : other.tiles)
-            {
-                auto [collide, pos] = IsCollide(it.pos, it.pos + move, size);
-
-                if(collide)
-                {
-                    return {collide, pos - it.pos};
-                }
             }
-            return {false, move};
+            return false;
         }
     };
 

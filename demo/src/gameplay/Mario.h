@@ -5,6 +5,8 @@
 
 #include "Entity.h"
 #include "ObjectMovement.h"
+#include "CollisionDetector.h"
+#include "Map.h"
 
 namespace demo
 {
@@ -23,28 +25,31 @@ namespace demo
 
     struct Mario : public Entity<1>
     {
-        Mario(glm::ivec2 position, nador::onTick_event_t& event);
+        Mario(glm::ivec2 position, glm::ivec2 size, nador::onTick_event_t& event, CollisionDetector<Map> collisionDetector);
 
-        Mario(Mario&&)            = default;
-        Mario& operator=(Mario&&) = default;
+        Mario(Mario&&) = default;
 
-        void MoveForward(const std::vector<GameElement>& map);
-        void MoveBackward(const std::vector<GameElement>& map);
-        void Stop(const std::vector<GameElement>& map);
-        void Jump(const std::vector<GameElement>& map);
-        void JumpTeardown(const std::vector<GameElement>& map);
+        void MoveForward();
+        void MoveBackward();
+        void Stop();
+        void Jump();
+        void JumpTeardown();
 
     private:
-        void MoveForDirection(glm::vec2 direction, const std::vector<GameElement>& map);
-        void Stop(glm::vec2 direction, const std::vector<GameElement>& map);
+        using ObjectMovement_t = ObjectMovement<Mario, CollisionDetector<Map>>;
 
-        std::unordered_map<glm::vec2, std::unique_ptr<ObjectMovement<Mario>>, Vec2Hash> _movements;
-        std::unique_ptr<ObjectMovement<Mario>>                                          _teardownMovement;
-        std::unique_ptr<ObjectMovement<Mario>>                                          _teardownJump;
+        void MoveForDirection(glm::vec2 direction);
+        void Stop(glm::vec2 direction);
+
+        std::unordered_map<glm::vec2, std::unique_ptr<ObjectMovement_t>, Vec2Hash> _movements;
+        std::unique_ptr<ObjectMovement_t>                                          _teardownMovement;
+        std::unique_ptr<ObjectMovement_t>                                          _teardownJump;
 
         nador::onTick_event_t* _onTickEvent;
 
-        //ObjectMovement<Mario> _gravity;
+        //ObjectMovement_t _gravity;
+
+        CollisionDetector<Map> _collisionDetector;
     };
 
     struct BigMario : Entity<2>

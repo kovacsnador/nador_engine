@@ -59,11 +59,13 @@ std::unique_ptr<demo::Game> demo::CreateGame(nador::IAppPtr app)
     auto fileData = fileCtrl->Read("res/mario_maps/mario_world_1.txt");
     MapParser mapParser(fileData.value());
 
-    Map map{mapParser.GetMap()};
+    auto map = std::make_shared<Map>(mapParser.GetMap());
 
     Drawer drawer{app->GetAtlasController()};
 
-    World world{map, drawer, mapParser.GetMarioStartPosition()};
+    CollisionDetector collisionDetector{map};
+
+    World world{map, drawer, mapParser.GetMarioStartPosition(), collisionDetector};
     auto gameScreen = std::make_unique<GameScreen>(std::move(world));
     
     return std::make_unique<Game>(app, std::move(mainScreen), std::move(gameScreen));

@@ -8,7 +8,7 @@ namespace demo
     class Block : public Entity<1>
     {
     public:
-        Block(glm::ivec2 position, nador::video::EImageName img);
+        Block(glm::ivec2 position, glm::ivec2 size, nador::video::EImageName img);
     };
 } // namespace demo
 

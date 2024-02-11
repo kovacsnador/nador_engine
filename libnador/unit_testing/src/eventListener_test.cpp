@@ -23,7 +23,7 @@ TEST(EventTest, SimpleEventTest)
     EXPECT_TRUE(fired);
 }
 
-INSTANTIATE_TEST_CASE_P(EventTest, EventTest, ::testing::Values(1, 10, 100));
+INSTANTIATE_TEST_SUITE_P(EventTest, EventTest, ::testing::Values(1, 10, 100));
 
 TEST_P(EventTest, MultiListenersEventTest)
 {

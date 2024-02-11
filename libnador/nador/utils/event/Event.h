@@ -96,7 +96,10 @@ namespace nador
             auto tempListeners = _listeners;
             for (auto it : tempListeners)
             {
-                it->operator()(args...);
+                if(_listeners.find(it) != _listeners.end())
+                {
+                    it->operator()(args...);
+                }
             }
         }
 

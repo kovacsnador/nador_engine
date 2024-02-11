@@ -2,24 +2,27 @@
 
 namespace demo
 {
-    Mario::Mario(glm::ivec2 position, nador::onTick_event_t& event)
-    : Entity<1>({ position, nador::video::EImageName::MARIO1 })
+    static Momentum s_gravityMomentum{ { 0, 1 }, 3000, 3000, 0};
+
+    Mario::Mario(glm::ivec2 position, glm::ivec2 size, nador::onTick_event_t& event, CollisionDetector<Map> collisionDetector)
+    : Entity<1>({ position, size, nador::video::EImageName::MARIO1 })
     , _onTickEvent(&event)
-    //, _gravity()
+    //, _gravity(*this, s_gravityMomentum, LinearAccelerationWithLimit, *_onTickEvent, nullptr, nullptr)
+    , _collisionDetector(collisionDetector)
     {
     }
 
-    void Mario::MoveForward(const std::vector<GameElement>& map)
+    void Mario::MoveForward()
     {
-        MoveForDirection({ 1, 0 }, map);
+        MoveForDirection({ 1, 0 });
     }
 
-    void Mario::MoveBackward(const std::vector<GameElement>& map)
+    void Mario::MoveBackward()
     {
-        MoveForDirection({ -1, 0 }, map);
+        MoveForDirection({ -1, 0 });
     }
 
-    void Mario::Stop(const std::vector<GameElement>& map)
+    void Mario::Stop()
     {
         if(_movements.find({-1, 0}) != _movements.end() && _movements.find({1, 0}) != _movements.end())
         {
@@ -28,26 +31,25 @@ namespace demo
             return;
         }
 
-        Stop({ -1, 0 }, map);
-        Stop({ 1, 0 }, map);
+        Stop({ -1, 0 });
+        Stop({ 1, 0 });
     }
 
-    void Mario::Jump(const std::vector<GameElement>& map)
+    void Mario::Jump()
     {
-        auto collisionCb = GenerateCollisionCb<Entity<1>>(map);
-        
-
-        Momentum momentum { { 0, -1 }, 1, 1000.05f, 1000 };
-        auto movement = std::make_unique<ObjectMovement<Mario>>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, [this, &map](float_t velocity) {
-            JumpTeardown(map);
-        }, collisionCb);
-        _movements.insert_or_assign({ 0, -1 }, std::move(movement));
+        glm::vec2 direction{0, -1}; 
+        if(_movements.contains(direction) == false && _teardownJump == nullptr)
+        {
+            Momentum momentum { direction, 1, 1000.05f, 1000 };
+            auto movement = std::make_unique<ObjectMovement_t>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, [this](float_t) {
+                JumpTeardown();
+            }, _collisionDetector );
+            _movements.insert_or_assign(direction, std::move(movement));
+        }
     }
 
-    void Mario::JumpTeardown(const std::vector<GameElement>& map)
+    void Mario::JumpTeardown()
     {
-        auto collisionCb = GenerateCollisionCb<Entity<1>>(map);
-
         float_t acceleration = 3000;
 
         auto iter = _movements.find({0, -1});
@@ -56,35 +58,31 @@ namespace demo
             auto velocity = iter->second->GetVelocity();
             
             Momentum momentum { { 0, -1 }, acceleration, 0, velocity };
-            auto movement = std::make_unique<ObjectMovement<Mario>>(*this, momentum, LinearDecelerationWithLimit, *_onTickEvent, [this, collisionCb](float_t velocity) {
-                Momentum momentum { { 0, 1 }, 3000, 3000, velocity};
-                _teardownJump = std::make_unique<ObjectMovement<Mario>>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, [this](float_t) {
+            auto movement = std::make_unique<ObjectMovement_t>(*this, momentum, LinearDecelerationWithLimit, *_onTickEvent, [this](float_t velocity) {
+                Momentum momentum { { 0, 1 }, 3000, 300000, velocity};
+                _teardownJump = std::make_unique<ObjectMovement_t>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, [this](float_t) {
                     _teardownJump.reset();
-                }, collisionCb);
-            }, collisionCb);
+                }, _collisionDetector);
+            }, _collisionDetector);
 
             _teardownJump = std::move(movement);
             _movements.erase({ 0, -1 });
         }
     }
 
-    void Mario::MoveForDirection(glm::vec2 direction, const std::vector<GameElement>& map)
+    void Mario::MoveForDirection(glm::vec2 direction)
     {
-        auto collisionCb = GenerateCollisionCb<Entity<1>>(map);
-
         float_t acceleration  = 1000;
         float_t maxVelocity   = 400;
         float_t startVelocity = 0;
 
         Momentum momentum { direction, acceleration, maxVelocity, startVelocity };
-        auto     movement = std::make_unique<ObjectMovement<Mario>>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, nullptr, collisionCb);
+        auto     movement = std::make_unique<ObjectMovement_t>(*this, momentum, LinearAccelerationWithLimit, *_onTickEvent, nullptr, _collisionDetector);
         _movements.insert_or_assign(direction, std::move(movement));
     }
 
-    void Mario::Stop(glm::vec2 direction, const std::vector<GameElement>& map)
+    void Mario::Stop(glm::vec2 direction)
     {
-        auto collisionCb = GenerateCollisionCb<Entity<1>>(map);
-
         float_t acceleration  = 2000;
         float_t maxVelocity   = 0;
         float_t startVelocity = 400;
@@ -96,8 +94,8 @@ namespace demo
             _movements.erase(iter);
 
             Momentum momentum { direction, acceleration, maxVelocity, startVelocity };
-            _teardownMovement = std::make_unique<ObjectMovement<Mario>>(
-                *this, momentum, LinearDecelerationWithLimit, *_onTickEvent, [this](float_t) { _teardownMovement.reset(); }, collisionCb);
+            _teardownMovement = std::make_unique<ObjectMovement_t>(
+                *this, momentum, LinearDecelerationWithLimit, *_onTickEvent, [this](float_t) { _teardownMovement.reset(); }, _collisionDetector);
         }
     }
 

@@ -7,7 +7,7 @@ namespace demo
         renderer->ClearColorRGBA(_backgroundColor);
 
         // render map
-        const auto& mapData = _map.GetMap();
+        const auto& mapData = _map->GetMap();
         std::for_each(mapData.begin(), mapData.end(), [this, renderer](const GameElement& e) {
             std::visit([this, renderer](const auto& entity) { _drawer(renderer, entity); }, e);
         });
@@ -25,7 +25,7 @@ namespace demo
         switch (keyCode)
         {
         case nador::EKeyCode::SPACE:
-            _mario.Jump(_map.GetMap());
+            _mario.Jump();
             /*{
                 Momentum momentum { { 0, -1 }, 3000, 0, 1000};
                 auto movement = std::make_unique<ObjectMovement<Mario>>(_mario, momentum, LinearDecelerationWithLimit, nador::g_onTickEvent, [this]() {
@@ -37,7 +37,7 @@ namespace demo
             }*/
             break;
         case nador::EKeyCode::LEFT:
-            _mario.MoveBackward(_map.GetMap());
+            _mario.MoveBackward();
             /*{
                 Momentum momentum { { -1., 0 }, acceleration, maxVelocity, startVelocity};
                 auto movement = std::make_unique<ObjectMovement<Mario>>(_mario, momentum, LinearAccelerationWithLimit, nador::g_onTickEvent);
@@ -46,7 +46,7 @@ namespace demo
 
             break;
         case nador::EKeyCode::RIGHT:
-            _mario.MoveForward(_map.GetMap());
+            _mario.MoveForward();
             /*{
                 Momentum momentum { { 1., 0 }, acceleration, maxVelocity, startVelocity};
                 auto movement = std::make_unique<ObjectMovement<Mario>>(_mario, momentum, LinearAccelerationWithLimit, nador::g_onTickEvent);
@@ -73,7 +73,7 @@ namespace demo
         switch (keyCode)
         {
         case nador::EKeyCode::SPACE:
-            _mario.JumpTeardown(_map.GetMap());
+            _mario.JumpTeardown();
             /*{
                 Momentum momentum { { 0, -1 }, 3000, 0, 1000};
                 auto movement = std::make_unique<ObjectMovement<Mario>>(_mario, momentum, LinearDecelerationWithLimit, nador::g_onTickEvent, [this]() {
@@ -85,7 +85,7 @@ namespace demo
             }*/
             break;
         case nador::EKeyCode::LEFT:
-            _mario.Stop(_map.GetMap());
+            _mario.Stop();
             /*{   
                 _marioMovements.erase(keyCode);
                 Momentum momentum { { -1, 0 }, acceleration, maxVelocity, startVelocity};
@@ -93,7 +93,7 @@ namespace demo
             }*/
             break;
         case nador::EKeyCode::RIGHT:
-            _mario.Stop(_map.GetMap());
+            _mario.Stop();
             /*{
                 _marioMovements.erase(keyCode);
                 Momentum momentum { { 1., 0 }, acceleration, maxVelocity, startVelocity};
